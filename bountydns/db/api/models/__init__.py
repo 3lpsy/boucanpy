@@ -16,4 +16,3 @@ for directory_name, sub_directories, files in walk(models_dir):
             model = getattr(module, class_name)
             if model not in models:
                 models.append(model)
-print(models)

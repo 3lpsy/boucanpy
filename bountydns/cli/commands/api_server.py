@@ -30,14 +30,14 @@ class ApiServer(BaseCommand):
         return parser
 
     def run(self):
-        args = ["bountydns.api.server.main:api"]
+        args = ["bountydns.api.main:api"]
         kwargs = self.get_kwargs()
         load_env("db")
         load_env("api")
 
         if self.option("import_check", False):
             logger.info("performing import check")
-            from bountydns.api.server.main import api
+            from bountydns.api.main import api
         logger.critical("starting api server with options: {}".format(str(kwargs)))
         return uvicorn.run(*args, **kwargs)
 

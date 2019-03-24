@@ -14,7 +14,7 @@ class ApiUrls(BaseCommand):
     def run(self):
         load_env("db")
         load_env("api")
-        from bountydns.api.server.main import api
+        from bountydns.api.main import api
 
         for route in api.routes:
             print(route.name, route.path)

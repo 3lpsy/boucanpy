@@ -1,18 +1,19 @@
 from pathlib import Path
 from dotenv import load_dotenv
 from bountydns.core.utils import root_dir
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
+
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 
 from bountydns.core import logger
-from bountydns.api.server.routers import routers
+from bountydns.api.routers import routers
 from bountydns.db.session import session, db_register
 from bountydns.db.utils import make_db_url
 
 db_register("api", make_db_url("api"))
 
-from bountydns.api.server import config  # environment must be loaded
+from bountydns.api import config  # environment must be loaded
 
 # CORS
 api = FastAPI(title=config.API_PROJECT_NAME, openapi_url="/api/v1/openapi.json")
@@ -34,9 +35,13 @@ if config.API_CORS_ORIGINS:
         allow_headers=["*"],
     ),
 
+main_router = APIRouter()
+
 for r, ropts in routers:
     logger.debug(f"registering router {str(r)} {str(ropts)}")
-    api.include_router(r, **ropts)
+    main_router.include_router(r, **ropts)
+
+api.include_router(main_router, prefix=config.API_V1_STR)
 
 
 @api.middleware("http")

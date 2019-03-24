@@ -37,12 +37,6 @@ def api_dir(path=None):
     return _ajoin(api_dir(), path)
 
 
-def api_server_dir(path=None):
-    if not path:
-        return api_dir("server")
-    return _ajoin(api_server_dir(), path)
-
-
 def db_dir(path=None):
     if not path:
         return project_dir("db")
