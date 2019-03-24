@@ -22,7 +22,6 @@ class Resolver(BaseResolver):
                     zone = Record(zone_map, rr)
                     zones.append(zone)
                     logger.debug(' %2d: %s', len(zones), zone)
-
             except Exception as e:
                 raise RuntimeError(f'Error processing line ({e.__class__.__name__}: {e}) "{zone_map[0].strip()}"') from e
         logger.debug('%d zone resource records generated', len(zones))
@@ -40,7 +39,6 @@ class Resolver(BaseResolver):
         for record in self.zones:
             # Check if label & type match
             if record.match(request.q):
-                logger.warning("resolver: found match request {}:{} to name {}:{}".format(qtype,qname, record.type, record.name))
                 a = copy.copy(record.rr)
                 reply.add_answer(a)
         if reply.rr:

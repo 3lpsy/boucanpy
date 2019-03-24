@@ -1,1 +1,1 @@
-from .logger import logger
+from .logger import logger, set_log_level

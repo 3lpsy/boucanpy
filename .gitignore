@@ -1,6 +1,11 @@
 .vscode
-.env
+
+.env/*.env
+!.env/.gitkeep
+!.env/*.example
+
 .venv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -99,7 +104,6 @@ celerybeat-schedule
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/

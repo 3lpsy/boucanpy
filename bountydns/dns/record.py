@@ -24,5 +24,5 @@ class Record:
             logger.debug("record matcher: comparing request {}:{} to name {}:{}".format(QTYPE[q.qtype], q.qname, self.type, record_name))
             matched = q.qname.matchGlob(record_name)
         if matched:
-            logger.debug("record matcher: match found {}:{} to name {}:{}".format(QTYPE[q.qtype], q.qname, self.type, record_name))
+            logger.info("record matcher: match found {}:{} to name {}:{}".format(QTYPE[q.qtype], q.qname, self.type, record_name))
         return matched
