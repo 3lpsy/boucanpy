@@ -4,8 +4,8 @@ from bountydns.db.models.zone import Zone
 
 
 class ApiZonesList(BaseCommand):
-    name = "apizoneslist"
-    aliases = ["apizones"]
+    name = "api-zone-list"
+    aliases = ["api-zones"]
     description = "list zones via API"
 
     @classmethod

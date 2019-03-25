@@ -5,7 +5,7 @@ from bountydns.db.models.zone import Zone
 
 
 class ZoneCreate(BaseCommand):
-    name = "zonecreate"
+    name = "zone-create"
     aliases = ["zone"]
     description = "create zones"
 

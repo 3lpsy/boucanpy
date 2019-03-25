@@ -4,7 +4,7 @@ from bountydns.db.models.zone import Zone
 
 
 class ZoneList(BaseCommand):
-    name = "zoneslist"
+    name = "zone-list"
     aliases = ["zones"]
     description = "list zones"
 

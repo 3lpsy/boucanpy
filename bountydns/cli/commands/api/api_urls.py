@@ -3,7 +3,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 
 class ApiUrls(BaseCommand):
-    name = "apiurls"
+    name = "api-urls"
     aliases = ["urls"]
     description = "list api urls"
 

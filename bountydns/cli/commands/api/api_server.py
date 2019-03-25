@@ -5,7 +5,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 
 class ApiServer(BaseCommand):
-    name = "apiserver"
+    name = "api-server"
     aliases = ["api"]
     description = "run api server"
 

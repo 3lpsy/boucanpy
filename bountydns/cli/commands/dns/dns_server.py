@@ -10,7 +10,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 
 class DnsServer(BaseCommand):
-    name = "dnsserver"
+    name = "dns-server"
     aliases = ["dns"]
     description = "run dns server"
 

@@ -9,20 +9,22 @@ When answering queries, the DNS server hits the API with information regarding t
 TODO:
 - [x] Build DNS Implementation
 - [x] Build CLI Foundation
+- [x] Build Alembic Commands
 - [ ] Build API Auth Routes
 - [ ] Build API Authentication Controls
 - [ ] Build API Token Capabilities (Extended Auth Tokens)
 - [ ] Build API Zone / DNS Routes
 - [ ] Integrate API Callbacks into DNS Server
+- [ ] Build Web GUI
 - [ ] Build ability for webhook's / events
 
 ```
 usage: bdnsctl.py [-h]
-                  {test,tests,alembic-current,alembic-downgrade,alembic-history,alembic-init,alembic-migrate,alembic-show,alembic-stamp,alembic-upgrade,zonecreate,zone,zoneslist,zones,apiserver,api,apiurls,urls,apizoneslist,apizones,dnsserver,dns}
+                  {test,tests,alembic-current,alembic-downgrade,alembic-history,alembic-init,alembic-migrate,alembic-show,alembic-stamp,alembic-upgrade,zone-create,zone,zone-list,zones,api-server,api,api-urls,urls,api-zone-list,api-zones,dns-server,dns}
                   ...
 
 positional arguments:
-  {test,tests,alembic-current,alembic-downgrade,alembic-history,alembic-init,alembic-migrate,alembic-show,alembic-stamp,alembic-upgrade,zonecreate,zone,zoneslist,zones,apiserver,api,apiurls,urls,apizoneslist,apizones,dnsserver,dns}
+  {test,tests,alembic-current,alembic-downgrade,alembic-history,alembic-init,alembic-migrate,alembic-show,alembic-stamp,alembic-upgrade,zone-create,zone,zone-list,zones,api-server,api,api-urls,urls,api-zone-list,api-zones,dns-server,dns}
                         command
     test (tests)        run tests
     alembic-current     run alembic current
@@ -33,13 +35,13 @@ positional arguments:
     alembic-show        run alembic show
     alembic-stamp       run alembic stamp
     alembic-upgrade     run alembic upgrade
-    zonecreate (zone)   create zones
-    zoneslist (zones)   list zones
-    apiserver (api)     run api server
-    apiurls (urls)      list api urls
-    apizoneslist (apizones)
+    zone-create (zone)  create zones
+    zone-list (zones)   list zones
+    api-server (api)    run api server
+    api-urls (urls)     list api urls
+    api-zone-list (api-zones)
                         list zones via API
-    dnsserver (dns)     run dns server
+    dns-server (dns)    run dns server
 
 optional arguments:
   -h, --help            show this help message and exit
