@@ -14,4 +14,34 @@ TODO:
 - [ ] Build API Token Capabilities (Extended Auth Tokens)
 - [ ] Build API Zone / DNS Routes
 - [ ] Integrate API Callbacks into DNS Server
-- [ ] Build ability for webhook's / events 
+- [ ] Build ability for webhook's / events
+
+```
+usage: bdnsctl.py [-h]
+                  {test,tests,alembic-current,alembic-downgrade,alembic-history,alembic-init,alembic-migrate,alembic-show,alembic-stamp,alembic-upgrade,zonecreate,zone,zoneslist,zones,apiserver,api,apiurls,urls,apizoneslist,apizones,dnsserver,dns}
+                  ...
+
+positional arguments:
+  {test,tests,alembic-current,alembic-downgrade,alembic-history,alembic-init,alembic-migrate,alembic-show,alembic-stamp,alembic-upgrade,zonecreate,zone,zoneslist,zones,apiserver,api,apiurls,urls,apizoneslist,apizones,dnsserver,dns}
+                        command
+    test (tests)        run tests
+    alembic-current     run alembic current
+    alembic-downgrade   run alembic downgrade
+    alembic-history     run alembic history
+    alembic-init        run alembic init
+    alembic-migrate     run alembic migrate
+    alembic-show        run alembic show
+    alembic-stamp       run alembic stamp
+    alembic-upgrade     run alembic upgrade
+    zonecreate (zone)   create zones
+    zoneslist (zones)   list zones
+    apiserver (api)     run api server
+    apiurls (urls)      list api urls
+    apizoneslist (apizones)
+                        list zones via API
+    dnsserver (dns)     run dns server
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+ ```
