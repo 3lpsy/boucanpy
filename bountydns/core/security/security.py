@@ -1,8 +1,9 @@
 from datetime import timedelta, datetime
-
+from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 import jwt
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
 
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

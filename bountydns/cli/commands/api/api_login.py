@@ -47,7 +47,7 @@ class ApiLogin(BaseCommand):
         return self.option("api_url") + "/api/v1/auth/login"
 
     def get_json(self):
-        return {"email": self.option("email"), "password": self.get_password()}
+        return {"username": self.option("email"), "password": self.get_password()}
 
     def get_password(self):
         if self.option("insecure_password"):
