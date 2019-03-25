@@ -1,5 +1,6 @@
 import argparse
-from bountydns.cli.commands import commands
+from bountydns.cli import commands
+
 
 def make_parser():
     parser = argparse.ArgumentParser()

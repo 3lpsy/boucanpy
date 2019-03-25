@@ -1,0 +1,16 @@
+version: '3.3'
+services:
+  tests:
+    build:
+      context: ${PWD}
+      dockerfile: ${PWD}/infra/docker/tests.dockerfile
+    command: bash -c "while true; do sleep 1; done"
+    env_file:
+      - ${PWD}/.env/api.test.env
+      - ${PWD}/.env/db.test.env
+    environment:
+      - SERVER_NAME=api
+  api:
+    environment:
+      # Don't send emails during testing
+      - SMTP_HOST=

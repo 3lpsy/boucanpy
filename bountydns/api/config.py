@@ -3,8 +3,9 @@ from base64 import b64encode
 from bountydns.core.utils import getenv_bool, getenv
 from bountydns.db.session import db_url
 
-print("IMPORTING CONFIG")
 API_V1_STR = "/api/v1"
+
+API_SERVER_HOST = getenv("SERVER_HOST")
 
 API_SECRET_KEY = getenv("API_SECRET_KEY")
 if not API_SECRET_KEY:

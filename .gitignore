@@ -3,6 +3,7 @@
 .env/*.env
 !.env/.gitkeep
 !.env/*.example
+!.env/*.test.env
 
 .venv
 
@@ -16,7 +17,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
+
 develop-eggs/
 dist/
 downloads/

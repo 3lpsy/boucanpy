@@ -15,6 +15,10 @@ def load_env(target):
         logger.warning(f"failed to load {target} environment")
 
 
+def setenv(key, val):
+    os.environ[key] = val
+
+
 def getenv(key, default=None, optional=False):
     val = os.getenv(key, default)
     if not val and not optional:

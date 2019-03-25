@@ -49,6 +49,12 @@ def web_dir(path=None):
     return _ajoin(web_dir(), path)
 
 
+def test_dir(path=None):
+    if not path:
+        return project_dir("tests")
+    return _ajoin(test_dir(), path)
+
+
 def root_dir(path=None):
     if not path:
         return _ajoin(project_dir(), "..")
@@ -59,3 +65,9 @@ def env_dir(path=None):
     if not path:
         return root_dir(".env")
     return _ajoin(env_dir(), path)
+
+
+def storage_dir(path=None):
+    if not path:
+        return root_dir("storage")
+    return _ajoin(storage_dir(), path)
