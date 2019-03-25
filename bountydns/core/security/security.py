@@ -3,8 +3,11 @@ from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 import jwt
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
-
+base_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
+# base_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
+#
+# def get_oauth()
+# def resolve_oauth()
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -31,3 +34,14 @@ def create_bearer_token(*, data: dict, expires_delta: timedelta = None):
     )
 
     return encoded_jwt
+
+
+# async def get_current_user(token: str = Security(oauth2_scheme)):
+#     try:
+#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+#     except PyJWTError:
+#         raise HTTPException(
+#             status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials"
+#         )
+#     user = get_user(fake_users_db, username=token_data.username)
+#     return user
