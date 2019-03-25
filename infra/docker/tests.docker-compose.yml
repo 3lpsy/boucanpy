@@ -9,8 +9,13 @@ services:
       - ${PWD}/.env/api.test.env
       - ${PWD}/.env/db.test.env
     environment:
-      - SERVER_NAME=api
+      - SERVER_NAME=localhost:8080
   api:
-    environment:
-      # Don't send emails during testing
-      - SMTP_HOST=
+    build:
+      context: ${PWD}
+      dockerfile: ${PWD}/infra/docker/api.local.dockerfile
+    env_file:
+       - ${PWD}/.env/api.test.env
+       - ${PWD}/.env/db.test.env
+  api:
+    
