@@ -57,3 +57,12 @@ def db_register(key, db_uri):
     )
     db["models"] = getattr(import_module(f"bountydns.db.models", "models"), "models")
     dbs[key] = db
+
+
+def resolve_db(key=None):
+    key = key or DEFAULT_KEY
+
+    def internal_resolve():
+        return session(key)
+
+    return internal_resolve

@@ -7,7 +7,7 @@ from bountydns.db.models.zone import Zone
 class ZoneCreate(BaseCommand):
     name = "zone-create"
     aliases = ["zone"]
-    description = "create zones"
+    description = "create zones via DB"
 
     @classmethod
     def parser(cls, parser):

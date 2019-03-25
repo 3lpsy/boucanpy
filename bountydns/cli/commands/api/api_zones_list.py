@@ -10,10 +10,16 @@ class ApiZonesList(BaseCommand):
 
     @classmethod
     def parser(cls, parser):
+        parser.add_argument(
+            "-a",
+            "--api-url",
+            action="store",
+            type=str,
+            default="http://127.0.0.1:8000",
+            help="api address",
+        )
+        parser.add_argument("-t", "--token", action="store", type=str, help="api token")
         return parser
 
     def run(self):
-        self.load_env("db")
-        self.db_register("api")
-        for zone in self.session("api").query(Zone).all():
-            print(zone.id, zone.domain, zone.ip)
+        pass

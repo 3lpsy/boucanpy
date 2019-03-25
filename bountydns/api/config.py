@@ -5,9 +5,11 @@ from bountydns.db.session import db_url
 
 API_V1_STR = "/api/v1"
 
-API_SERVER_HOST = getenv("SERVER_HOST")
+API_SERVER_HOST = getenv("API_SERVER_HOST")
 
 API_SECRET_KEY = getenv("API_SECRET_KEY")
+JWT_ALGORITHM = "HS256"
+
 if not API_SECRET_KEY:
     API_SECRET_KEY = b64encode(os.urandom(32)).decode("utf-8")
 
