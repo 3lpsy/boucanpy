@@ -10,9 +10,9 @@ TODO:
 - [x] Build DNS Implementation
 - [x] Build CLI Foundation
 - [x] Build Alembic Commands
-- [ ] Build API Auth Routes
-- [ ] Build API Authentication Controls
-- [ ] Build API Token Capabilities (Extended Auth Tokens)
+- [x] Build API Auth Routes
+- [x] Build API Authentication Controls
+- [ ] Build API Token Capabilities (Generate Extended Auth Tokens)
 - [ ] Build API Zone / DNS Routes
 - [ ] Integrate API Callbacks into DNS Server
 - [ ] Build Web GUI

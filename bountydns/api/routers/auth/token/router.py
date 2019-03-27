@@ -22,9 +22,11 @@ async def login(
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
     if user.mfa_secret:  # mfa is enabled
-        scopes = "profile password_enabled password_authenticated mfa_enabled"
+        scopes = "profile mfa_required"
+    elif user.is_superuser:
+        scopes = "profile super zone"  # grant access to super routes
     else:
-        scopes = "profile password_enabled password_authenticated"
+        scopes = "profile zone"
 
     token = create_bearer_token(data={"sub": user.id, "scopes": scopes})
     return PasswordAuthResponse(token_type="bearer", access_token=str(token.decode()))

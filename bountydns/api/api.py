@@ -15,7 +15,7 @@ from bountydns.db.utils import make_db_url
 db_register("api", make_db_url("api"))
 
 from bountydns.api import config  # environment must be loaded
-from bountydns.core.security import oauth2_scheme
+
 
 # CORS
 api = FastAPI(title=config.API_PROJECT_NAME, openapi_url="/api/v1/openapi.json")

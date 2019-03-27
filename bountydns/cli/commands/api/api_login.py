@@ -6,6 +6,7 @@ class ApiLogin(BaseCommand):
     name = "api-login"
     aliases = ["zones"]
     description = "login via API"
+    path = "/api/v1/auth/login"
 
     @classmethod
     def parser(cls, parser):
@@ -39,12 +40,13 @@ class ApiLogin(BaseCommand):
         email = self.option("email")
         password = self.get_password()
         print(f"attempting to login to {self.get_url()}")
-        response = requests.post(self.get_url(), json=self.get_json())
+        # spec requires form-data
+        response = requests.post(self.get_url(), data=self.get_json())
         json_res = response.json()
         print(json_res)
 
     def get_url(self):
-        return self.option("api_url") + "/api/v1/auth/login"
+        return self.option("api_url") + self.path
 
     def get_json(self):
         return {"username": self.option("email"), "password": self.get_password()}

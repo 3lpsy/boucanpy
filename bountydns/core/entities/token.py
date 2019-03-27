@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 
@@ -7,4 +8,5 @@ class Token(BaseModel):
 
 
 class TokenPayload(BaseModel):
-    user_id: int = None
+    sub: int = None
+    scopes: List[str]

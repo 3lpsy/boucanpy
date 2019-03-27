@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class PasswordAuthForm(BaseModel):
-    email: str
+    username: str
     password: str
 
 

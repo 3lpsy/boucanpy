@@ -1,13 +1,16 @@
 from datetime import timedelta, datetime
+from typing import List
+import jwt
+from starlette.requests import Request
+from fastapi import HTTPException, Security, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
-import jwt
+from bountydns.core.entities import TokenPayload
 
-base_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
-# base_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
-#
-# def get_oauth()
-# def resolve_oauth()
+DEFAULT_TOKEN_URL = "/api/v1/auth/token"
+oauth2 = OAuth2PasswordBearer(tokenUrl=DEFAULT_TOKEN_URL)
+
+
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -36,12 +39,43 @@ def create_bearer_token(*, data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-# async def get_current_user(token: str = Security(oauth2_scheme)):
-#     try:
-#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-#     except PyJWTError:
-#         raise HTTPException(
-#             status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials"
-#         )
-#     user = get_user(fake_users_db, username=token_data.username)
-#     return user
+def validate_jwt_token(token: str = Security(oauth2)):
+    from bountydns.api import config  # environment must be loaded
+
+    try:
+        payload = jwt.decode(
+            token, config.API_SECRET_KEY, algorithms=config.JWT_ALGORITHM
+        )
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Forbidden")
+    return payload
+
+
+def token_has_required_scopes(token_payload: TokenPayload, scopes: List[str]):
+    token_scopes = []
+    if "scopes" in token_payload.keys():
+        token_scopes = token_payload["scopes"].split(" ")
+    for required_scope in scopes:
+        satisfied = False
+        for token_scope in token_scopes:
+            if token_scope == required_scope:
+                satisfied = True
+            # probably bad / too generous
+            # a:b in a:b:c
+            elif token_scope in required_scope:
+                satisfied = True
+        if not satisfied:
+            return False
+    return True
+
+
+class ScopedTo(Depends):
+    def __init__(self, *scopes) -> None:
+        super().__init__(self.__call__)
+        self._scopes = scopes
+
+    def __call__(self, request: Request, token: str = Security(oauth2)) -> TokenPayload:
+        token = validate_jwt_token(token)  # proper validation goes here
+        if not token_has_required_scopes(token, self._scopes):
+            raise HTTPException(403, detail="Forbidden")
+        return token
