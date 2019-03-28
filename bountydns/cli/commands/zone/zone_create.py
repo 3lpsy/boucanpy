@@ -21,12 +21,12 @@ class ZoneCreate(BaseCommand):
 
     def run(self):
         self.load_env("db")
-        self.db_register("api")
+        self.db_register()
         ip = self.get_ip()
         domain = self.get_domain()
         zone = Zone(ip=ip, domain=domain)
-        self.session("api").add(zone)
-        self.session("api").commit()
+        self.session().add(zone)
+        self.session().commit()
 
     def get_ip(self):
         ip_raw = self.options.get("ip")

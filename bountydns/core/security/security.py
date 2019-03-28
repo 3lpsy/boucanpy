@@ -5,7 +5,8 @@ from starlette.requests import Request
 from fastapi import HTTPException, Security, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
-from bountydns.core.entities import TokenPayload
+from bountydns.core.entities import TokenPayload, UserRepo
+from bountydns.db.models.user import User
 
 DEFAULT_TOKEN_URL = "/api/v1/auth/token"
 oauth2 = OAuth2PasswordBearer(tokenUrl=DEFAULT_TOKEN_URL)
@@ -55,7 +56,8 @@ def token_has_required_scopes(token_payload: TokenPayload, scopes: List[str]):
     token_scopes = []
     if "scopes" in token_payload.keys():
         token_scopes = token_payload["scopes"].split(" ")
-    for required_scope in scopes:
+    required_scopes = scopes or []
+    for required_scope in required_scopes:
         satisfied = False
         for token_scope in token_scopes:
             if token_scope == required_scope:
@@ -79,3 +81,12 @@ class ScopedTo(Depends):
         if not token_has_required_scopes(token, self._scopes):
             raise HTTPException(403, detail="Forbidden")
         return token
+
+
+def current_user(
+    token: str = ScopedTo(), user_repo: UserRepo = Depends(UserRepo)
+) -> User:
+    user = user_repo.get_by_sub(token.sub)
+    if not user:
+        raise HTTPException(404, detail="Not Found")
+    return user

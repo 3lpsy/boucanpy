@@ -12,7 +12,7 @@ from bountydns.api.routers import routers
 from bountydns.db.session import session, db_register
 from bountydns.db.utils import make_db_url
 
-db_register("api", make_db_url("api"))
+db_register(make_db_url())
 
 from bountydns.api import config  # environment must be loaded
 

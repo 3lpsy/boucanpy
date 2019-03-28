@@ -17,5 +17,5 @@ class AlembicUpgrade(BaseCommand):
 
     def run(self):
         load_env("db")
-        db_register("api", make_db_url("api"))
+        db_register(make_db_url())
         upgrade(join(db_dir("alembic"), "api"))

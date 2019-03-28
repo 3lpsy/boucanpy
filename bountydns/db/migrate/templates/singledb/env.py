@@ -24,8 +24,8 @@ logger = logging.getLogger("alembic.env")
 from bountydns.core.utils import getenv
 from bountydns.db.session import metadata, db_url
 
-config.set_main_option("sqlalchemy.url", db_url("api"))
-target_metadata = metadata("api")
+config.set_main_option("sqlalchemy.url", db_url())
+target_metadata = metadata()
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

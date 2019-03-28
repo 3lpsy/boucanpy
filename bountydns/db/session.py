@@ -1,7 +1,7 @@
 from importlib import import_module
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-from bountydns.db.paginate.query import PaginationQuery
+from bountydns.db.pagination.query import PaginationQuery
 
 DEFAULT_KEY = "api"
 
@@ -9,36 +9,31 @@ dbs = {}
 _sessions = {}
 
 # TODO: fix this, move back to single database target
-def session(key=None):
-    key = key or DEFAULT_KEY
-    if key in _sessions.keys():
-        return _sessions[key]
-    session = dbs[key]["Session"]()
-    _sessions[key] = session
+def session():
+    if DEFAULT_KEY in _sessions.keys():
+        return _sessions[DEFAULT_KEY]
+    session = dbs[DEFAULT_KEY]["Session"]()
+    _sessions[DEFAULT_KEY] = session
     return session
 
 
-def db_session(key=None):
-    key = key or DEFAULT_KEY
-    return dbs[key]["db_session"]
+def db_session():
+    return dbs[DEFAULT_KEY]["db_session"]
 
 
-def engine(key=None):
-    key = key or DEFAULT_KEY
-    return dbs[key]["engine"]
+def engine():
+    return dbs[DEFAULT_KEY]["engine"]
 
 
-def db_url(key=None):
-    key = key or DEFAULT_KEY
-    return dbs[key]["url"]
+def db_url():
+    return dbs[DEFAULT_KEY]["url"]
 
 
-def metadata(key=None):
-    key = key or DEFAULT_KEY
-    return dbs[key]["metadata"]
+def metadata():
+    return dbs[DEFAULT_KEY]["metadata"]
 
 
-def db_register(key, db_uri):
+def db_register(db_uri):
     global dbs
     engine = create_engine(db_uri)
     db = {}
@@ -56,13 +51,4 @@ def db_register(key, db_uri):
         import_module(f"bountydns.db.models.base", "base"), "metadata"
     )
     db["models"] = getattr(import_module(f"bountydns.db.models", "models"), "models")
-    dbs[key] = db
-
-
-def resolve_db(key=None):
-    key = key or DEFAULT_KEY
-
-    def internal_resolve():
-        return session(key)
-
-    return internal_resolve
+    dbs[DEFAULT_KEY] = db

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from bountydns.core.entities.auth import PasswordAuthForm, PasswordAuthResponse
 from bountydns.core.security import verify_password, create_bearer_token
 from bountydns.db.models.user import User
-from bountydns.db.session import resolve_db
+from bountydns.db.session import session
 from starlette.responses import RedirectResponse
 from starlette.requests import Request
 

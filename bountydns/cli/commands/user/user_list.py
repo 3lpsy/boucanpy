@@ -14,6 +14,6 @@ class UserList(BaseCommand):
 
     def run(self):
         self.load_env("db")
-        self.db_register("api")
-        for user in self.session("api").query(User).all():
+        self.db_register()
+        for user in self.session().query(User).all():
             print(user.id, user.email, user.is_superuser)

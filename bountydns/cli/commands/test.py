@@ -16,7 +16,7 @@ class Test(BaseCommand):
     def run(self):
         self.load_env("api.test")
         self.load_env("db.test")
-        self.db_register("api")
+        self.db_register()
         setenv("API_DB_DATABASE", storage_dir("tmp"))
         print(test_dir("api"))
         pytest.main(["-x", test_dir("api")])

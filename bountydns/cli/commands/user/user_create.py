@@ -34,7 +34,7 @@ class UserCreate(BaseCommand):
 
     def run(self):
         self.load_env("db")
-        self.db_register("api")
+        self.db_register()
         email = self.option("email")
         password = self.get_password()
         hashed_password = hash_password(password)
@@ -43,8 +43,8 @@ class UserCreate(BaseCommand):
             email=email, hashed_password=hashed_password, is_superuser=is_superuser
         )
 
-        self.session("api").add(user)
-        self.session("api").commit()
+        self.session().add(user)
+        self.session().commit()
 
     def get_password(self):
         if self.option("insecure_password"):

@@ -14,6 +14,6 @@ class ZoneList(BaseCommand):
 
     def run(self):
         self.load_env("db")
-        self.db_register("api")
-        for zone in self.session("api").query(Zone).all():
+        self.db_register()
+        for zone in self.session().query(Zone).all():
             print(zone.id, zone.domain, zone.ip)

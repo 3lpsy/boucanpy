@@ -17,5 +17,5 @@ class AlembicMigrate(BaseCommand):
 
     def run(self):
         load_env("db")
-        db_register("api", make_db_url("api"))
+        db_register(make_db_url())
         migrate(join(db_dir("alembic"), "api"))

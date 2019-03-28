@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy import orm
-from bountydns.db.paginate.pagination import Pagination
+from bountydns.db.pagination.pagination import Pagination
 
 
 class PaginationQuery(orm.Query):

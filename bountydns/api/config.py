@@ -19,7 +19,7 @@ API_CORS_ORIGINS = getenv(
     "API_CORS_ORIGINS"
 )  # a string of origins separated by commas, e.g: "http://localhost, http://localhost:4200, http://localhost:3000, http://localhost:8080, http://local.dockertoolbox.tiangolo.com"
 API_PROJECT_NAME = getenv("API_PROJECT_NAME", "Bounty DNS")
-SQLALCHEMY_DATABASE_URI = db_url("api")
+SQLALCHEMY_DATABASE_URI = db_url()
 
 API_SUPERUSER_EMAIL = getenv("API_SUPERUSER_EMAIL", optional=True)
 API_SUPERUSER_PASSWORD = getenv("API_SUPERUSER_PASSWORD", optional=True)

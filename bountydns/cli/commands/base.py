@@ -46,12 +46,12 @@ class BaseCommand:
         return load_env(key)
 
     @classmethod
-    def db_register(cls, key):
-        return db_register("api", make_db_url("api"))
+    def db_register(cls):
+        return db_register(make_db_url())
 
     @classmethod
-    def session(cls, *args, **kwargs):
-        return session(*args, **kwargs)
+    def session(cls):
+        return session()
 
     def exit(self, status):
         exit(status)
