@@ -1,3 +1,4 @@
+import requests
 import binascii, time
 from dnslib import QTYPE, RCODE, RR
 from bountydns.core import logger
@@ -49,6 +50,24 @@ class DnsLogger:
         )
 
     def log_request(self, handler, request):
+        url = self.api_url + "/api/v1/dns-request"
+        data = {
+            "name": str(request.q.qname),
+            "source_address": str(handler.client_address[0]),
+            "source_port": int(handler.client_address[1]),
+            "type": str(QTYPE[request.q.qtype]),
+            "protocol": str(handler.protocol),
+        }
+        print("logging request")
+        res = requests.post(
+            url,
+            headers={"Authentication": "Bearer {}".format(self.api_token)},
+            json=data,
+        )
+        print(res.status_code)
+
+        print(res.json())
+
         logger.info(
             "%sRequest: [%s:%d] (%s) / '%s' (%s)"
             % (
