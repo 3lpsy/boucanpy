@@ -4,11 +4,9 @@ from bountydns.core import logger
 
 
 class DnsLogger:
-    def __init__(self, api_client=None, prefix=""):
-        self.api_client = None
-
-        if api_client and api_client.authenticate():
-            self.api_client = api_client
+    def __init__(self, api_url, api_token, prefix=""):
+        self.api_url = api_url
+        self.api_token = api_token
         self.prefix = prefix
 
     def log_pass(self, *args):
@@ -51,15 +49,6 @@ class DnsLogger:
         )
 
     def log_request(self, handler, request):
-        if self.api_client:
-            self.api_client.dns_event.make(
-                event="REQUEST",
-                name=request.q.qname,
-                type=QTYPE[request.q.qtype],
-                source_address=handler.client_address[0],
-                source_port=handler.client_address[1],
-                protocol=handler.protocol,
-            )
         logger.info(
             "%sRequest: [%s:%d] (%s) / '%s' (%s)"
             % (
@@ -74,15 +63,6 @@ class DnsLogger:
         self.log_data(request)
 
     def log_reply(self, handler, reply):
-        if self.api_client:
-            self.api_client.dns_event.make(
-                event="RESPONSE",
-                name=reply.q.qname,
-                type=QTYPE[reply.q.qtype],
-                source_address=handler.client_address[0],
-                source_port=handler.client_address[1],
-                protocol=handler.protocol,
-            )
         if reply.header.rcode == RCODE.NOERROR:
             logger.info(
                 "%sReply: [%s:%d] (%s) / '%s' (%s) / RRs: %s"

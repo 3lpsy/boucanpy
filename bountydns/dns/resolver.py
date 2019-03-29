@@ -1,31 +1,51 @@
-import textwrap 
+import requests
+import textwrap
 import copy
 from dnslib.server import DNSServer, BaseResolver
-from dnslib import RR,QTYPE,RCODE
+from dnslib import RR, QTYPE, RCODE
 from bountydns.core import logger
 from bountydns.dns.zone_template import ZONE_TEMPLATE
 from bountydns.dns.record import Record
 
+
 class Resolver(BaseResolver):
-    def __init__(self, zone_maps, upstream, api_url, api_token):
+    def __init__(self, api_url, api_token):
         # super().__init__(upstream, 53, 5)
-        self.zones = self.maps_to_zones(zone_maps)
         self.api_url = api_url
         self.api_token = api_token
-    
+        self.zones = self.maps_to_zones(self.get_zone_maps())
+
     def maps_to_zones(self, maps):
         zones = []
         for zone_map in maps:
             try:
                 for rr in self.map_to_rr(zone_map):
-                    logger.debug('registering zone rr name {} and type {}'.format(rr.rname, QTYPE[rr.rtype]))
+                    logger.debug(
+                        "registering zone rr name {} and type {}".format(
+                            rr.rname, QTYPE[rr.rtype]
+                        )
+                    )
                     zone = Record(zone_map, rr)
                     zones.append(zone)
-                    logger.debug(' %2d: %s', len(zones), zone)
+                    logger.debug(" %2d: %s", len(zones), zone)
             except Exception as e:
-                raise RuntimeError(f'Error processing line ({e.__class__.__name__}: {e}) "{zone_map[0].strip()}"') from e
-        logger.debug('%d zone resource records generated', len(zones))
+                raise RuntimeError(
+                    f'Error processing line ({e.__class__.__name__}: {e}) "{zone_map[0].strip()}"'
+                ) from e
+            logger.info("zone map generated {}".format(str(zone_map)))
+        logger.info("%d zone resource records generated", len(zones))
         return zones
+
+    def get_zone_maps(self):
+        res = requests.get(
+            "{}/api/v1/{}".format(self.api_url, "zone"),
+            headers={"Authorization": "Bearer {}".format(self.api_token)},
+        )
+        # TODO: Error handling / boot without api-token (?)
+        zm = []
+        for zone in res.json()["zones"]:
+            zm.append((zone["domain"], zone["ip"]))
+        return zm
 
     def map_to_rr(self, zone_map):
         z = ZONE_TEMPLATE.format(domain_name=zone_map[0], domain_ip=zone_map[1])
@@ -43,7 +63,7 @@ class Resolver(BaseResolver):
                 reply.add_answer(a)
         if reply.rr:
             return reply
-            
+
         if not reply.rr:
             reply.header.rcode = RCODE.NXDOMAIN
         return reply

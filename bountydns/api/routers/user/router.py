@@ -12,6 +12,5 @@ async def index(
     user_repo: UserRepo = Depends(UserRepo),
     token: str = ScopedTo("user:list"),
 ):
-    pg, items = user_repo.paginate(pagination)
-    items = [UserData(id=i.id, email=i.email) for i in items]
+    pg, items = user_repo.paginate(pagination).set_data_model(UserData).data()
     return UsersResponse(pagination=pg, users=items)
