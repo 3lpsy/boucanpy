@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from bountydns.core import logger
 from bountydns.core.security import ScopedTo
 from bountydns.core.entities import (
     DnsRequestRepo,
@@ -32,7 +33,7 @@ async def index(
     "/dns-request", name="dns_request.store", response_model=DnsRequestResponse
 )
 async def index(
-    form: DnsRequestCreateForm = Depends(),
+    form: DnsRequestCreateForm,
     dns_request_repo: DnsRequestRepo = Depends(DnsRequestRepo),
     zone_repo: ZoneRepo = Depends(ZoneRepo),
     token: str = ScopedTo("dns-request:list"),
@@ -46,10 +47,8 @@ async def index(
     )
     if zone:
         data["zone_id"] = zone.id
+    else:
+        logger.warning(f"No zone found for dns request {data['name']}")
+    dns_request = dns_request_repo.create(data).set_data_model(DnsRequestData).data()
 
-    dns_request = dns_request_repo.create(data)
-    response_data = (
-        dns_request_repo.set_data_model(DnsRequestData).get(dns_request.id).data()
-    )
-
-    return DnsRequestResponse(dns_request=response_data)
+    return DnsRequestResponse(dns_request=dns_request)

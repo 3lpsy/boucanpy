@@ -17,7 +17,7 @@ class BaseRepo:
         self._data_model = None
         self._model = None
         self._is_paginated = False
-        self._is_list = False
+        self._is_list = False  # check at runtime instead (?)
 
     def results(self):
         return self._results
@@ -26,8 +26,8 @@ class BaseRepo:
         if self._is_paginated:
             return self.paginated_data()
         if self._is_list:
-            return [self.data_model()(**dict(r.__dict__)) for r in self.results()]
-        return self.data_model()(**dict(self.results().__dict__))
+            return [self.data_model()(**r.as_dict()) for r in self.results()]
+        return self.data_model()(**self.results().as_dict())
 
     def paginated_data(self):
         return (
@@ -36,7 +36,7 @@ class BaseRepo:
                 per_page=self._results.per_page,
                 total=self._results.total,
             ),
-            [self.data_model()(**dict(r.__dict__)) for r in self._results.items],
+            [self.data_model()(**r.as_dict()) for r in self._results.items],
         )
 
     def get(self, id):
@@ -56,10 +56,16 @@ class BaseRepo:
         return self
 
     def create(self, data):
-        instance = self.model(**dict(data))
-        self.db.add(instance)
-        self.db.commit()
-        return instance
+        try:
+            instance = self.model()(**dict(data))
+            self.db.add(instance)
+            self.db.commit()
+            self.db.flush()
+            self._results = instance
+            return self
+        except Exception as e:
+            self.db.rollback()
+            raise e
 
     def query(self):
         if not self._query:

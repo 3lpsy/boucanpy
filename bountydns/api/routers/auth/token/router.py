@@ -23,7 +23,7 @@ async def login(
     if user.mfa_secret:  # mfa is enabled
         scopes = "profile mfa_required"
     elif user.is_superuser:
-        scopes = "profile super zone user"  # grant access to super routes
+        scopes = "profile super zone user dns-request"  # grant access to super routes
     else:
         scopes = "profile zone user:list"
 

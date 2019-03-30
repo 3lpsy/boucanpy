@@ -58,10 +58,9 @@ class DnsLogger:
             "type": str(QTYPE[request.q.qtype]),
             "protocol": str(handler.protocol),
         }
-        print("logging request")
         res = requests.post(
             url,
-            headers={"Authentication": "Bearer {}".format(self.api_token)},
+            headers={"Authorization": "Bearer {}".format(self.api_token)},
             json=data,
         )
         print(res.status_code)
