@@ -8,7 +8,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 class AlembicStamp(BaseCommand):
     name = "alembic-stamp"
-    aliases = []
+    aliases = ["al-stamp"]
     description = "run alembic stamp"
 
     @classmethod

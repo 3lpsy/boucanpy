@@ -8,7 +8,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 class AlembicInit(BaseCommand):
     name = "alembic-init"
-    aliases = []
+    aliases = ["al-init"]
     description = "run alembic init"
 
     @classmethod

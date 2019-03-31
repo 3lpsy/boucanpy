@@ -12,9 +12,9 @@ TODO:
 - [x] Build Alembic Commands
 - [x] Build API Auth Routes
 - [x] Build API Authentication Controls
-- [ ] Build API Token Capabilities (Generate Extended Auth Tokens)
-- [ ] Build API Zone / DNS Routes
-- [ ] Integrate API Callbacks into DNS Server
+- [x] Build API Token Capabilities (Generate Extended Auth Tokens)
+- [x] Build API Zone / DNS Routes
+- [x] Integrate API Callbacks into DNS Server
 - [ ] Build Web GUI
 - [ ] Build ability for webhook's / events
 

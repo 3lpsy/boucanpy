@@ -8,7 +8,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 class AlembicCurrent(BaseCommand):
     name = "alembic-current"
-    aliases = []
+    aliases = ["al-current"]
     description = "run alembic current"
 
     @classmethod

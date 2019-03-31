@@ -1,6 +1,12 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from '@/views/Home.vue';
+import Zone from '@/views/Zone.vue';
+import ApiToken from '@/views/ApiToken.vue';
+import Login from '@/views/Login.vue';
+import NotFound from '@/views/errors/NotFound.vue';
+
+
 import GuardCollection from '@/router/guards/collection';
 import { HasAuthenticationCookie, IsAuthenticated } from '@/router/guards/auth';
 
@@ -20,9 +26,26 @@ export default new Router({
             beforeEnter: AUTHED_GUARDS,
         },
         {
+            path: '/zone',
+            name: 'zone',
+            component: Zone,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/api-token',
+            name: 'api-token',
+            component: ApiToken,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
             path: '/login',
             name: 'login',
-            component: () => import('@/views/Login.vue'),
+            component: Login,
+        },
+        {
+            path: '*',
+            name: '404',
+            component: NotFound,
         },
     ],
 });

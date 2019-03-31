@@ -8,7 +8,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 class AlembicMigrate(BaseCommand):
     name = "alembic-migrate"
-    aliases = []
+    aliases = ["al-migrate"]
     description = "run alembic migrate"
 
     @classmethod

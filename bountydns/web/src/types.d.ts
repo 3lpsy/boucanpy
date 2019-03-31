@@ -3,6 +3,11 @@ export interface LoginForm {
     password: string;
 }
 
+export interface Message {
+    type: string;
+    text: string;
+}
+
 export interface Profile {
     username: string;
     bio?: string;
@@ -11,7 +16,59 @@ export interface Profile {
 }
 
 export interface User {
+    id: number;
     email: string;
+}
+
+export interface ApiToken {
+    id: number
+    token?: string | null
+    scopes: string
+    is_active: boolean
+}
+
+export interface ApiTokenResponse {
+    api_token: ApiToken;
+    messages?: Message[]
+    pagination?: object
+}
+
+export interface ApiTokensResponse {
+    api_tokens: ApiToken[];
+    messages?: Message[]
+    pagination?: object
+}
+
+export interface ApiTokenCreateForm {
+    scopes: string
+    expires_at: number
+}
+
+export interface DnsRequest {
+    id: number
+    name: string
+    zone_id: number | null
+    source_address: string
+    source_port: number
+    type: string
+    protocol: string
+}
+
+export interface DnsRequestsResponse {
+    dns_requests: DnsRequest;
+    messages?: Message[]
+    pagination?: object
+}
+
+export interface UserResponse {
+    user: User;
+    messages?: Message[]
+    pagination?: object
+}
+export interface TokenPayload {
+    sub: string;
+    exp: string;
+    scopes: string;
 }
 
 export interface Token {

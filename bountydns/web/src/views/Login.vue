@@ -1,5 +1,5 @@
 <template>
-    <div class="auth-page">
+    <div class="auth-page row">
         <b-container style="padding-top: 10px" class="page">
             <div class="row">
                 <div class="col-md-6 offset-md-3 col-xs-12">

@@ -8,7 +8,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 class AlembicHistory(BaseCommand):
     name = "alembic-history"
-    aliases = []
+    aliases = ["al-history"]
     description = "run alembic history"
 
     @classmethod

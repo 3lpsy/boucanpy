@@ -21,7 +21,7 @@ class ApiZonesList(BaseCommand):
             help="api address",
         )
         parser.add_argument(
-            "-t", "--api-token", action="store", type=str, help="api token"
+            "-t", "--auth-token", action="store", type=str, help="api token"
         )
         return parser
 
@@ -33,4 +33,4 @@ class ApiZonesList(BaseCommand):
         return self.option("api_url") + self.path
 
     def get_headers(self):
-        return {"Authorization": "Bearer " + self.option("api_token")}
+        return {"Authorization": "Bearer " + self.option("auth_token")}

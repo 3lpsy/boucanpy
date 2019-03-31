@@ -8,7 +8,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 class AlembicUpgrade(BaseCommand):
     name = "alembic-upgrade"
-    aliases = []
+    aliases = ["al-upgrade"]
     description = "run alembic upgrade"
 
     @classmethod

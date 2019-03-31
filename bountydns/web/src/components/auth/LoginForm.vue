@@ -30,7 +30,7 @@
     import { Vue, Component } from 'vue-property-decorator';
     import { mixins } from 'vue-class-component';
     import CommonMixin from '@/mixins/common';
-    import {LoginForm as LoginFormData} from '@/types';
+    import {LoginForm as LoginFormData, User} from '@/types';
     import authService from '@/services/auth';
 
     @Component
@@ -42,16 +42,14 @@
             password: ''
         }
         onSubmit() {
-            authService
-              .login(this.form)
-              .then((accessToken) => {
-                  console.log("Recieved login token", accessToken);
-                  this.$router.push('/')
-              })
-              .catch((err) => {
-                console.error(err);
-                this.loginError = 'Invalid username or password';
-              });
+            console.log("dispatching auth/authenticate")
+            this.$store.dispatch('auth/authenticate', this.form).then((user: User) => {
+                this.$router.push('/')
+            }).catch((err) => {
+                this.loginError = "Authentication failed"
+                console.log("ERROR", err)
+                throw err
+            })
         }
 
     }

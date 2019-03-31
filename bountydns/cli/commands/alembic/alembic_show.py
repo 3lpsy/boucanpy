@@ -8,7 +8,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 class AlembicShow(BaseCommand):
     name = "alembic-show"
-    aliases = []
+    aliases = ["al-show"]
     description = "run alembic show"
 
     @classmethod

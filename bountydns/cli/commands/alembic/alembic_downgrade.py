@@ -8,7 +8,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 class AlembicDowngrade(BaseCommand):
     name = "alembic-downgrade"
-    aliases = []
+    aliases = ["al-downgrade"]
     description = "run alembic downgrade"
 
     @classmethod

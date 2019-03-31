@@ -40,12 +40,12 @@ def create_bearer_token(*, data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-def validate_jwt_token(token: str = Security(oauth2)):
+def validate_jwt_token(token: str, leeway=0):
     from bountydns.api import config  # environment must be loaded
 
     try:
         payload = jwt.decode(
-            token, config.API_SECRET_KEY, algorithms=config.JWT_ALGORITHM
+            token, config.API_SECRET_KEY, algorithms=config.JWT_ALGORITHM, leeway=leeway
         )
     except jwt.PyJWTError:
         raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Forbidden")
@@ -72,21 +72,22 @@ def token_has_required_scopes(token_payload: TokenPayload, scopes: List[str]):
 
 
 class ScopedTo(Depends):
-    def __init__(self, *scopes) -> None:
+    def __init__(self, *scopes, leeway=0) -> None:
         super().__init__(self.__call__)
         self._scopes = scopes
+        self._leeway = leeway
 
     def __call__(self, request: Request, token: str = Security(oauth2)) -> TokenPayload:
-        token = validate_jwt_token(token)  # proper validation goes here
+        token = validate_jwt_token(token, self._leeway)  # proper validation goes here
         if not token_has_required_scopes(token, self._scopes):
             raise HTTPException(403, detail="Forbidden")
         return token
 
 
 def current_user(
-    token: str = ScopedTo(), user_repo: UserRepo = Depends(UserRepo)
+    token: TokenPayload = ScopedTo(), user_repo: UserRepo = Depends(UserRepo)
 ) -> User:
-    user = user_repo.get_by_sub(token.sub)
+    user = user_repo.get_by_sub(token["sub"])
     if not user:
         raise HTTPException(404, detail="Not Found")
     return user

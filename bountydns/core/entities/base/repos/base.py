@@ -22,6 +22,11 @@ class BaseRepo:
     def results(self):
         return self._results
 
+    def set_results(self, results):
+        # TODO: not compatible with list / pagination / see above
+        self._results = results
+        return self
+
     def data(self):
         if self._is_paginated:
             return self.paginated_data()
@@ -43,6 +48,10 @@ class BaseRepo:
         self._results = self.query().get(id)
         return self
 
+    def exists(self, id):
+        self._results = self.query().get(id)
+        return bool(self._results)
+
     def all(self):
         self._results = self.query().all()
         self._is_list = True
@@ -54,6 +63,26 @@ class BaseRepo:
         )
         self._is_paginated = True
         return self
+
+    def deactivate(self, id):
+        self.get(id)
+        self.update({"is_active": False})
+        return self
+
+    def update(self, data):
+        # TODO: make work with list
+        try:
+            instance = self.results()
+            for attr, value in dict(data).items():
+                setattr(instance, attr, value)
+            self.db.add(instance)
+            self.db.commit()
+            self.db.flush()
+            self._results = instance
+            return self
+        except Exception as e:
+            self.db.rollback()
+            raise e
 
     def create(self, data):
         try:

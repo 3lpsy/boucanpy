@@ -20,7 +20,7 @@ class ApiUserCreate(BaseCommand):
         )
         parser.add_argument(
             "-t",
-            "--api-token",
+            "--auth-token",
             action="store",
             type=str,
             required=True,
@@ -51,7 +51,7 @@ class ApiUserCreate(BaseCommand):
         # spec requires form-data
         response = requests.post(
             self.get_url(),
-            headers={"Authorization": "Bearer {}".format(self.option("api_token"))},
+            headers={"Authorization": "Bearer {}".format(self.option("auth_token"))},
             json=self.get_json(),
         )
         json_res = response.json()

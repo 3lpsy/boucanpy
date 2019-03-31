@@ -6,6 +6,13 @@ import Component from 'vue-class-component';
 @Component
 export default class MyMixin extends Vue {
     get isAuthenticated(): boolean {
-        return this.$store.state.auth.user && this.$store.state.auth.token;
+        return this.$store.getters['auth/isAuthenticated'];
+    }
+
+    logout() {
+        console.log("dispatching auth/defauthenticate")
+        this.$store.dispatch('auth/deauthenticate').then(() => {
+            this.$router.push({name: 'login'})
+        })
     }
 }
