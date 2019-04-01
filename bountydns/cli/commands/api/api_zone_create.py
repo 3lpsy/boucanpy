@@ -2,9 +2,9 @@ import requests
 from bountydns.cli.commands.base import BaseCommand
 
 
-class ApiUserCreate(BaseCommand):
-    name = "api-user-create"
-    aliases = ["api-user"]
+class ApiZoneCreate(BaseCommand):
+    name = "api-zone-create"
+    aliases = ["api-zone"]
     description = "create user via API"
     path = "/api/v1/user"
 

@@ -10,6 +10,7 @@ class AlembicShow(BaseCommand):
     name = "alembic-show"
     aliases = ["al-show"]
     description = "run alembic show"
+    migration_dir = join(db_dir("alembic"), "api")
 
     @classmethod
     def parser(cls, parser):
@@ -18,4 +19,4 @@ class AlembicShow(BaseCommand):
     def run(self):
         load_env("db")
         db_register(make_db_url())
-        show(join(db_dir("alembic"), "api"))
+        show(self.migration_dir)

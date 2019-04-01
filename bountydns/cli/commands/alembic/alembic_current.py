@@ -10,6 +10,7 @@ class AlembicCurrent(BaseCommand):
     name = "alembic-current"
     aliases = ["al-current"]
     description = "run alembic current"
+    migration_dir = join(db_dir("alembic"), "api")
 
     @classmethod
     def parser(cls, parser):
@@ -18,4 +19,4 @@ class AlembicCurrent(BaseCommand):
     def run(self):
         load_env("db")
         db_register(make_db_url())
-        current(join(db_dir("alembic"), "api"))
+        current(self.migration_dir)

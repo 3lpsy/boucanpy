@@ -3,10 +3,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from bountydns.db.pagination.query import PaginationQuery
 
+# TODO: fix this nonsense
+
+
 DEFAULT_KEY = "api"
 
 dbs = {}
 _sessions = {}
+_session = sessionmaker(autocommit=False, autoflush=False, query_cls=PaginationQuery)
+_scoped_session = scoped_session(_session)
 
 # TODO: fix this, move back to single database target
 def session():
@@ -38,17 +43,15 @@ def db_register(db_uri):
     engine = create_engine(db_uri)
     db = {}
     db["engine"] = engine
-    db["Session"] = sessionmaker(
-        autocommit=False, autoflush=False, bind=engine, query_cls=PaginationQuery
-    )
-    db["db_session"] = scoped_session(
-        sessionmaker(
-            autocommit=False, autoflush=False, bind=engine, query_cls=PaginationQuery
-        )
-    )
+    _scoped_session.configure(bind=engine)
+    db["Session"] = _session
+    db["db_session"] = _scoped_session
     db["url"] = db_uri
     db["metadata"] = getattr(
         import_module(f"bountydns.db.models.base", "base"), "metadata"
     )
     db["models"] = getattr(import_module(f"bountydns.db.models", "models"), "models")
     dbs[DEFAULT_KEY] = db
+
+    # setup factory
+    from bountydns.db.factories.base import BaseFactory

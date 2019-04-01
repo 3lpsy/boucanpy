@@ -9,6 +9,8 @@ from starlette.requests import Request
 from bountydns.core import logger
 
 from bountydns.api.routers import routers
+from bountydns.api.routers.webui import router as webui_router
+
 from bountydns.db.session import session, db_register
 from bountydns.db.utils import make_db_url
 
@@ -44,6 +46,7 @@ for r, ropts in routers:
     main_router.include_router(r, **ropts)
 
 api.include_router(main_router, prefix=config.API_V1_STR)
+api.include_router(webui_router)
 
 
 @api.middleware("http")

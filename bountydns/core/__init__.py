@@ -1,2 +1,2 @@
 from .logger import logger, set_log_level
-from .utils import only
+from .utils import only, load_env

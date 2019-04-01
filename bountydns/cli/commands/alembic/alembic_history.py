@@ -10,6 +10,7 @@ class AlembicHistory(BaseCommand):
     name = "alembic-history"
     aliases = ["al-history"]
     description = "run alembic history"
+    migration_dir = join(db_dir("alembic"), "api")
 
     @classmethod
     def parser(cls, parser):
@@ -18,4 +19,4 @@ class AlembicHistory(BaseCommand):
     def run(self):
         load_env("db")
         db_register(make_db_url())
-        history(join(db_dir("alembic"), "api"))
+        history(self.migration_dir)

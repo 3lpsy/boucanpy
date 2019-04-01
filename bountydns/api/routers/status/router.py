@@ -4,6 +4,6 @@ router = APIRouter()
 options = {"prefix": ""}
 
 
-@router.get("/status", name="staus.show")
+@router.get("/status", name="status.show")
 async def login():
     return {"status": "up"}

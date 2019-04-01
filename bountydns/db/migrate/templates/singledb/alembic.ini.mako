@@ -30,14 +30,14 @@ handlers =
 qualname = sqlalchemy.engine
 
 [logger_alembic]
-level = INFO
+level = WARN
 handlers =
 qualname = alembic
 
 [handler_console]
 class = StreamHandler
 args = (sys.stderr,)
-level = NOTSET
+level = WARN
 formatter = generic
 
 [formatter_generic]

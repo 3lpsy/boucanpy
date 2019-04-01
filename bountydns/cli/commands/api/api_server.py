@@ -8,6 +8,8 @@ class ApiServer(BaseCommand):
     name = "api-server"
     aliases = ["api"]
     description = "run api server"
+    add_log_level = True
+    add_debug = True
 
     @classmethod
     def parser(cls, parser):
@@ -17,7 +19,6 @@ class ApiServer(BaseCommand):
         parser.add_argument(
             "-l", "--listen", action="store", default="127.0.0.1", help="bind address"
         )
-        parser.add_argument("-d", "--debug", action="store_true", help="debug")
         parser.add_argument("-r", "--reload", action="store_true", help="reload")
         parser.add_argument("-w", "--workers", action="store", help="workers")
         parser.add_argument(
@@ -55,15 +56,6 @@ class ApiServer(BaseCommand):
             kwargs["workers"] = self.get_workers()
 
         return kwargs
-
-    def get_log_level(self):
-        level = "info"
-        if self.option("debug", None):
-            level = "debug"
-        elif self.option("log_level", None):
-            level = self.option("log_level")
-        set_log_level(level)
-        return level
 
     def get_reload(self):
         if self.option("debug", None):

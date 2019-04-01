@@ -10,6 +10,7 @@ class AlembicDowngrade(BaseCommand):
     name = "alembic-downgrade"
     aliases = ["al-downgrade"]
     description = "run alembic downgrade"
+    migration_dir = join(db_dir("alembic"), "api")
 
     @classmethod
     def parser(cls, parser):
@@ -18,4 +19,4 @@ class AlembicDowngrade(BaseCommand):
     def run(self):
         load_env("db")
         db_register(make_db_url())
-        downgrade(join(db_dir("alembic"), "api"))
+        downgrade(self.migration_dir)

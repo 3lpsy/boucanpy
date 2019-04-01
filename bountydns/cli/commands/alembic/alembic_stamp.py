@@ -10,6 +10,7 @@ class AlembicStamp(BaseCommand):
     name = "alembic-stamp"
     aliases = ["al-stamp"]
     description = "run alembic stamp"
+    migration_dir = join(db_dir("alembic"), "api")
 
     @classmethod
     def parser(cls, parser):
@@ -18,4 +19,4 @@ class AlembicStamp(BaseCommand):
     def run(self):
         load_env("db")
         db_register(make_db_url())
-        stamp(join(db_dir("alembic"), "api"))
+        stamp(self.migration_dir)

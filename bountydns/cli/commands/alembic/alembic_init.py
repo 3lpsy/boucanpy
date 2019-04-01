@@ -10,6 +10,7 @@ class AlembicInit(BaseCommand):
     name = "alembic-init"
     aliases = ["al-init"]
     description = "run alembic init"
+    migration_dir = join(db_dir("alembic"), "api")
 
     @classmethod
     def parser(cls, parser):
@@ -18,4 +19,4 @@ class AlembicInit(BaseCommand):
     def run(self):
         load_env("db")
         db_register(make_db_url())
-        initialize(join(db_dir("alembic"), "api"))
+        initialize(self.migration_dir)
