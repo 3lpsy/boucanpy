@@ -7,6 +7,8 @@ from bountydns.core.entities import (
     ApiTokenResponse,
     ApiTokenRepo,
     ApiTokenCreateForm,
+    SensitiveApiTokenResponse,
+    SensitiveApiTokenData,
     BaseResponse,
 )
 import uuid
@@ -27,7 +29,7 @@ async def index(
 
 
 @router.post("/api-token", name="api_token.store", response_model=ApiTokenResponse)
-async def index(
+async def store(
     form: ApiTokenCreateForm,
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
     token: TokenPayload = ScopedTo("api-token:create"),
@@ -54,6 +56,37 @@ async def index(
     }
     api_token = api_token_repo.create(data).data()
     return ApiTokenResponse(api_token=api_token)
+
+
+@router.get(
+    "/api-token/{api_token_id}", name="api_token.show", response_model=ApiTokenResponse
+)
+async def index(
+    api_token_id: int,
+    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
+    token: TokenPayload = ScopedTo("api-token:read"),
+):
+    if not api_token_repo.exists(api_token_id):
+        raise HTTPException(404, detail="Not found")
+    api_token = api_token_repo.data()
+    return ApiTokenResponse(api_token=api_token)
+
+
+@router.get(
+    "/api-token/{api_token_id}/sensitive",
+    name="api_token.show.sensitive",
+    response_model=SensitiveApiTokenResponse,
+)
+async def index(
+    api_token_id: int,
+    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
+    token: TokenPayload = ScopedTo("api-token:read"),
+):
+    # TODO: require stronger scope
+    if not api_token_repo.exists(api_token_id):
+        raise HTTPException(404, detail="Not found")
+    api_token = api_token_repo.set_data_model(SensitiveApiTokenData).data()
+    return SensitiveApiTokenResponse(api_token=api_token)
 
 
 @router.delete("/api-token/{api_token_id}", response_model=BaseResponse)

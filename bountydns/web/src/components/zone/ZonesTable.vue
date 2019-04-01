@@ -16,22 +16,13 @@
              >
                 Deactivate
             </b-button>
-            <span v-else>
-                Dead
-            </span>
-        </template>
-        <template slot="reveal" slot-scope="row">
             <b-button
                 size="sm"
-                @click="revealAction(row.item, row.index, $event.target)"
-                v-if="row.item.is_active"
+                @click="activateAction(row.item, row.index, $event.target)"
+                v-if="! row.item.is_active"
              >
-                Reveal
+                Activate
             </b-button>
-
-            <span v-else>
-                Dead
-            </span>
         </template>
         </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">
@@ -50,19 +41,6 @@
             aria-controls="my-table"
         ></b-pagination>
 
-        <b-modal
-            ref="token-reveal-modal"
-            size="lg"
-            hide-footer
-            id="reveal-api-token"
-            :title="'Api Token (' + revealed.id + ')'"
-            v-if="revealed.id > 0"
-        >
-        <p class="text-center">
-            <strong>Token:</strong> {{ revealed.token }}
-        </p>
-        </b-modal>
-
     </div>
 
 </template>
@@ -71,14 +49,14 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
-import ApiTokenMixin from '@/mixins/apiToken';
+import ZoneMixin from '@/mixins/zone';
 import DataTableMixin from '@/mixins/dataTable';
 
-import apiToken from '@/services/apiToken';
+import zone from '@/services/zone';
 
 // TODO: move to vuex / persistent data
 @Component
-export default class ApiTokensTable extends mixins(CommonMixin, ApiTokenMixin, DataTableMixin) {
+export default class ZonesTable extends mixins(CommonMixin, ZoneMixin, DataTableMixin) {
     revealed = {
         id: 0,
         token: ''
@@ -90,59 +68,42 @@ export default class ApiTokensTable extends mixins(CommonMixin, ApiTokenMixin, D
             sortable: true
         },
         {
-            key: 'scopes',
-            label: 'Scopes',
+            key: 'domain',
+            label: 'Domain',
             sortable: true
         },
         {
-            key: 'expires_at',
-            label: 'Expires',
+            key: 'ip',
+            label: 'Resolves',
             sortable: true
         },
         {
             key: 'actions',
             label: 'Status'
-        },
-        {
-            key: 'reveal',
-            label: 'Reveal'
         }
     ]
 
     deactivateAction(token, index, target) {
-        apiToken.deactivateApiToken(token.id).then((res) => {
+        zone.deactivateZone(token.id).then((res) => {
             this.freshLoad()
         })
     }
 
-    revealAction(token, index, target) {
-        apiToken.getSensitiveApiToken(token.id).then((res) => {
-            let token = res.api_token;
-            this.revealed.id = token.id;
-            this.revealed.token = token.token;
-            this.openRevealedModal()
+    activateAction(token, index, target) {
+        zone.activateZone(token.id).then((res) => {
+            this.freshLoad()
         })
     }
 
-
-     openRevealedModal() {
-         this.$refs['token-reveal-modal'].show()
-     }
-
-    closeRevealedModal() {
-        console.log("Closing modal")
-        this.$refs['token-reveal-modal'].hide()
-     }
-
     loadData() {
-        return apiToken.getApiTokens(this.currentPage, this.perPage)
+        return zone.getZones(this.currentPage, this.perPage)
     }
 
     freshLoad() {
         this.loadData().then((res) => {
             this.currentPage = res.pagination.page
             this.perPage = res.pagination.per_page
-            this.items = res.api_tokens
+            this.items = res.zones
             this.isLoaded = true
         })
     }

@@ -1,6 +1,11 @@
 <template>
     <div class="home-page row">
         <b-container style="padding-top: 10px" class="page">
+            <div class="row">
+                <div class="col-md-10 offset-md-1 col-xs-12">
+                    <h2>Api Tokens</h2>
+                </div>
+            </div>
             <div class="row" style="padding-bottom: 20px">
                 <div class="col-md-10 offset-md-1 col-xs-12">
                       <b-button v-b-modal.create-api-token class="pull-right" variant="outline-primary">

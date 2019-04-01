@@ -22,7 +22,6 @@ export interface User {
 
 export interface ApiToken {
     id: number
-    token?: string | null
     scopes: string
     is_active: boolean
 }
@@ -43,6 +42,46 @@ export interface ApiTokenCreateForm {
     scopes: string
     expires_at: number
 }
+
+
+export interface SensitiveApiToken {
+    id: number
+    token?: string | null
+    scopes: string
+    is_active: boolean
+}
+
+export interface SensitiveApiTokenResponse {
+    api_token: SensitiveApiToken;
+    messages?: Message[]
+    pagination?: object
+}
+
+
+export interface Zone {
+    id: number
+    domain: string
+    ip: string
+    is_active: boolean
+}
+
+export interface ZoneResponse {
+    zone: Zone;
+    messages?: Message[]
+    pagination?: object
+}
+
+export interface ZonesResponse {
+    zones: Zone[];
+    messages?: Message[]
+    pagination?: object
+}
+
+export interface ZoneCreateForm {
+    domain: string
+    ip: string
+}
+
 
 export interface DnsRequest {
     id: number

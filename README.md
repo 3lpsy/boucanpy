@@ -1,10 +1,29 @@
 # Bounty DNS: A DNS Catcher
 
-Status: Non-functional / WIP
+Status: Non-functional / WIP / PoC
 
 This project is an attempt to implement a lightweight burp collaborator-esc application and consists of two main components: a DNS Server (Custom Python Implemention with dnslib) and an API.
 
 When answering queries, the DNS server hits the API with information regarding the DNS query. The API will then serve the log of the DNS queries via a RESTful HTTP API as well as front-end (HTML/JS) web GUI.
+
+## Phase 1: Build the PoC (Current)
+
+The first iteration of the project will be a proof of concept to demonstrate the project's viability. At this point, the project should not be considered stable, secure, or feature complete.
+
+## Phase 2: Polish The Code
+
+After demonstrating that the project is worth dedicating time to, Phase 2 will involve making the project feature complete with all clients (JS / SimpleWeb / CLI) and features (webhooks / email / queue) completed. At this point, the project should not be considered stable nor secure.
+
+## Phase 3: Stability
+
+Next, sanity checks and proper handlers will be put in place so that API calls fail gracefully. At this point the project should not be considered secure.
+
+## Phase 4: Release 0.1.0-alpha
+
+Once I'm satisfied the code is not complete trash, I'll release it as version 0.1.0. At this point, the project should be considered secure enough to deploy in protected subnets.
+
+
+
 
 TODO:
 - [x] Build DNS Implementation
@@ -17,6 +36,7 @@ TODO:
 - [x] Integrate API Callbacks into DNS Server
 - [ ] Build Web GUI
 - [ ] Build ability for webhook's / events
+- [ ] Implement actual validation
 
 ```
 usage: bdnsctl.py [-h]

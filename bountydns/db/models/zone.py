@@ -8,3 +8,4 @@ class Zone(Base):
     id = Column(Integer, primary_key=True, index=True)
     domain = Column(String, unique=True, index=True)
     ip = Column(String, unique=False, index=True)
+    is_active = Column(Boolean(), default=True)

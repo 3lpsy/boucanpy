@@ -1,6 +1,6 @@
 import qs from 'qs';
 import * as api from '@/services/api'
-import { ApiTokensResponse, ApiTokenResponse, ApiTokenCreateForm } from '@/types';
+import { ApiTokensResponse, ApiTokenResponse, ApiTokenCreateForm, SensitiveApiTokenResponse } from '@/types';
 
 
 class ApiTokenService {
@@ -12,6 +12,15 @@ class ApiTokenService {
                 resolve(responseData)
             }).catch((err) => {
                 reject(err)
+            })
+        })
+    }
+
+    getSensitiveApiToken(tokenId: number) {
+        return new Promise((resolve, reject) => {
+            api.http.get(`/api-token/${tokenId}/sensitive`).then((response: any) => {
+                let responseData = (response.data as SensitiveApiTokenResponse)
+                resolve(responseData)
             })
         })
     }

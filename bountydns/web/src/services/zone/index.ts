@@ -1,0 +1,53 @@
+import qs from 'qs';
+import * as api from '@/services/api'
+import { ZonesResponse, ZoneResponse, ZoneCreateForm } from '@/types';
+
+
+class ZoneService {
+    getZones(page: number = 1, perPage: number = 20): Promise<ZonesResponse> {
+        return new Promise((resolve, reject) => {
+            let query = qs.stringify({page: page, per_page: perPage});
+            api.http.get('/zone', {data: query}).then((response: any) => {
+                let responseData = (response.data as ZonesResponse)
+                resolve(responseData)
+            }).catch((err) => {
+                reject(err)
+            })
+        })
+    }
+
+    createZone(form: ZoneCreateForm): Promise<ZoneResponse> {
+        return new Promise((resolve, reject) => {
+            api.http.post('/zone', form).then((response: any) => {
+                let responseData = (response.data as ZoneResponse)
+                resolve(responseData)
+            }).catch((err) => {
+                reject(err)
+            })
+        })
+    }
+
+    deactivateZone(zoneId: number): Promise<any> {
+        return new Promise((resolve, reject) => {
+            api.http.delete(`/zone/${zoneId}`).then((response: any) => {
+                let responseData = (response.data as ZoneResponse)
+                resolve(responseData)
+            }).catch((err) => {
+                reject(err)
+            })
+        })
+    }
+
+    activateZone(zoneId: number): Promise<any> {
+        return new Promise((resolve, reject) => {
+            api.http.put(`/zone/${zoneId}/activate`).then((response: any) => {
+                let responseData = (response.data as ZoneResponse)
+                resolve(responseData)
+            }).catch((err) => {
+                reject(err)
+            })
+        })
+    }
+}
+
+export default new ZoneService();
