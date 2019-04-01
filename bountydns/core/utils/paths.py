@@ -43,10 +43,10 @@ def db_dir(path=None):
     return _ajoin(db_dir(), path)
 
 
-def web_dir(path=None):
+def webui_dir(path=None):
     if not path:
-        return project_dir("web")
-    return _ajoin(web_dir(), path)
+        return project_dir("webui")
+    return _ajoin(webui_dir(), path)
 
 
 def test_dir(path=None):

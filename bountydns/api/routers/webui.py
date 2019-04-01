@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, File
 from starlette.responses import HTMLResponse
-from bountydns.core.utils import web_dir
+from bountydns.core.utils import webui_dir
 from bountydns.api.jinja2 import jinja2
 
 router = APIRouter()
