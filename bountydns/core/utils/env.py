@@ -12,7 +12,7 @@ def load_env(target):
         logger.debug(f"loading {target} environment")
         load_dotenv(dotenv_path=target_path)
     else:
-        logger.warning(f"failed to load {target} environment")
+        logger.warning(f"failed to load {target} environment file")
 
 
 def setenv(key, val):

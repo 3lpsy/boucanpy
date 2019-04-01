@@ -1,0 +1,6 @@
+version: '3.3'
+services:
+  bountydns:
+    build:
+      context: ./../../
+      dockerfile: bountydns.dockerfile

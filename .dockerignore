@@ -1,1 +1,8 @@
 .env/*
+.venv
+.vscode
+.pytest_cache
+.mypy_cache
+.git
+infra
+__pycache__
