@@ -22,10 +22,8 @@ Next, sanity checks and proper handlers will be put in place so that API calls f
 
 Once I'm satisfied the code is not complete trash, I'll release it as version 0.1.0. At this point, the project should be considered secure enough to deploy in protected subnets.
 
-
-
-
 TODO:
+
 - [x] Build DNS Implementation
 - [x] Build CLI Foundation
 - [x] Build Alembic Commands
@@ -34,7 +32,9 @@ TODO:
 - [x] Build API Token Capabilities (Generate Extended Auth Tokens)
 - [x] Build API Zone / DNS Routes
 - [x] Integrate API Callbacks into DNS Server
-- [ ] Build Web GUI
+- [x] Build Web GUI Foundation
+- [ ] Incorporate ApiClient and ApiTokens into DNS Server
+- [ ] Get Websockets Working
 - [ ] Build ability for webhook's / events
 - [ ] Implement actual validation
 
@@ -65,5 +65,4 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-
- ```
+```
