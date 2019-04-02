@@ -5,7 +5,7 @@ from starlette.requests import Request
 from fastapi import HTTPException, Security, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
-from bountydns.core.entities import TokenPayload, UserRepo
+from bountydns.core.entities import TokenPayload, UserRepo, BlackListedTokenRepo
 from bountydns.db.models.user import User
 
 DEFAULT_TOKEN_URL = "/api/v1/auth/token"
@@ -31,7 +31,7 @@ def create_bearer_token(*, data: dict, expires_delta: timedelta = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=60)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
         to_encode, config.API_SECRET_KEY, algorithm=config.JWT_ALGORITHM
@@ -40,15 +40,20 @@ def create_bearer_token(*, data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-def validate_jwt_token(token: str, leeway=0):
+def verify_jwt_token(token: str, bl_token_repo=None, leeway=0):
     from bountydns.api import config  # environment must be loaded
 
+    if bl_token_repo:
+        if bl_token_repo.exists(token=token):
+            raise HTTPException(status_code=403, detail="Forbidden")
+    else:
+        logger.warning("verifying token without checking the blacklist. dangerous!")
     try:
         payload = jwt.decode(
             token, config.API_SECRET_KEY, algorithms=config.JWT_ALGORITHM, leeway=leeway
         )
     except jwt.PyJWTError:
-        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Forbidden")
+        raise HTTPException(status_code=403, detail="Forbidden")
     return payload
 
 
@@ -77,8 +82,15 @@ class ScopedTo(Depends):
         self._scopes = scopes
         self._leeway = leeway
 
-    def __call__(self, request: Request, token: str = Security(oauth2)) -> TokenPayload:
-        token = validate_jwt_token(token, self._leeway)  # proper validation goes here
+    def __call__(
+        self,
+        request: Request,
+        bl_token_repo: BlackListedTokenRepo = Depends(BlackListedTokenRepo),
+        token: str = Security(oauth2),
+    ) -> TokenPayload:
+        token = verify_jwt_token(
+            token, bl_token_repo, self._leeway
+        )  # proper validation goes here
         if not token_has_required_scopes(token, self._scopes):
             raise HTTPException(403, detail="Forbidden")
         return token

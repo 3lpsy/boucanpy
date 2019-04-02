@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -9,3 +10,5 @@ class DnsRequestData(BaseModel):
     source_port: int
     type: str
     protocol: str
+    dns_server_name: str
+    created_at: datetime

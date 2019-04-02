@@ -1,13 +1,10 @@
-
 <template>
-  <footer class="footer">
-    <div class="container text-center">
-      <a href="/" class="logo-font">@bountydns</a>
-      <span class="attribution">
-
-      </span>
-    </div>
-  </footer>
+    <footer class="footer row">
+        <div class="container text-center">
+            <a href="/" class="logo-font">@bountydns</a>
+            <span class="attribution"> </span>
+        </div>
+    </footer>
 </template>
 
 <script>
@@ -18,8 +15,8 @@ export default class AppFooter extends Vue {}
 
 <style media="screen">
 .footer {
-    position: absolute;
-    bottom: 0;
+    /* position: absolute; */
+    /* bottom: 0; */
     width: 100%;
     height: 60px;
     line-height: 60px;

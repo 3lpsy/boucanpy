@@ -10,6 +10,7 @@ from bountydns.core import logger
 
 from bountydns.api.routers import routers
 from bountydns.api.routers.webui import router as webui_router
+from bountydns.api.routers.websocket import router as websocket_router
 
 from bountydns.db.session import session, db_register
 from bountydns.db.utils import make_db_url
@@ -47,6 +48,7 @@ for r, ropts in routers:
 
 api.include_router(main_router, prefix=config.API_V1_STR)
 api.include_router(webui_router)
+api.include_router(websocket_router)
 
 
 @api.middleware("http")

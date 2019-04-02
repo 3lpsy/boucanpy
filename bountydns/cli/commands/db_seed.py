@@ -1,7 +1,7 @@
-from bountydns.core import logger, load_env
+from bountydns.core import logger
 from bountydns.cli.commands.base import BaseCommand
 from bountydns.db.factories import factory
-from bountydns.db import db_register, make_db_url
+import uuid
 
 
 class DbSeed(BaseCommand):
@@ -16,14 +16,18 @@ class DbSeed(BaseCommand):
         return parser
 
     def run(self):
-        load_env("db")
-        db_register(make_db_url())
+        self.load_env("api", "db")
+        self.db_register()
+
         logger.info("creating superuser")
         super = factory("SuperUserFactory").create(email="jim@jim.jim")
         logger.info("creating zones")
 
         zone = factory("ZoneFactory").create(domain="example.com", ip="127.0.1.1")
-        zone2 = factory("ZoneFactory").create(domain="potato.com", ip="127.0.1.1")
+        dns_server_name = uuid.uuid4()
+        zone2 = factory("ZoneFactory").create(
+            domain="potato.com", ip="127.0.1.1", dns_server_name=dns_server_name
+        )
 
         logger.info("creating api_tokens")
 
@@ -33,5 +37,9 @@ class DbSeed(BaseCommand):
         logger.info("creating dns_requests")
         dns_request = factory("DnsRequestFactory").create(zone_id=zone.id)
         dns_request = factory("DnsRequestFactory").create(zone_id=zone2.id)
-        dns_request = factory("DnsRequestFactory").create()
-        dns_request = factory("DnsRequestFactory").create()
+        dns_request = factory("DnsRequestFactory").create(
+            dns_server_name=dns_server_name
+        )
+        dns_request = factory("DnsRequestFactory").create(
+            dns_server_name=dns_server_name
+        )

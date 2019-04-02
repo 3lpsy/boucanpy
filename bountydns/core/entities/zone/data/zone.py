@@ -1,4 +1,6 @@
+from typing import Optional
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class ZoneData(BaseModel):
@@ -6,3 +8,5 @@ class ZoneData(BaseModel):
     ip: str
     domain: str
     is_active: bool
+    dns_server_name: Optional[str]
+    created_at: datetime

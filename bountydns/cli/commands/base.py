@@ -49,6 +49,10 @@ class BaseCommand:
                 default="info",
                 help="secondary log level",
             )
+
+            parser.add_argument(
+                "--no-envs", action="store_true", help="don't load env files"
+            )
         if cls.add_debug:
             parser.add_argument("-D", "--debug", action="store_true", help="debug")
 
@@ -81,9 +85,12 @@ class BaseCommand:
             return self.options.get(key)
         return self.options.get(key, default)
 
-    @classmethod
-    def load_env(cls, key):
-        return load_env(key)
+    def load_env(self, *args):
+        if not self.option("no_envs", False):
+            for key in args:
+                load_env(key)
+            return True
+        return False
 
     @classmethod
     def db_register(cls):

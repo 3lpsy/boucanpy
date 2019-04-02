@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from bountydns.core import logger
-from bountydns.core.security import ScopedTo
+from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.core.entities import (
     DnsRequestRepo,
     PaginationQS,
@@ -21,7 +21,7 @@ options = {"prefix": ""}
 async def index(
     pagination: PaginationQS = Depends(PaginationQS),
     dns_request_repo: DnsRequestRepo = Depends(DnsRequestRepo),
-    token: str = ScopedTo("dns-request:list"),
+    token: TokenPayload = ScopedTo("dns-request:list"),
 ):
     pg, items = (
         dns_request_repo.paginate(pagination).set_data_model(DnsRequestData).data()

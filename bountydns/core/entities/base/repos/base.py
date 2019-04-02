@@ -30,29 +30,45 @@ class BaseRepo:
     def data(self):
         if self._is_paginated:
             return self.paginated_data()
+        dm = self.data_model()
         if self._is_list:
-            return [self.data_model()(**r.as_dict()) for r in self.results()]
-        return self.data_model()(**self.results().as_dict())
+            return [dm(**self.to_dict(r)) for r in self.results()]
+        return dm(**self.to_dict(self.results()))
 
     def paginated_data(self):
+        dm = self.data_model()
         return (
             PaginationData(
                 page=self._results.page,
                 per_page=self._results.per_page,
                 total=self._results.total,
             ),
-            [self.data_model()(**r.as_dict()) for r in self._results.items],
+            [dm(**self.to_dict(r)) for r in self._results.items],
         )
 
+    def to_dict(self, item):
+        return item.as_dict() if hasattr(item, "as_dict") else dict(item)
+
     def get(self, id):
-        self._results = self.query().get(id)
+        return self.query().get(id)
+
+    def first(self, **kwargs):
+        self._results = self.query().filter_by(**kwargs).first()
         return self
 
-    def exists(self, id):
-        self._results = self.query().get(id)
+    def exists(self, id=None, **kwargs):
+        if id and not kwargs:
+            kwargs = {"id": id}
+        self._results = self.query().filter_by(**kwargs).first()
         return bool(self._results)
 
-    def all(self):
+    def filter_by(**kwargs):
+        self.query().filter_by(**kwargs)
+        return self
+
+    def all(self, **kwargs):
+        if kwargs:
+            self.filter_by(**kwargs)
         self._results = self.query().all()
         self._is_list = True
         return self

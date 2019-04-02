@@ -1,4 +1,5 @@
 import random
+import uuid
 from factory import Faker, LazyFunction
 from .base import BaseFactory, fake
 from bountydns.db.models.dns_request import DnsRequest
@@ -24,3 +25,4 @@ class DnsRequestFactory(BaseFactory):
     source_port = LazyFunction(random_port)
     type = "A"
     protocol = "udp"
+    dns_server_name = LazyFunction(uuid.uuid4)

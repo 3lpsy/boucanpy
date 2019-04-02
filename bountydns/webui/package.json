@@ -6,7 +6,6 @@
         "serve": "vue-cli-service serve --port 8000",
         "build": "vue-cli-service build",
         "watch": "vue-cli-service build --watch",
-
         "lint": "vue-cli-service lint",
         "test:e2e": "vue-cli-service test:e2e",
         "test:unit": "vue-cli-service test:unit"
@@ -25,10 +24,15 @@
         "prettier-eslint": "^8.8.2",
         "prettier-tslint": "^0.4.2",
         "qs": "^6.7.0",
+        "underscore": "^1.9.1",
+        "uuid4": "^1.1.4",
         "vue": "^2.6.6",
+        "vue-bootstrap-typeahead": "^0.2.6",
         "vue-class-component": "^6.0.0",
+        "vue-native-websocket": "^2.0.12",
         "vue-property-decorator": "^8.1.0",
         "vue-router": "^3.0.1",
+        "vue-websocket": "^0.2.3",
         "vuex": "^3.0.1",
         "vuex-module-decorators": "^0.9.8"
     },

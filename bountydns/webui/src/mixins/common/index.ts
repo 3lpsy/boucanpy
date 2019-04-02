@@ -10,9 +10,9 @@ export default class MyMixin extends Vue {
     }
 
     logout() {
-        console.log("dispatching auth/defauthenticate")
+        console.log('dispatching auth/defauthenticate');
         this.$store.dispatch('auth/deauthenticate').then(() => {
-            this.$router.push({name: 'login'})
-        })
+            this.$router.push({ name: 'login' });
+        });
     }
 }

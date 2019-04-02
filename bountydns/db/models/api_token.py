@@ -10,3 +10,4 @@ class ApiToken(Base):
     scopes = Column(String)
     is_active = Column(Boolean(), default=True)
     expires_at = Column(DateTime, default=True)
+    dns_server_name = Column(String)

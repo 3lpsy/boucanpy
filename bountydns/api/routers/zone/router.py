@@ -20,7 +20,7 @@ async def index(
     zone_repo: ZoneRepo = Depends(ZoneRepo),
     token: TokenPayload = ScopedTo("zone:list"),
 ):
-    pg, items = zone_repo.paginate(pagination).set_data_model(ZoneData).data()
+    pg, items = zone_repo.paginate(pagination).data()
     return ZonesResponse(pagination=pg, zones=items)
 
 

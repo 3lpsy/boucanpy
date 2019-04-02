@@ -1,11 +1,10 @@
-
 <template>
-  <div id="app">
-      <app-navbar></app-navbar>
-      <app-alerts></app-alerts>
-      <router-view></router-view>
-      <app-footer></app-footer>
-  </div>
+    <div id="app">
+        <app-navbar></app-navbar>
+        <app-alerts></app-alerts>
+        <router-view></router-view>
+        <app-footer></app-footer>
+    </div>
 </template>
 
 <script lang="ts">
@@ -15,22 +14,34 @@ import AppNavbar from '@/components/AppNavbar.vue';
 import AppAlerts from '@/components/AppAlerts.vue';
 
 @Component({
-  components: {
-    AppFooter,
-    AppNavbar,
-    AppAlerts
-  },
+    components: {
+        AppFooter,
+        AppNavbar,
+        AppAlerts,
+    },
 })
 export default class App extends Vue {
+    mounted() {
+        console.log('sending websocket');
+        // @ts-ignore
+        this.$socket.send('hello');
+    }
 }
 </script>
 
-<style lang='scss'>
+<style lang="scss">
 @import '~@/assets/scss/main.scss';
 
+body {
+    background-color: #f5f5f5;
+}
 #app {
+    display: block;
     height: 100%;
     width: 100%;
-    margin-bottom: 60px;
+    background-color: #f5f5f5;
+}
+.page {
+    background-color: #ffffff;
 }
 </style>

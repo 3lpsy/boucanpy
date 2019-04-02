@@ -1,6 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from bountydns.core import logger, only
-from bountydns.core.security import ScopedTo, TokenPayload
+from bountydns.core.security import (
+    ScopedTo,
+    TokenPayload,
+    create_bearer_token,
+    current_user,
+)
+from bountydns.db.models.user import User
 from bountydns.core.entities import (
     PaginationQS,
     ApiTokensResponse,
@@ -11,7 +17,6 @@ from bountydns.core.entities import (
     SensitiveApiTokenData,
     BaseResponse,
 )
-import uuid
 
 
 router = APIRouter()
@@ -33,6 +38,7 @@ async def store(
     form: ApiTokenCreateForm,
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
     token: TokenPayload = ScopedTo("api-token:create"),
+    user: User = Depends(current_user),
 ):
     scopes = []
     for requested_scope in form.scopes.split(" "):
@@ -49,11 +55,22 @@ async def store(
             scopes.append(requested_scope)
 
     # TODO: use better randomness
+
+    token = create_bearer_token(
+        data={
+            "sub": user.id,
+            "scopes": " ".join(scopes),
+            "dns_server_name": form.dns_server_name,
+        }
+    )
+
     data = {
         "scopes": " ".join(scopes),
-        "token": uuid.uuid4().hex,
+        "token": str(token.decode()),
         "expires_at": form.expires_at,
+        "dns_server_name": form.dns_server_name,
     }
+
     api_token = api_token_repo.create(data).data()
     return ApiTokenResponse(api_token=api_token)
 

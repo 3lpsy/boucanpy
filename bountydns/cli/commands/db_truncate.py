@@ -17,7 +17,7 @@ class DbTruncate(BaseCommand):
         return parser
 
     def run(self):
-        self.load_env("db")
+        self.load_env("api", "db")
         self.db_register()
         failed = []
         if self.option("confirm"):

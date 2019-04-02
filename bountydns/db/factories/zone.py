@@ -10,3 +10,4 @@ class ZoneFactory(BaseFactory):
     domain = Faker("domain_name")
     ip = LazyFunction(fake.ipv4_private)
     is_active = True
+    dns_server_name = None

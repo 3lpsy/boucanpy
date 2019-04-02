@@ -9,46 +9,37 @@ from bountydns.dns.record import Record
 
 
 class Resolver(BaseResolver):
-    def __init__(self, api_url, api_token):
+    def __init__(self, api_client):
         # super().__init__(upstream, 53, 5)
-        self.api_url = api_url
-        self.api_token = api_token
-        self.zones = self.maps_to_zones(self.get_zone_maps())
+        self.api_client = api_client
+        self.records = self.zones_to_records(self.get_zones())
 
-    def maps_to_zones(self, maps):
-        zones = []
-        for zone_map in maps:
+    def zones_to_records(self, zones):
+        records = []
+        for zone in zones:
             try:
-                for rr in self.map_to_rr(zone_map):
+                for rr in self.zone_to_rr(zone):
                     logger.debug(
                         "registering zone rr name {} and type {}".format(
                             rr.rname, QTYPE[rr.rtype]
                         )
                     )
-                    zone = Record(zone_map, rr)
-                    zones.append(zone)
-                    logger.debug(" %2d: %s", len(zones), zone)
+                    record = Record(zone, rr)
+                    records.append(record)
+                    logger.debug(" %2d: %s", len(records), record)
             except Exception as e:
                 raise RuntimeError(
-                    f'Error processing line ({e.__class__.__name__}: {e}) "{zone_map[0].strip()}"'
+                    f'Error processing line ({e.__class__.__name__}: {e}) "{zone.domain}"'
                 ) from e
-            logger.info("zone map generated {}".format(str(zone_map)))
-        logger.info("%d zone resource records generated", len(zones))
-        return zones
+            logger.info("zone map generated {}".format(str(zone)))
+        logger.info("%d zone resource records generated", len(records))
+        return records
 
-    def get_zone_maps(self):
-        res = requests.get(
-            "{}/api/v1/{}".format(self.api_url, "zone"),
-            headers={"Authorization": "Bearer {}".format(self.api_token)},
-        )
-        # TODO: Error handling / boot without api-token (?)
-        zm = []
-        for zone in res.json()["zones"]:
-            zm.append((zone["domain"], zone["ip"]))
-        return zm
+    def get_zones(self):
+        return self.api_client.get_zones()
 
-    def map_to_rr(self, zone_map):
-        z = ZONE_TEMPLATE.format(domain_name=zone_map[0], domain_ip=zone_map[1])
+    def zone_to_rr(self, zone):
+        z = ZONE_TEMPLATE.format(domain_name=zone.domain, domain_ip=zone.ip)
         return RR.fromZone(textwrap.dedent(z))
 
     def resolve(self, request, handler):
@@ -56,7 +47,7 @@ class Resolver(BaseResolver):
         logger.warning(request.__class__.__name__)
         qname = request.q.qname
         qtype = QTYPE[request.q.qtype]
-        for record in self.zones:
+        for record in self.records:
             # Check if label & type match
             if record.match(request.q):
                 a = copy.copy(record.rr)
