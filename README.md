@@ -10,6 +10,11 @@ When answering queries, the DNS server hits the API with information regarding t
 
 The first iteration of the project will be a proof of concept to demonstrate the project's viability. At this point, the project should not be considered stable, secure, or feature complete.
 
+Features:
+
+- WebSocket Support
+- WebHook Support
+
 ## Phase 2: Polish The Code
 
 After demonstrating that the project is worth dedicating time to, Phase 2 will involve making the project feature complete with all clients (JS / SimpleWeb / CLI) and features (webhooks / email / queue) completed. At this point, the project should not be considered stable nor secure.
