@@ -160,7 +160,7 @@ export default class ApiTokensTable extends mixins(
     }
 
     loadData() {
-        return apiToken.getApiTokens(this.currentPage || 1, this.perPage, this.sortBy, this.sortDir).then((res) => {
+        return apiToken.getApiTokens(this.currentPage || 1, this.perPage, this.sortBy, this.sortDesc ? 'desc' : 'asc').then((res) => {
             this.currentPage = res.pagination.page;
             this.perPage = res.pagination.per_page;
             this.total = res.pagination.total;

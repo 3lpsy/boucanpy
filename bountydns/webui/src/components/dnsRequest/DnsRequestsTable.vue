@@ -47,7 +47,8 @@ export default class DnsRequestsTable extends mixins(
     DnsRequestMixin,
     DataTableMixin,
 ) {
-    sortBy = 'created_by';
+    sortBy = 'created_at';
+    sortDesc = true;
     fields = {
         id: {
             label: 'ID',

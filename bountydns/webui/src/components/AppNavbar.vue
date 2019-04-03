@@ -1,6 +1,6 @@
 <template>
         <b-navbar toggleable="lg" type="dark" variant="dark">
-            <b-navbar-brand :to="{name: 'home'}">
+            <b-navbar-brand href="/>
                 BountyDNS
             </b-navbar-brand>
 
