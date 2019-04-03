@@ -8,6 +8,7 @@ from bountydns.core.security import (
 )
 from bountydns.db.models.user import User
 from bountydns.core.entities import (
+    SortQS,
     PaginationQS,
     ApiTokensResponse,
     ApiTokenResponse,
@@ -25,11 +26,12 @@ options = {"prefix": ""}
 
 @router.get("/api-token", name="api_token.index", response_model=ApiTokensResponse)
 async def index(
+    sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
     token: TokenPayload = ScopedTo("api-token:list"),
 ):
-    pg, items = api_token_repo.paginate(pagination).data()
+    pg, items = api_token_repo.sort(sort_qs).paginate(pagination).data()
     return ApiTokensResponse(pagination=pg, api_tokens=items)
 
 

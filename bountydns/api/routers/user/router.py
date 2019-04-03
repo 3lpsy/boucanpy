@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends
 from bountydns.core.security import ScopedTo, hash_password, TokenPayload
 from bountydns.core.entities import (
-    UserRepo,
     PaginationQS,
+    SortQS,
+    UserRepo,
     UsersResponse,
     UserResponse,
     UserData,
@@ -15,11 +16,12 @@ options = {"prefix": ""}
 
 @router.get("/user", name="user.index", response_model=UsersResponse)
 async def index(
+    sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
     user_repo: UserRepo = Depends(UserRepo),
     token: TokenPayload = ScopedTo("user:list"),
 ):
-    pg, items = user_repo.paginate(pagination).set_data_model(UserData).data()
+    pg, items = user_repo.sort(sort_qs).paginate(pagination).data()
     return UsersResponse(pagination=pg, users=items)
 
 
@@ -36,5 +38,5 @@ async def post(
         "is_active": True,
         "is_superuser": False,
     }
-    item = user_repo.create(data).set_data_model(UserData).data()
+    item = user_repo.create(data).data()
     return UserResponse(user=item)

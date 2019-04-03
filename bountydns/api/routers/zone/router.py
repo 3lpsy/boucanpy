@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends
 from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.core.entities import (
-    ZoneRepo,
+    SortQS,
     PaginationQS,
+    ZoneRepo,
     ZonesResponse,
     ZoneResponse,
     ZoneData,
@@ -16,11 +17,12 @@ options = {"prefix": ""}
 
 @router.get("/zone", name="zone.index", response_model=ZonesResponse)
 async def index(
+    sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
     zone_repo: ZoneRepo = Depends(ZoneRepo),
     token: TokenPayload = ScopedTo("zone:list"),
 ):
-    pg, items = zone_repo.paginate(pagination).data()
+    pg, items = zone_repo.sort(sort_qs).paginate(pagination).data()
     return ZonesResponse(pagination=pg, zones=items)
 
 

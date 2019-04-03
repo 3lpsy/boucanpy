@@ -3,8 +3,9 @@ from fastapi import APIRouter, Depends
 from bountydns.core import logger
 from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.core.entities import (
-    DnsRequestRepo,
+    SortQS,
     PaginationQS,
+    DnsRequestRepo,
     DnsRequestsResponse,
     DnsRequestResponse,
     DnsRequestData,
@@ -20,13 +21,12 @@ options = {"prefix": ""}
     "/dns-request", name="dns_request.index", response_model=DnsRequestsResponse
 )
 async def index(
+    sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
     dns_request_repo: DnsRequestRepo = Depends(DnsRequestRepo),
     token: TokenPayload = ScopedTo("dns-request:list"),
 ):
-    pg, items = (
-        dns_request_repo.paginate(pagination).set_data_model(DnsRequestData).data()
-    )
+    pg, items = dns_request_repo.sort(sort_qs).paginate(pagination).data()
     return DnsRequestsResponse(pagination=pg, dns_requests=items)
 
 
@@ -48,6 +48,6 @@ async def index(
         data["zone_id"] = zone_repo.data().id
     else:
         logger.warning(f"No zone found for dns request {domain_name}")
-    dns_request = dns_request_repo.create(data).set_data_model(DnsRequestData).data()
+    dns_request = dns_request_repo.create(data).data()
 
     return DnsRequestResponse(dns_request=dns_request)

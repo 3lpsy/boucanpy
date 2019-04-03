@@ -99,7 +99,6 @@ class BaseRepo:
         logger.debug(
             f"executing page query {self.compiled()} in {self.__class__.__name__}"
         )
-        self.sort(pagination.sort_by, pagination.sort_dir)
         self._results = self.query().paginate(
             page=pagination.page, per_page=pagination.per_page, count=True
         )
@@ -108,9 +107,9 @@ class BaseRepo:
 
     ## FILTERS / MODIFICATION
 
-    def sort(self, sort_by, sort_dir):
-        sort = self.label(sort_by)
-        if sort_dir.lower() == "desc":
+    def sort(self, sort_qs):
+        sort = self.label(sort_qs.sort_by)
+        if sort_qs.sort_dir.lower() == "desc":
             sort = desc(sort)
         self._query = self.query().order_by(sort)
         return self
