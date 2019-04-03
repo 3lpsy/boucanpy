@@ -3,10 +3,19 @@ import jwtDecode from 'jwt-decode';
 import {Token as TokenData, TokenPayload} from '@/types';
 
 const COOKIE_NAME = process.env.VUE_APP_COOKIE_NAME || 'auth_token';
+const WS_COOKIE_NAME = process.env.VUE_APP_WS_COOKIE_NAME || 'ws_auth_token';
 
 class Token {
     cookie(): string {
         let cookie = Cookie.get(COOKIE_NAME);
+        if (!cookie || typeof cookie !== 'string') {
+            return '';
+        }
+        return cookie;
+    }
+
+    cookieWS(): string {
+        let cookie = Cookie.get(WS_COOKIE_NAME);
         if (!cookie || typeof cookie !== 'string') {
             return '';
         }
@@ -19,6 +28,10 @@ class Token {
 
     save(accessToken: string) {
         return Cookie.set(COOKIE_NAME, accessToken)
+    }
+
+    saveWS(wsAccessToken: string) {
+        return Cookie.set(WS_COOKIE_NAME, wsAccessToken)
     }
 
     remove() {
@@ -38,6 +51,10 @@ class Token {
 
     get(): string {
         return this.cookie()
+    }
+
+    getWS(): string {
+        return this.cookieWS()
     }
 }
 

@@ -9,9 +9,9 @@ Vue.component('vue-bootstrap-typeahead', VueBootstrapTypeahead);
 import App from './App.vue';
 import router from '@/router';
 import { store } from './store';
-import {publicWS} from '@/broadcast'
+import broadcast from '@/broadcast'
 
-console.log(publicWS)
+broadcast.registerPublicWS()
 
 Vue.config.productionTip = false;
 

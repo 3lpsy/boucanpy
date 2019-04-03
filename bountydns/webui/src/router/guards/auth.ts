@@ -19,7 +19,7 @@ export class IsAuthenticated extends Guard {
     protect(to: Route, from: Route, next: any): void {
         console.log('Running Guard', this);
         if (! store.getters['auth/hasToken'] || ! store.getters['auth/hasUser']) {
-            store.dispatch('auth/authenticateWithToken', token.cookie()).then((user: User) => {
+            store.dispatch('auth/authenticateWithToken', {accessToken: token.cookie(), wsAccessToken: token.cookieWS()}).then((user: User) => {
                 next()
             }).catch((err) => {
                 console.log("Error during middleware authentication")

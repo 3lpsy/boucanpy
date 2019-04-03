@@ -6,7 +6,7 @@ import { User, LoginForm, UserResponse} from '@/types';
 import authService from '@/services/auth';
 import tokenService from '@/services/token';
 import * as api from '@/services/api';
-
+import broadcast from '@/broadcast'
 
 export interface IAuthActions {
     loadUser(context: ActionContext<IAuthState, IState>):  Promise<User>;
@@ -64,8 +64,7 @@ export const AuthActions: IAuthActions = {
           .login(form)
           .then((tokens: any) => {
               console.log('dispatching auth/authenticateWithToken')
-              commit('SET_WS_TOKEN_RAW', tokens.wsAccessToken)
-              return dispatch('authenticateWithToken', tokens.accessToken)
+              return dispatch('authenticateWithToken', tokens)
           }).catch((err) => {
               console.log("authenticate error")
               console.log("dispatching auth/deauthenticate")
@@ -77,12 +76,15 @@ export const AuthActions: IAuthActions = {
           });
     },
 
-    authenticateWithToken({ dispatch, commit }, accessToken: string): Promise<User> {
+    authenticateWithToken({ dispatch, commit }, tokens: any): Promise<User> {
         console.log('auth/authenticateWithToken')
-        let token = tokenService.parse(accessToken)
-        tokenService.save(accessToken)
-        commit('SET_TOKEN', token)
-        api.setServiceToken(accessToken)
+        let token = tokenService.parse(tokens.accessToken)
+        tokenService.save(tokens.accessToken)
+        tokenService.saveWS(tokens.wsTokenRaw)
+        commit('SET_TOKEN', tokens.accessToken)
+        commit('SET_WS_TOKEN_RAW', tokens.wsAccessToken)
+        api.setServiceToken(tokens.accessToken)
+        broadcast.registerAuthedWS(tokens.wsAccessToken)
         return dispatch('loadUser')
     },
 
