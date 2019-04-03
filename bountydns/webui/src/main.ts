@@ -9,12 +9,13 @@ Vue.component('vue-bootstrap-typeahead', VueBootstrapTypeahead);
 import App from './App.vue';
 import router from '@/router';
 import { store } from './store';
+import {publicWS} from '@/broadcast'
 
-// import { WS_URL } from '@/config';
+console.log(publicWS)
 
 Vue.config.productionTip = false;
 
-const vm = new Vue({
+new Vue({
     router,
     store,
     render: (h) => h(App),

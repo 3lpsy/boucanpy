@@ -62,9 +62,10 @@ export const AuthActions: IAuthActions = {
         console.log('auth/authenticate')
         return authService
           .login(form)
-          .then((accessToken: string) => {
+          .then((tokens: any) => {
               console.log('dispatching auth/authenticateWithToken')
-              return dispatch('authenticateWithToken', accessToken)
+              commit('SET_WS_TOKEN_RAW', tokens.wsAccessToken)
+              return dispatch('authenticateWithToken', tokens.accessToken)
           }).catch((err) => {
               console.log("authenticate error")
               console.log("dispatching auth/deauthenticate")

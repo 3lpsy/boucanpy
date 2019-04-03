@@ -15,13 +15,15 @@ from starlette.exceptions import HTTPException
 from bountydns.core.utils import webui_dir, landing_dir
 from bountydns.core import logger
 from bountydns.api.routers import routers
-from bountydns.api.routers.websocket import router as websocket_router
+from bountydns.api.websocket import broadcast_index, broadcast_authed_index
 from bountydns.db.session import session, db_register
 from bountydns.db.utils import make_db_url
 
 db_register(make_db_url())
 
-from bountydns.api import config  # environment must be loaded
+from bountydns.api import (
+    config,
+)  # environment must be loaded, dabatabse must be registerd
 
 
 # CORS
@@ -51,7 +53,14 @@ for r, ropts in routers:
     main_router.include_router(r, **ropts)
 
 api.include_router(main_router, prefix=config.API_V1_STR)
-api.include_router(websocket_router)
+
+from starlette.websockets import WebSocket
+
+# public broadcast
+api.add_websocket_route("/broadcast", broadcast_index, name="broadcast.index")
+api.add_websocket_route(
+    "/broadcast/{ws_auth_token}", broadcast_authed_index, name="broadcast.authed.index"
+)
 
 
 @api.get("/")

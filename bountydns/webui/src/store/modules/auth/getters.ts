@@ -7,6 +7,8 @@ export interface IAuthGetters {
     getUser(state: IAuthState): User;
     hasToken(state: IAuthState): boolean;
     hasUser(state: IAuthState): boolean;
+    hasWSTokenRaw(state: IAuthState): boolean;
+    getWSTokenRaw(state: IAuthState): string;
 
 }
 
@@ -41,5 +43,12 @@ export const AuthGetters: IAuthGetters = {
 
     getUser(state: IAuthState): User {
         return state.user
+    },
+
+    getWSTokenRaw(state: IAuthState): string {
+        return state.wsTokenRaw
+    },
+    hasWSTokenRaw(state: IAuthState): boolean {
+        return state.wsTokenRaw.length > 0
     },
 };

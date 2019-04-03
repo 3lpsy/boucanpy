@@ -16,8 +16,7 @@ options = {"prefix": "/auth"}
 
 @router.post("/refresh", name="auth.refresh", response_model=PasswordAuthResponse)
 async def login(
-    token: TokenPayload = ScopedTo("profile"), user: User = Depends(current_user)
+    token: TokenPayload = ScopedTo("refresh"), user: User = Depends(current_user)
 ):
-
     token = create_bearer_token(data={"sub": token["sub"], "scopes": token["scopes"]})
     return PasswordAuthResponse(token_type="bearer", access_token=str(token.decode()))

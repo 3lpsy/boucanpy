@@ -6,9 +6,20 @@ RUN npm run build
 
 # Main Container
 FROM nginx:1.15
+
+EXPOSE 80
+EXPOSE 443
+
+ENV SSL_ENABLED="1"
+ENV API_BACKEND_PROTO="https"
+ENV API_BACKEND_HOST="api"
+ENV API_BACKEND_PORT="8080"
+ENV DEBUG_CONF="0"
+
 # for development, make /var/www/nginx/webui a volume
 RUN mkdir /nginxconfs
 COPY insecure.nginx.conf /nginxconfs
+
 # TODO: make prod actually prod
 COPY ssl.nginx.conf /nginxconfs
 
@@ -16,7 +27,8 @@ RUN chown -R nginx:nginx /nginxconfs
 
 RUN mkdir -p /var/www/
 COPY --from=build-stage /webui/dist/ /var/www/webui
-COPY --from=build-stage /web/ /var/www/web
+COPY --from=build-stage /landing/ /var/www/landing
+
 RUN chown -R nginx:nginx /var/www
 
 # dynamically configure configs or user defaults to avoid mounts

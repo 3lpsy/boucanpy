@@ -32,4 +32,5 @@ sed -i "s/API_BACKEND_PORT/$API_BACKEND_PORT/g" /etc/nginx/nginx.conf
 if [[ "$DEBUG_CONF" == "1" ]]; then
     cat /etc/nginx/nginx.conf;
 fi
+
 exec nginx -g "daemon off;";

@@ -2,6 +2,7 @@ import uvicorn
 from bountydns.core import logger, set_log_level
 from bountydns.core.utils import project_dir, load_env
 from bountydns.cli.commands.base import BaseCommand
+from bountydns.cli.commands.db_setup import DbSetup
 
 
 class ApiServer(BaseCommand):
@@ -28,18 +29,43 @@ class ApiServer(BaseCommand):
             help="perform an import check of the api instance",
         )
 
+        parser.add_argument(
+            "--no-db-check", action="store_true", help="do not wait for database"
+        )
+
+        parser.add_argument(
+            "--db-setup", action="store_true", help="run db setup before start"
+        )
         return parser
 
     def run(self):
         args = ["bountydns.api.main:api"]
         kwargs = self.get_kwargs()
-        load_env("db")
-        load_env("api")
+        self.load_env("db", "api", "broadcast")
 
         if self.option("import_check", False):
             logger.info("performing import check")
             from bountydns.api.main import api
         logger.critical("starting api server with options: {}".format(str(kwargs)))
+        from bountydns.db.checks import is_db_up, is_db_setup
+
+        if not self.option("no_db_check", False):
+            self.db_register()
+            db_up = is_db_up()
+            if not db_up:
+                logger.critical("database not up error. please check logs")
+                return self.exit(1)
+
+        if self.option("db_setup"):
+            logger.critical("running database migration")
+            DbSetup.make(self.options).run()
+
+        if not self.option("no_db_check", False):
+            db_setup = is_db_setup()
+            if not db_setup:
+                logger.critical("database not setup error. please check logs")
+                return self.exit(1)
+
         return uvicorn.run(*args, **kwargs)
 
     def get_kwargs(self):

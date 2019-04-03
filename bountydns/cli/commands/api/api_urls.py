@@ -17,4 +17,4 @@ class ApiUrls(BaseCommand):
         from bountydns.api.main import api
 
         for route in api.routes:
-            print(route.name, route.path, route.methods)
+            print(route.name, route.path, getattr(route, "methods", None))

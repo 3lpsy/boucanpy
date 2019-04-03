@@ -13,4 +13,4 @@ RUN npm install
 
 COPY ./webui /webui
 
-COPY ./web /web
+COPY ./landing /landing

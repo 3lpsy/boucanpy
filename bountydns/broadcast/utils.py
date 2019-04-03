@@ -1,0 +1,15 @@
+from bountydns.core.utils import getenv
+
+# TODO: no caps
+
+
+def make_broadcast_url():
+    BROADCAST_USER = ""
+    BROADCAST_DRIVER = getenv("BROADCAST_DRIVER")
+    BROADCAST_PATH = getenv("BROADCAST_PATH")
+    BROADCAST_HOST = getenv("BROADCAST_HOST")
+    BROADCAST_USER = getenv("BROADCAST_USER")
+    BROADCAST_PASSWORD = getenv("BROADCAST_PASSWORD")
+    BROADCAST_URL = f"{BROADCAST_DRIVER}://{BROADCAST_USER}:{BROADCAST_PASSWORD}@{BROADCAST_HOST}/{BROADCAST_PATH}"
+
+    return BROADCAST_URL

@@ -13,7 +13,9 @@ options = {"prefix": "/auth"}
 
 @router.post("/token", name="auth.token", response_model=PasswordAuthResponse)
 async def login(
-    db: Session = Depends(session), form: OAuth2PasswordRequestForm = Depends()
+    ws_access_token: bool = False,
+    db: Session = Depends(session),
+    form: OAuth2PasswordRequestForm = Depends(),
 ):
     user = db.query(User).filter_by(email=form.username).first()
     if not user or not user.hashed_password:
@@ -27,10 +29,15 @@ async def login(
         scopes = "profile mfa_required"
     elif user.is_superuser:
         scopes = (
-            "profile super zone user dns-request api-token"
+            "profile super zone user dns-request api-token refresh"
         )  # grant access to super routes
     else:
-        scopes = "profile zone user:list dns-request api-token:list api-token:create api-token:destroy"
+        scopes = "profile zone user:list dns-request api-token:list api-token:create api-token:destroy refresh"
     logger.warning(f"creating token with scopes {scopes}")
     token = create_bearer_token(data={"sub": user.id, "scopes": scopes})
-    return PasswordAuthResponse(token_type="bearer", access_token=str(token.decode()))
+    data = {"token_type": "bearer", "access_token": str(token.decode())}
+    if ws_access_token:
+        data["ws_access_token"] = create_bearer_token(
+            data={"sub": user.id, "scopes": "zone:publish dns-request:publish refresh"}
+        )
+    return PasswordAuthResponse(**data)

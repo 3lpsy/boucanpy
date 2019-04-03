@@ -4,7 +4,8 @@ import { LoginForm, UserResponse } from '@/types';
 
 export interface TokenResponse {
     access_token: string;
-    token_type: string
+    token_type: string;
+    ws_access_token?: string
 }
 
 class AuthService {
@@ -22,16 +23,19 @@ class AuthService {
         })
     }
 
-    login(form: LoginForm): Promise<string> {
+    login(form: LoginForm): Promise<any> {
         // must be form data for authentication
         return new Promise((resolve, reject) => {
             let headers = { 'content-type': 'application/x-www-form-urlencoded' }
-            let data = qs.stringify(form)
-            let request = api.http.post('/auth/token', data, {headers})
+            let params = { ws_access_token: true }
+            let data = qs.stringify(form);
+            let config = {headers, params};
+            let request = api.http.post('/auth/token', data, config);
             return request.then((response) => {
                 console.log("recieved valid login response", response)
-                const token = (response.data as TokenResponse).access_token
-                resolve(token);
+                const accessToken = (response.data as TokenResponse).access_token
+                const wsAccessToken = (response.data as TokenResponse).ws_access_token || ''
+                resolve({accessToken, wsAccessToken});
             }).catch((err) => {
                 console.log("recieved invalid login response", err)
                 reject(err)
