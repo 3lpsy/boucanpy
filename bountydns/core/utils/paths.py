@@ -49,6 +49,12 @@ def webui_dir(path=None):
     return _ajoin(webui_dir(), path)
 
 
+def landing_dir(path=None):
+    if not path:
+        return project_dir("landing")
+    return _ajoin(landing_dir(), path)
+
+
 def test_dir(path=None):
     if not path:
         return project_dir("tests")

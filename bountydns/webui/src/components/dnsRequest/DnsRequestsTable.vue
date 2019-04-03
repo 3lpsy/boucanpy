@@ -2,10 +2,14 @@
     <div class="" v-if="isAuthenticated">
         <b-table
             v-if="items.length > 0"
+            no-local-sorting
             striped
             hover
             :items="items"
             :fields="fields"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            v-on:sort-changed="changeSort"
         >
         </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">
@@ -17,11 +21,13 @@
         </div>
 
         <b-pagination
-            v-if="currentPage > 0 && items.length > 0"
+            v-if="items.length > 0"
             v-model="currentPage"
-            :total-rows="rows"
+            :total-rows="total"
             :per-page="perPage"
             aria-controls="my-table"
+            @change="changePage"
+
         ></b-pagination>
     </div>
 </template>
@@ -41,10 +47,7 @@ export default class DnsRequestsTable extends mixins(
     DnsRequestMixin,
     DataTableMixin,
 ) {
-    isLoaded = false;
-    currentPage = 0;
-    perPage = 20;
-    items = [];
+    sortBy = 'created_by';
     fields = {
         id: {
             label: 'ID',
@@ -66,30 +69,27 @@ export default class DnsRequestsTable extends mixins(
             label: 'Source',
             sortable: true,
         },
+        type: {
+            label: 'Type',
+            sortable: true,
+        },
         created_at: {
             label: 'Created',
             sortable: true,
             formatter: 'formatDate',
         },
-        type: {
-            label: 'Type',
-            sortable: true,
-        },
     };
-
-    get rows() {
-        return this.items.length;
-    }
-
-    mounted() {
+    loadData() {
         dnsRequest
-            .getDnsRequests(this.currentPage, this.perPage)
+            .getDnsRequests(this.currentPage || 1, this.perPage, this.sortBy, this.sortDesc ? 'desc' : 'asc')
             .then((res) => {
                 this.currentPage = res.pagination.page;
                 this.perPage = res.pagination.per_page;
+                this.total = res.pagination.total;
                 this.items = res.dns_requests;
                 this.isLoaded = true;
             });
     }
+
 }
 </script>

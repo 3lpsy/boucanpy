@@ -1,6 +1,6 @@
 # Bounty DNS: A DNS Catcher
 
-Status: Non-functional / WIP / PoC
+Status: WIP / PoC
 
 This project is an attempt to implement a lightweight burp collaborator-esc application and consists of two main components: a DNS Server (Custom Python Implemention with dnslib) and an API.
 
@@ -11,9 +11,9 @@ When answering queries, the DNS server hits the API with information regarding t
 The first iteration of the project will be a proof of concept to demonstrate the project's viability. At this point, the project should not be considered stable, secure, or feature complete.
 
 Features:
-
-- WebSocket Support
-- WebHook Support
+- Create API Tokens via WebUI / CLI for Dns Servers
+- Create Zones for Specific DNS Servers
+- Log DNS Resolution
 
 ## Phase 2: Polish The Code
 
@@ -25,7 +25,7 @@ Next, sanity checks and proper handlers will be put in place so that API calls f
 
 ## Phase 4: Release 0.1.0-alpha
 
-Once I'm satisfied the code is not complete trash, I'll release it as version 0.1.0. At this point, the project should be considered secure enough to deploy in protected subnets.
+Once I'm satisfied the code is not complete trash, I'll release it as version 0.1.0-alpha. At this point, the project should be considered secure enough to deploy. Though I'd recommend doing so in a protected network. If the application proves valuable enough to me personally or others, I'll continue to add features / improvements.
 
 TODO:
 
@@ -38,11 +38,14 @@ TODO:
 - [x] Build API Zone / DNS Routes
 - [x] Integrate API Callbacks into DNS Server
 - [x] Build Web GUI Foundation
-- [ ] Incorporate ApiClient and ApiTokens into DNS Server
+- [x] Incorporate ApiClient and ApiTokens into DNS Server
 - [ ] Get Websockets Working
 - [ ] Build ability for webhook's / events
-- [ ] Implement actual validation
-
+- [ ] Handle Pagination on the Front End
+- [ ] Perform Validation on the Front End
+- [ ] Perform Better Validation on the Backend
+- [ ] Handle Errors on the Front End
+- [ ] Confirm DNS Server is as Compliant as possible
 ```
 usage: bdnsctl.py [-h]
                   {test,tests,alembic-current,alembic-downgrade,alembic-history,alembic-init,alembic-migrate,alembic-show,alembic-stamp,alembic-upgrade,zone-create,zone,zone-list,zones,api-server,api,api-urls,urls,api-zone-list,api-zones,dns-server,dns}

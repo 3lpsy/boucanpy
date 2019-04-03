@@ -4,10 +4,10 @@ import { ApiTokensResponse, ApiTokenResponse, ApiTokenCreateForm, SensitiveApiTo
 
 
 class ApiTokenService {
-    getApiTokens(page: number = 1, perPage: number = 20): Promise<ApiTokensResponse> {
+    getApiTokens(page: number = 1, perPage: number = 20, sortBy: string = 'id', sortDir: string = 'asc'): Promise<ApiTokensResponse> {
         return new Promise((resolve, reject) => {
-            let query = qs.stringify({page: page, per_page: perPage});
-            api.http.get('/api-token', {data: query}).then((response: any) => {
+            let query = {page: page, per_page: perPage, sort_by: sortBy, sort_dir: sortDir};
+            api.http.get('/api-token', {params: query}).then((response: any) => {
                 let responseData = (response.data as ApiTokensResponse)
                 resolve(responseData)
             }).catch((err) => {

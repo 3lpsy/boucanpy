@@ -17,7 +17,7 @@ class PaginationQuery(orm.Query):
         return rv
 
     def paginate(
-        self, page=1, per_page=20, error_out=True, max_per_page=None, count=None
+        self, page=1, per_page=20, error_out=True, max_per_page=None, count=True
     ):
         if max_per_page is not None:
             per_page = min(per_page, max_per_page)

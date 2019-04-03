@@ -22,9 +22,7 @@ import AppAlerts from '@/components/AppAlerts.vue';
 })
 export default class App extends Vue {
     mounted() {
-        console.log('sending websocket');
-        // @ts-ignore
-        this.$socket.send('hello');
+
     }
 }
 </script>
@@ -43,5 +41,6 @@ body {
 }
 .page {
     background-color: #ffffff;
+    padding-bottom: 20px;
 }
 </style>

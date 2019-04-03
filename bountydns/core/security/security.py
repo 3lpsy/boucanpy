@@ -5,6 +5,7 @@ from starlette.requests import Request
 from fastapi import HTTPException, Security, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
+from bountydns.core import logger
 from bountydns.core.entities import TokenPayload, UserRepo, BlackListedTokenRepo
 from bountydns.db.models.user import User
 
@@ -72,6 +73,8 @@ def token_has_required_scopes(token_payload: TokenPayload, scopes: List[str]):
             elif token_scope in required_scope:
                 satisfied = True
         if not satisfied:
+            logger.critical(f"auth token missing scope: {required_scope}")
+
             return False
     return True
 

@@ -1,17 +1,21 @@
 from pathlib import Path
+from os.path import join
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 from bountydns.core.utils import root_dir
 from fastapi import FastAPI, APIRouter
 
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
+from starlette.routing import Router, Mount
+from starlette.staticfiles import StaticFiles
+from starlette.responses import RedirectResponse, FileResponse, JSONResponse
+from starlette.exceptions import HTTPException
 
+from bountydns.core.utils import webui_dir, landing_dir
 from bountydns.core import logger
-
 from bountydns.api.routers import routers
-from bountydns.api.routers.webui import router as webui_router
 from bountydns.api.routers.websocket import router as websocket_router
-
 from bountydns.db.session import session, db_register
 from bountydns.db.utils import make_db_url
 
@@ -47,8 +51,50 @@ for r, ropts in routers:
     main_router.include_router(r, **ropts)
 
 api.include_router(main_router, prefix=config.API_V1_STR)
-api.include_router(webui_router)
 api.include_router(websocket_router)
+
+
+@api.get("/")
+async def webui_redir():
+    return RedirectResponse(url="/landing/", status_code=302)
+
+
+# served by nginx
+@api.get("/landing/")
+async def web_index():
+    return FileResponse(landing_dir("index.html"))
+
+
+api.mount("/landing", StaticFiles(directory=landing_dir()))
+
+# served by nginx
+@api.get("/webui")
+async def webui_redir():
+    return RedirectResponse(url="/webui/", status_code=302)
+
+
+# served by nginx w/ slight rewrite
+@api.get("/webui/assets")
+async def webui_index():
+    return FileResponse(webui_dir(join("dist", "index.html")))
+
+
+api.mount("/webui/assets", StaticFiles(directory=webui_dir("dist")))
+
+# TODO: make core handler
+
+
+@api.exception_handler(404)
+async def http_exception(request, exc):
+    url = urlparse(str(request.url))
+    if not url.path.startswith("/api/v1"):
+        return FileResponse(webui_dir(join("dist", "index.html")))
+    return JSONResponse({"detail": "Not Found"}, status_code=404)
+
+
+@api.exception_handler(500)
+async def http_exception(request, exc):
+    return JSONResponse({"detail": "Server Error"}, status_code=500)
 
 
 @api.middleware("http")

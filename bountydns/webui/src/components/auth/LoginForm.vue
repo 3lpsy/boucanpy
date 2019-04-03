@@ -1,5 +1,5 @@
 <template>
-    <b-form @submit="onSubmit" v-if="show">
+    <b-form @submit.prevent="onSubmit" v-if="show">
         <fieldset class="form-group">
             <input
                 type="text"
@@ -44,7 +44,7 @@
         onSubmit() {
             console.log("dispatching auth/authenticate")
             this.$store.dispatch('auth/authenticate', this.form).then((user: User) => {
-                this.$router.push('/')
+                this.$router.push({'name': 'home'})
             }).catch((err) => {
                 this.loginError = "Authentication failed"
                 console.log("ERROR", err)

@@ -4,10 +4,10 @@ import { ZonesResponse, ZoneResponse, ZoneCreateForm } from '@/types';
 
 
 class ZoneService {
-    getZones(page: number = 1, perPage: number = 20): Promise<ZonesResponse> {
+    getZones(page: number = 1, perPage: number = 20, sortBy: string = '', sortDir: string = 'asc'): Promise<ZonesResponse> {
         return new Promise((resolve, reject) => {
-            let query = qs.stringify({page: page, per_page: perPage});
-            api.http.get('/zone', {data: query}).then((response: any) => {
+            let query = {page: page, per_page: perPage, sort_by: sortBy, sort_dir: sortDir};
+            api.http.get('/zone', {params: query}).then((response: any) => {
                 let responseData = (response.data as ZonesResponse)
                 resolve(responseData)
             }).catch((err) => {

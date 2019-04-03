@@ -1,5 +1,5 @@
 <template id="">
-    <b-form @submit="onSubmit">
+    <b-form @submit.prevent="onSubmit">
         <fieldset class="form-group">
             <label for="input-domain">Zone Domain</label>
             <input

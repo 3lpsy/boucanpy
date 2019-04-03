@@ -6,6 +6,9 @@
             hover
             :items="items"
             :fields="fields"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            v-on:sort-changed="changeSort"
         >
             <!-- TODO: don't use expires_at, use expires delta -->
             <template slot="actions" slot-scope="row">
@@ -47,9 +50,10 @@
         <b-pagination
             v-if="currentPage > 0 && items.length > 0"
             v-model="currentPage"
-            :total-rows="itemCount"
+            :total-rows="total"
             :per-page="perPage"
             aria-controls="my-table"
+            @change="changePage"
         ></b-pagination>
 
         <b-modal
@@ -156,17 +160,19 @@ export default class ApiTokensTable extends mixins(
     }
 
     loadData() {
-        return apiToken.getApiTokens(this.currentPage, this.perPage);
-    }
-
-    freshLoad() {
-        this.loadData().then((res) => {
+        return apiToken.getApiTokens(this.currentPage || 1, this.perPage, this.sortBy, this.sortDir).then((res) => {
             this.currentPage = res.pagination.page;
             this.perPage = res.pagination.per_page;
+            this.total = res.pagination.total;
             this.items = res.api_tokens;
             this.isLoaded = true;
         });
     }
+
+    freshLoad() {
+        this.loadData()
+    }
+
     mounted() {
         this.freshLoad();
         bus.$on('API_TOKEN_ADDED', (payload) => {

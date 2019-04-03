@@ -16,4 +16,4 @@ class ZoneList(BaseCommand):
         self.load_env("db")
         self.db_register()
         for zone in self.session().query(Zone).all():
-            print(zone.id, zone.domain, zone.ip)
+            print(zone.id, zone.domain, zone.ip, zone.dns_server_name)

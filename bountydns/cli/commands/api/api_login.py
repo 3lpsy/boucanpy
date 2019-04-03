@@ -4,7 +4,7 @@ from bountydns.cli.commands.base import BaseCommand
 
 class ApiLogin(BaseCommand):
     name = "api-login"
-    aliases = ["zones"]
+    aliases = ["login"]
     description = "login via API"
     path = "/api/v1/auth/login"
 

@@ -29,9 +29,6 @@ class DnsServer(BaseCommand):
             "-t", "--api-token", required=True, action="store", help="api token"
         )
         parser.add_argument(
-            "-i", "--dns-server-id", required=True, action="store", help="dns server id"
-        )
-        parser.add_argument(
             "-p", "--port", action="store", type=int, default=53, help="listen port"
         )
         parser.add_argument(
@@ -43,11 +40,7 @@ class DnsServer(BaseCommand):
         port = self.get_port()
         listen = self.get_listen()
         # TODO: thread issues?
-        api_client = ApiClient(
-            self.option("api_url"),
-            self.option("api_token"),
-            self.option("dns_server_id"),
-        )
+        api_client = ApiClient(self.option("api_url"), self.option("api_token"))
         resolver = Resolver(api_client)
         udp_server = DNSServer(
             resolver,

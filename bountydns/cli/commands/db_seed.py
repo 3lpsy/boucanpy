@@ -29,12 +29,18 @@ class DbSeed(BaseCommand):
             domain="potato.com", ip="127.0.1.1", dns_server_name=dns_server_name
         )
 
+        dns_server_name2 = uuid.uuid4()
+        zone3 = factory("ZoneFactory").create(
+            domain="differentzone.com", ip="127.0.1.1", dns_server_name=dns_server_name2
+        )
+
         logger.info("creating api_tokens")
 
-        api_token = factory("ApiTokenFactory").create()
-        api_token2 = factory("ApiTokenFactory").create()
+        api_token = factory("ApiTokenFactory").create(dns_server_name=dns_server_name)
+        api_token2 = factory("ApiTokenFactory").create(dns_server_name=dns_server_name2)
 
         logger.info("creating dns_requests")
+
         dns_request = factory("DnsRequestFactory").create(zone_id=zone.id)
         dns_request = factory("DnsRequestFactory").create(zone_id=zone2.id)
         dns_request = factory("DnsRequestFactory").create(
@@ -43,3 +49,8 @@ class DbSeed(BaseCommand):
         dns_request = factory("DnsRequestFactory").create(
             dns_server_name=dns_server_name
         )
+
+        for i in range(50):
+            dns_request = factory("DnsRequestFactory").create(
+                dns_server_name=dns_server_name2
+            )

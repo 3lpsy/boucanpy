@@ -8,14 +8,33 @@ import moment from 'moment';
 export default class ApiTokenMixin extends Vue {
     isLoaded = false;
     currentPage = 0;
-    perPage = 20;
+    perPage = 40;
+    total = 0;
+    sortBy = 'id';
+    sortDesc = false;
     items = [];
 
-    get itemCount() {
-        return this.items.length;
+    changeSort(sort: any) {
+        this.sortBy = sort.sortBy
+        this.sortDesc = sort.sortDesc
+        this.loadData()
     }
+
+    changePage(page: any) {
+        this.currentPage = page;
+        this.loadData()
+    }
+
+    loadData() {
+
+    }
+
 
     formatDate(dt: number) {
         return moment(dt).format('YYYY-MM-DD HH:mm:ss');
+    }
+
+    mounted() {
+        this.loadData()
     }
 }

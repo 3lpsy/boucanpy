@@ -19,33 +19,34 @@ const AUTHED_GUARDS = GuardCollection([
 Vue.use(Router);
 
 export default new Router({
+    mode: 'history',
     routes: [
         {
-            path: '/',
+            path: '/webui',
             name: 'home',
             component: Home,
             beforeEnter: AUTHED_GUARDS,
         },
         {
-            path: '/zone',
+            path: '/webui/zone',
             name: 'zone',
             component: Zone,
             beforeEnter: AUTHED_GUARDS,
         },
         {
-            path: '/api-token',
+            path: '/webui/api-token',
             name: 'api-token',
             component: ApiToken,
             beforeEnter: AUTHED_GUARDS,
         },
         {
-            path: '/chat',
+            path: '/webui/chat',
             name: 'chat',
             component: Chat,
             beforeEnter: AUTHED_GUARDS,
         },
         {
-            path: '/login',
+            path: '/webui/login',
             name: 'login',
             component: Login,
         },

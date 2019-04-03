@@ -18,6 +18,7 @@ class Resolver(BaseResolver):
         records = []
         for zone in zones:
             try:
+                logger.warning(f"loading zone: {zone.domain} ({zone.id})")
                 for rr in self.zone_to_rr(zone):
                     logger.debug(
                         "registering zone rr name {} and type {}".format(
@@ -31,8 +32,8 @@ class Resolver(BaseResolver):
                 raise RuntimeError(
                     f'Error processing line ({e.__class__.__name__}: {e}) "{zone.domain}"'
                 ) from e
-            logger.info("zone map generated {}".format(str(zone)))
-        logger.info("%d zone resource records generated", len(records))
+            logger.debug("zone map generated {}".format(str(zone)))
+        logger.debug("%d zone resource records generated", len(records))
         return records
 
     def get_zones(self):
@@ -47,14 +48,16 @@ class Resolver(BaseResolver):
         logger.warning(request.__class__.__name__)
         qname = request.q.qname
         qtype = QTYPE[request.q.qtype]
+        zone = None
         for record in self.records:
             # Check if label & type match
             if record.match(request.q):
                 a = copy.copy(record.rr)
                 reply.add_answer(a)
+                zone = record.zone
         if reply.rr:
-            return reply
+            return reply, zone
 
         if not reply.rr:
             reply.header.rcode = RCODE.NXDOMAIN
-        return reply
+        return reply, zone

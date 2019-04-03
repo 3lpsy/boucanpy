@@ -10,7 +10,7 @@ import App from './App.vue';
 import router from '@/router';
 import { store } from './store';
 
-import { WS_URL } from '@/config';
+// import { WS_URL } from '@/config';
 
 Vue.config.productionTip = false;
 

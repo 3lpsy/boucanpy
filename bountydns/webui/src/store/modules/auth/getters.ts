@@ -12,7 +12,7 @@ export interface IAuthGetters {
 
 export const AuthGetters: IAuthGetters = {
     isAuthenticated(state: IAuthState): boolean {
-        if (state.user.id < 1) {
+        if (! state.user || state.user.id < 1) {
             return false
         }
         else if (state.token.sub.length < 1) {
@@ -22,14 +22,14 @@ export const AuthGetters: IAuthGetters = {
     },
 
     hasToken(state: IAuthState): boolean {
-        if (state.token.sub.length < 1) {
+        if (! state.token || state.token.sub.length < 1) {
             return false
         }
         return true
     },
 
     hasUser(state: IAuthState): boolean {
-        if (state.user.id < 1) {
+        if (! state.user || state.user.id < 1) {
             return false
         }
         return true
