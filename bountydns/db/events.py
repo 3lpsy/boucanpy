@@ -1,5 +1,6 @@
 from sqlalchemy.event import listen
 import asyncio
+from bountydns.core import logger
 
 ORM_EVENTS = ["after_insert"]
 
@@ -9,6 +10,7 @@ def make_event(func):
     def _event(*args, **kwargs):
         loop = asyncio.get_event_loop()
         # task = loop.create_task(func(*args, **kwargs))
+        logger.info(f"triggering event for function {str(func)}")
         result = asyncio.ensure_future(func(*args, **kwargs), loop=loop)
         return result
 

@@ -12,4 +12,4 @@ async def ws_test():
     res = await publisher.publish_json(
         "channel:auth", {"type": "MESSAGE", "name": "TESTING_WS", "payload": ""}
     )
-    return {"status": "up"}
+    return {"status": "success"}

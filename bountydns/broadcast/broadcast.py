@@ -1,8 +1,6 @@
 import aioredis
 from .utils import make_broadcast_url
 
-publisher = None
-
 
 async def make_redis():
     return await aioredis.create_redis(make_broadcast_url())

@@ -2,6 +2,8 @@
 
 Status: WIP / PoC
 
+[Screenshot](screenshots/screenshot-dns-requests)
+
 This project is an attempt to implement a lightweight burp collaborator-esc application and consists of two main components: a DNS Server (Custom Python Implemention with dnslib) and an API.
 
 When answering queries, the DNS server hits the API with information regarding the DNS query. The API will then serve the log of the DNS queries via a RESTful HTTP API as well as front-end (HTML/JS) web GUI.

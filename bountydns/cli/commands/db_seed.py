@@ -16,7 +16,7 @@ class DbSeed(BaseCommand):
         return parser
 
     async def run(self):
-        self.load_env("api", "db")
+        self.load_env("api", "db", "broadcast")
         self.db_register()
 
         logger.info("creating superuser")
