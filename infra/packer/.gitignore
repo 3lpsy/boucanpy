@@ -1,0 +1,11 @@
+# Cache objects
+packer_cache/
+
+# For built boxes
+*.box
+env
+env.sh
+.env
+.env.sh
+*.pem
+*.pem.pub

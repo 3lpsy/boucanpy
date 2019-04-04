@@ -41,13 +41,18 @@ TODO:
 - [x] Integrate API Callbacks into DNS Server
 - [x] Build Web GUI Foundation
 - [x] Incorporate ApiClient and ApiTokens into DNS Server
-- [ ] Get Websockets Working
+- [x] Get Websockets Working
+- [x] Handle Pagination on the Front End
+- [ ] Create docker compose files
+- [ ] Create Packer build
+- [ ] Create Terraform build
 - [ ] Build ability for webhook's / events
-- [ ] Handle Pagination on the Front End
 - [ ] Perform Validation on the Front End
 - [ ] Perform Better Validation on the Backend
 - [ ] Handle Errors on the Front End
 - [ ] Confirm DNS Server is as Compliant as possible
+- [ ] Use vuex store for datatable data
+
 ```
 usage: bdnsctl.py [-h]
                   {db-seed,seed,db-setup,setup,db-truncate,truncate,test,tests,user-create,user,user-list,users,alembic-current,al-current,alembic-downgrade,al-downgrade,alembic-history,al-history,alembic-init,al-init,alembic-migrate,al-migrate,alembic-show,al-show,alembic-stamp,al-stamp,alembic-upgrade,al-upgrade,zone-create,zone,zone-list,zones,api-login,login,api-server,api,api-urls,urls,api-user-create,api-user,api-user-list,api-users,api-zone-create,api-zone,api-zone-list,api-zones,api-token-list,api-tokens,dns-server,dns}
