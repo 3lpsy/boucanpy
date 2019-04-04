@@ -2,6 +2,7 @@ from importlib import import_module
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from bountydns.db.pagination.query import PaginationQuery
+from .events import db_register_model_events
 
 # TODO: fix this nonsense
 
@@ -50,8 +51,11 @@ def db_register(db_uri):
     db["metadata"] = getattr(
         import_module(f"bountydns.db.models.base", "base"), "metadata"
     )
-    db["models"] = getattr(import_module(f"bountydns.db.models", "models"), "models")
+    models = getattr(import_module(f"bountydns.db.models", "models"), "models")
+    db["models"] = models
     dbs[DEFAULT_KEY] = db
 
-    # setup factory
+    # setup factory / avoid circular imports /
     from bountydns.db.factories.base import BaseFactory
+
+    db_register_model_events(models)

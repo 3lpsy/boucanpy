@@ -12,7 +12,7 @@ class UserList(BaseCommand):
     def parser(cls, parser):
         return parser
 
-    def run(self):
+    async def run(self):
         self.load_env("db")
         self.db_register()
         for user in self.session().query(User).all():

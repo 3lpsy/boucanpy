@@ -25,7 +25,7 @@ class ApiZonesList(BaseCommand):
         )
         return parser
 
-    def run(self):
+    async def run(self):
         res = requests.get(self.get_url(), headers=self.get_headers())
         print(res.json())
 

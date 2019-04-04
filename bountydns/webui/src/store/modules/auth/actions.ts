@@ -40,7 +40,7 @@ export const AuthActions: IAuthActions = {
               .refresh()
               .then((accessToken: string) => {
                   console.log('dispatching auth/authenticateWithToken')
-                  dispatch('authenticateWithToken', accessToken).then((user) => {
+                  dispatch('authenticateWithToken', {accessToken}).then((user) => {
                       resolve(accessToken)
                   }).catch((err) => {
                       reject(err)
@@ -59,7 +59,7 @@ export const AuthActions: IAuthActions = {
     },
 
     authenticate({ dispatch, commit }, form: LoginForm): Promise<User> {
-        console.log('auth/authenticate')
+        console.log('auth/authenticate', form)
         return authService
           .login(form)
           .then((tokens: any) => {
@@ -77,14 +77,17 @@ export const AuthActions: IAuthActions = {
     },
 
     authenticateWithToken({ dispatch, commit }, tokens: any): Promise<User> {
-        console.log('auth/authenticateWithToken')
-        let token = tokenService.parse(tokens.accessToken)
+        console.log('auth/authenticateWithToken', tokens)
+        let parsedAccessToken = tokenService.parse(tokens.accessToken)
         tokenService.save(tokens.accessToken)
-        tokenService.saveWS(tokens.wsTokenRaw)
-        commit('SET_TOKEN', tokens.accessToken)
+        tokenService.saveWS(tokens.wsAccessToken)
+        commit('SET_TOKEN', parsedAccessToken)
         commit('SET_WS_TOKEN_RAW', tokens.wsAccessToken)
         api.setServiceToken(tokens.accessToken)
-        broadcast.registerAuthedWS(tokens.wsAccessToken)
+        if (tokens.wsAccessToken) {
+            console.log("enabling authws")
+            broadcast.registerAuthedWS(tokens.wsAccessToken)
+        }
         return dispatch('loadUser')
     },
 

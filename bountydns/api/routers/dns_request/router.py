@@ -12,6 +12,7 @@ from bountydns.core.entities import (
     DnsRequestCreateForm,
     ZoneRepo,
 )
+from bountydns.broadcast import make_redis
 
 router = APIRouter()
 options = {"prefix": ""}
@@ -49,5 +50,4 @@ async def index(
     else:
         logger.warning(f"No zone found for dns request {domain_name}")
     dns_request = dns_request_repo.create(data).data()
-
     return DnsRequestResponse(dns_request=dns_request)

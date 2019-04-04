@@ -48,16 +48,14 @@ class Resolver(BaseResolver):
         logger.warning(request.__class__.__name__)
         qname = request.q.qname
         qtype = QTYPE[request.q.qtype]
-        zone = None
         for record in self.records:
             # Check if label & type match
             if record.match(request.q):
                 a = copy.copy(record.rr)
                 reply.add_answer(a)
-                zone = record.zone
         if reply.rr:
-            return reply, zone
+            return reply
 
         if not reply.rr:
             reply.header.rcode = RCODE.NXDOMAIN
-        return reply, zone
+        return reply

@@ -16,7 +16,7 @@ class DbTruncate(BaseCommand):
         parser.add_argument("-c", "--confirm", action="store_true", help="seed data")
         return parser
 
-    def run(self):
+    async def run(self):
         self.load_env("api", "db")
         self.db_register()
         failed = []

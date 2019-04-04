@@ -5,12 +5,14 @@
 
       <b-alert
         dismissible
-        :show="true"
+        fade
+        :show="alert.show > 0"
         :max="30"
         :variant="alert.type || 'info'"
         v-on:dismissed="removeAlert(alert)"
         :key="index"
         v-for="(alert, index) in alerts" v-if="alerts.length > 0"
+        style="margin-bottom: 0px"
     >
           {{ alert.text }}
       </b-alert>
@@ -29,11 +31,21 @@ export default class AppAlerts extends Vue {
     removeAlert(alert) {
         console.log("Remving alert", alert)
         this.alerts = this.alerts.filter((a) => a != alert )
+        alert.show = false
     }
+
     mounted() {
-        bus.$on("APP_ALERT", (payload) => {
-            console.log("Received alert", payload)
-            this.alerts.push(payload)
+        bus.$on("APP_ALERT", (alert) => {
+            if (alert.show === null || alert.show === undefined) {
+                alert.show = true
+            }
+            if (alert.timeout === null || alert.timeout === undefined) {
+                alert.timeout = 10
+            }
+            this.alerts.push(alert)
+            setTimeout(function(){
+                this.removeAlert(alert)
+            }.bind(this), alert.timeout * 1000);
         })
     }
 }

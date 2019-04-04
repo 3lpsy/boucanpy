@@ -9,7 +9,7 @@ def is_db_up():
         if seconds > 60:
             logger.critical("could not start api. database not up")
             return False
-        logger.info("checking for db status")
+        logger.debug("checking for db status")
         try:
             session().execute("SELECT 1")
             return True
@@ -34,7 +34,7 @@ def is_db_setup():
         if seconds > 60:
             logger.critical("could not start api. database not setup")
             return False
-        logger.info("checking for db migrations")
+        logger.debug("checking for db migrations")
         try:
             session().execute("SELECT * from alembic_version")
             return True

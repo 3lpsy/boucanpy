@@ -13,7 +13,7 @@ class Test(BaseCommand):
     def parser(cls, parser):
         return parser
 
-    def run(self):
+    async def run(self):
         self.load_env("api.test")
         self.load_env("db.test")
         self.db_register()

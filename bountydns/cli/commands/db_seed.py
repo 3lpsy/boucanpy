@@ -15,7 +15,7 @@ class DbSeed(BaseCommand):
     def parser(cls, parser):
         return parser
 
-    def run(self):
+    async def run(self):
         self.load_env("api", "db")
         self.db_register()
 

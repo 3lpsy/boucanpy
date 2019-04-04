@@ -35,7 +35,7 @@ class ApiLogin(BaseCommand):
         )
         return parser
 
-    def run(self):
+    async def run(self):
         url = self.option("api_url")
         email = self.option("email")
         password = self.get_password()

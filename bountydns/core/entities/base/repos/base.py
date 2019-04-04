@@ -63,7 +63,7 @@ class BaseRepo:
             self.filter_by(id=id)
         elif kwargs:
             self.filter_by(**kwargs)
-        logger.debug(
+        self.debug(
             f"executing first (exists) query {self.compiled()} in {self.__class__.__name__}"
         )
         results = self.query().first()
@@ -73,14 +73,14 @@ class BaseRepo:
     def first(self, **kwargs):
         if kwargs:
             self.filter_by(**kwargs)
-        logger.debug(
+        self.debug(
             f"executing first query {self.compiled()} in {self.__class__.__name__}"
         )
         self._results = self.query().first()
         return self
 
     def get(self, id):
-        logger.debug(
+        self.debug(
             f"executing get query {self.compiled()} in {self.__class__.__name__}"
         )
         return self.query().get(id)
@@ -88,7 +88,7 @@ class BaseRepo:
     def all(self, **kwargs):
         if kwargs:
             self.filter_by(**kwargs)
-        logger.debug(
+        self.debug(
             f"executing all query {self.compiled()} in {self.__class__.__name__}"
         )
         self._results = self.query().all()
@@ -96,7 +96,7 @@ class BaseRepo:
         return self
 
     def paginate(self, pagination):
-        logger.debug(
+        self.debug(
             f"executing page query {self.compiled()} in {self.__class__.__name__}"
         )
         self._results = self.query().paginate(
@@ -120,13 +120,13 @@ class BaseRepo:
 
     def filter_by(self, **kwargs):
         self._query = self.query().filter_by(**kwargs)
-        logger.debug(f"adding filters {kwargs} to query {self.compiled()}")
+        self.debug(f"adding filters {kwargs} to query {self.compiled()}")
 
         return self
 
     def filter(self, *args, **kwargs):
         self._query = self.query().filter(*args, **kwargs)
-        logger.debug(f"adding filters {args} and {kwargs} to query {self.compiled()}")
+        self.debug(f"adding filters {args} and {kwargs} to query {self.compiled()}")
         return self
 
     ## COMMITTING / UPDATING
@@ -165,7 +165,7 @@ class BaseRepo:
     ## GETTERS
     def query(self):
         if not self._query:
-            logger.debug(f"making query for repo: {self.__class__.__name__}")
+            self.debug(f"making query for repo: {self.__class__.__name__}")
             self._query = self.db.query(self.model())
         return self._query
 
@@ -192,3 +192,7 @@ class BaseRepo:
 
     def data_model(self):
         return self._data_model or self.default_data_model
+
+    def debug(self, msg):
+        pass
+        # logger.debug(msg)

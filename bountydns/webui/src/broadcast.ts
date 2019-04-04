@@ -1,44 +1,75 @@
+import Vue from 'vue'
 
 import {BROADCAST_URL} from '@/config';
 
-class Broadcast {
-    publicWS: any = new WebSocket(BROADCAST_URL)
-    authedWS: any
+import bus from "@/bus";
 
-    authedWSOnOpen(event: any) {
+// TODO: make this cooler (more dynamic / general)
+class Broadcast {
+    public publicWS: any
+    public authedWS: any
+    public authEnabled: boolean
+    public bus: Vue
+
+    constructor(bus: Vue, publicWS: WebSocket, authedWS: WebSocket|null) {
+        this.bus = bus;
+        this.publicWS = publicWS
+        this.authedWS = authedWS
+        this.authEnabled = authedWS ? true : false
+    }
+
+    public authedWSOnOpen(event: any) {
         console.log("authed ws on open", event)
 
     }
-    authedWSOnMessage(event: any) {
-        console.log("authed ws on message", event)
-
+    public authedWSOnMessage(event: any) {
+        let res = event.data;
+        let data = JSON.parse(res)
+        console.log("authed ws on message", data)
+        this.bus.$emit("WS_BROADCAST_MESSAGE", {
+            channel: 'auth',
+            on: 'message',
+            event: event,
+            message: data
+        })
     }
 
-    registerAuthedWS(wsTokenRaw: string) {
-        let url = BROADCAST_URL + '/' + wsTokenRaw;
+    public registerAuthedWS(wsTokenRaw: string) {
+        console.log("registerAuthedWS", wsTokenRaw)
+        let url = BROADCAST_URL + '/auth?ws_access_token=' + wsTokenRaw;
         const authedWS = new WebSocket(url);
         this.authedWS = authedWS
-        authedWS.onopen = this.authedWSOnOpen
-        authedWS.onmessage = this.authedWSOnMessage
+        authedWS.onopen = this.authedWSOnOpen.bind(this)
+        authedWS.onmessage = this.authedWSOnMessage.bind(this)
+        this.authEnabled = true
     }
 
-    publicOnMessage(event: any) {
+    public publicOnMessage(event: any) {
+        console.log(this)
         let res = event.data;
         let data = JSON.parse(res)
         console.log("onmessage", data)
+        this.bus.$emit("WS_BROADCAST_MESSAGE", {
+            channel: 'public',
+            on: 'message',
+            event: event,
+            message: data
+        })
     };
 
-    publicOnOpen(event: any) {
+    public publicOnOpen(event: any) {
         console.log("onopen", event)
         let msg = {message: 'yo'}
-        this.publicWS.send(JSON.stringify(msg))
+        event.target.send(JSON.stringify(msg))
     }
 
-    registerPublicWS() {
-        this.publicWS.onmessage = this.publicOnMessage
-        this.publicWS.onopen = this.publicOnOpen
+    public registerPublicWS() {
+        this.publicWS.onmessage = this.publicOnMessage.bind(this)
+        this.publicWS.onopen = this.publicOnOpen.bind(this)
     }
 
 }
 
-export default new Broadcast()
+const broadcast = new Broadcast(bus, new WebSocket(BROADCAST_URL), null)
+console.log("BROADCAST", broadcast)
+export default broadcast

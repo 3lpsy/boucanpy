@@ -59,7 +59,7 @@ from starlette.websockets import WebSocket
 # public broadcast
 api.add_websocket_route("/broadcast", broadcast_index, name="broadcast.index")
 api.add_websocket_route(
-    "/broadcast/{ws_auth_token}", broadcast_authed_index, name="broadcast.authed.index"
+    "/broadcast/auth", broadcast_authed_index, name="broadcast.authed.index"
 )
 
 

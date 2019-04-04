@@ -23,8 +23,8 @@ class DNSHandler(BaseDNSHandler):
 
         try:
             request_uuid = uuid.uuid4()
-            rdata, zone = self.get_reply(data, request_uuid)
-            self.server.logger.log_send(self, rdata, zone, request_uuid)
+            rdata = self.get_reply(data, request_uuid)
+            self.server.logger.log_send(self, rdata)
 
             if self.protocol == "tcp":
                 rdata = struct.pack("!H", len(rdata)) + rdata
@@ -40,8 +40,8 @@ class DNSHandler(BaseDNSHandler):
         self.server.logger.log_request(self, request, request_uuid)
 
         resolver = self.server.resolver
-        reply, zone = resolver.resolve(request, self)
-        self.server.logger.log_reply(self, reply)
+        reply = resolver.resolve(request, self)
+        self.server.logger.log_reply(self, reply, request_uuid)
 
         if self.protocol == "udp":
             rdata = reply.pack()
@@ -52,4 +52,4 @@ class DNSHandler(BaseDNSHandler):
         else:
             rdata = reply.pack()
 
-        return rdata, zone
+        return rdata

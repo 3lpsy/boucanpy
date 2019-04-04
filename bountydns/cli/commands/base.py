@@ -1,5 +1,5 @@
 from sys import exit
-from bountydns.core import load_env, set_log_level
+from bountydns.core import load_env, set_log_level, make_logger
 from bountydns.db.session import db_register, session
 from bountydns.db.utils import make_db_url
 
@@ -14,7 +14,7 @@ class BaseCommand:
     def __init__(self, options):
         self.options = options
 
-    def run(self):
+    async def run(self):
         raise NotImplementedError()
 
     @classmethod
@@ -29,10 +29,10 @@ class BaseCommand:
             raise NotImplementedError()
         return parser
 
-    def call(self):
+    async def call(self):
         if self.add_log_level:
             set_log_level(self.get_log_level(), self.get_second_log_level())
-        return self.run()
+        return await self.run()
 
     @classmethod
     def apply_parser(cls, sub_parser):

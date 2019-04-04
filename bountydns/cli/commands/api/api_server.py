@@ -36,9 +36,15 @@ class ApiServer(BaseCommand):
         parser.add_argument(
             "--db-setup", action="store_true", help="run db setup before start"
         )
+
+        parser.add_argument(
+            "--no-bcast-check",
+            action="store_true",
+            help="do not wait for broadcast service",
+        )
         return parser
 
-    def run(self):
+    async def run(self):
         args = ["bountydns.api.main:api"]
         kwargs = self.get_kwargs()
         self.load_env("db", "api", "broadcast")
@@ -58,7 +64,7 @@ class ApiServer(BaseCommand):
 
         if self.option("db_setup"):
             logger.critical("running database migration")
-            DbSetup.make(self.options).run()
+            await DbSetup.make(self.options).run()
 
         if not self.option("no_db_check", False):
             db_setup = is_db_setup()
@@ -66,6 +72,13 @@ class ApiServer(BaseCommand):
                 logger.critical("database not setup error. please check logs")
                 return self.exit(1)
 
+        from bountydns.broadcast import is_broadcast_up
+
+        if not self.option("no_bcast_check", False):
+            bcast_up = await is_broadcast_up()
+            if not bcast_up:
+                logger.critical("broadcast (queue) not up error. please check logs")
+                return self.exit(1)
         return uvicorn.run(*args, **kwargs)
 
     def get_kwargs(self):

@@ -44,6 +44,5 @@ def set_log_level(level, second_level=None):
     get_handler().setLevel(getattr(logging, level.upper()))
 
     for l in LIB_LOGGERS:
-
         sl = logging.getLogger(l)
         sl.setLevel(getattr(logging, second_level.upper()))

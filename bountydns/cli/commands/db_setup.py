@@ -20,16 +20,16 @@ class DbSetup(BaseCommand):
         parser.add_argument("-s", "--seed", action="store_true", help="seed data")
         return parser
 
-    def run(self):
+    async def run(self):
         if not Path(AlembicInit.migration_dir).is_dir():
             logger.info("[*] running alembic-init")
-            AlembicInit.make(self.options).run()
+            await AlembicInit.make(self.options).run()
         logger.info("[*] running alembic upgrade")
-        AlembicUpgrade.make(self.options).run()
+        await AlembicUpgrade.make(self.options).run()
         logger.info("[*] running alembic migrate")
-        AlembicMigrate.make(self.options).run()
+        await AlembicMigrate.make(self.options).run()
         logger.info("[*] running alembic upgrade again")
-        AlembicUpgrade.make(self.options).run()
+        await AlembicUpgrade.make(self.options).run()
         if self.option("seed", None):
             logger.info("[*] running db seed")
-            DbSeed.make(self.options).run()
+            await DbSeed.make(self.options).run()

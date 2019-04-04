@@ -36,7 +36,7 @@ class DnsServer(BaseCommand):
         )
         return parser
 
-    def run(self):
+    async def run(self):
         port = self.get_port()
         listen = self.get_listen()
         # TODO: thread issues?

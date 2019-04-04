@@ -44,7 +44,7 @@ class ApiZoneCreate(BaseCommand):
         )
         return parser
 
-    def run(self):
+    async def run(self):
         # TODO: run this
         url = self.option("api_url")
         domain = self.option("domain")

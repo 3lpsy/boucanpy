@@ -1,7 +1,6 @@
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
-
 from sqlalchemy.orm import relationship
-
+from bountydns.broadcast import make_redis, make_broadcast_url
 from .base import Base
 
 
@@ -21,3 +20,12 @@ class DnsRequest(Base):
     type = Column(String, index=True)
     protocol = Column(String, index=True)
     dns_server_name = Column(String, index=True)
+
+    @staticmethod
+    async def on_after_insert(mapper, connection, target):
+        print("on_after_insert", mapper, connection, target)
+        publisher = await make_redis()
+        res = await publisher.publish_json(
+            "channel:auth",
+            {"type": "MESSAGE", "name": "DNS_REQUEST_CREATED", "payload": ""},
+        )

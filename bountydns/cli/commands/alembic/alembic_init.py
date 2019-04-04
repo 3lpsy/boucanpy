@@ -16,7 +16,7 @@ class AlembicInit(BaseCommand):
     def parser(cls, parser):
         return parser
 
-    def run(self):
+    async def run(self):
         load_env("db")
         db_register(make_db_url())
         initialize(self.migration_dir)
