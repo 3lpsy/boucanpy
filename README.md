@@ -8,7 +8,7 @@ This project is an attempt to implement a lightweight burp collaborator-esc appl
 
 When answering queries, the DNS server hits the API with information regarding the DNS query. The API will then serve the log of the DNS queries via a RESTful HTTP API as well as front-end (HTML/JS) web GUI.
 
-## Phase 1: Build the PoC (Current)
+## Phase 1: Build the PoC
 
 The first iteration of the project will be a proof of concept to demonstrate the project's viability. At this point, the project should not be considered stable, secure, or feature complete.
 
@@ -17,17 +17,30 @@ Features:
 - Create Zones for Specific DNS Servers
 - Log DNS Resolution
 
-## Phase 2: Polish The Code
+## Phase 2: Polish The Code (Current)
 
-After demonstrating that the project is worth dedicating time to, Phase 2 will involve making the project feature complete with all clients (JS / SimpleWeb / CLI) and features (webhooks / email / queue) completed. At this point, the project should not be considered stable nor secure.
+After demonstrating that the project is worth dedicating time to, Phase 2 will involve making the project feature complete with all clients (WebUI / CLI) and features (webhooks / email / queue) completed. At this point, the project should not be considered stable nor secure.
+
+Features:
+- Manage DNS Records through WebUI / API
+- Ability to update the DNS server's records for running DNS Server (WebSocket)
+- Receive Notifications on DNS Resolution via email or webhook
+- Easily build the application with Docker, Packer, & Terraform
 
 ## Phase 3: Stability
 
 Next, sanity checks and proper handlers will be put in place so that API calls fail gracefully. At this point the project should not be considered secure.
 
+Features:
+- Actual validation & Error Handling
+
 ## Phase 4: Release 0.1.0-alpha
 
 Once I'm satisfied the code is not complete trash, I'll release it as version 0.1.0-alpha. At this point, the project should be considered secure enough to deploy. Though I'd recommend doing so in a protected network. If the application proves valuable enough to me personally or others, I'll continue to add features / improvements.
+
+## Phase 5: Extending the Application
+
+Once the core DNS use case is satisfied, the API will be extended to support the resolution of HTTP/S and SMTP requests. 
 
 TODO:
 
@@ -46,6 +59,8 @@ TODO:
 - [ ] Create docker compose files
 - [ ] Create Packer build
 - [ ] Create Terraform build
+- [ ] Transfer record creation to the API
+- [ ] Implement websocket in DNS server to receive updates regarding records
 - [ ] Build ability for webhook's / events
 - [ ] Perform Validation on the Front End
 - [ ] Perform Better Validation on the Backend

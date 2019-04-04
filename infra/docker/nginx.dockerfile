@@ -7,8 +7,9 @@ RUN npm run build
 # Main Container
 FROM nginx:1.15
 
-EXPOSE 80
-EXPOSE 443
+# do not listen on 80 & 443, a future http service will listen on that port
+EXPOSE 8080
+EXPOSE 4843
 
 ENV SSL_ENABLED="1"
 ENV API_BACKEND_PROTO="https"
