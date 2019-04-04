@@ -13,46 +13,59 @@ class DbSeed(BaseCommand):
 
     @classmethod
     def parser(cls, parser):
+        parser.add_argument(
+            "-t", "--target", action="store", default="dev", help="target"
+        )
         return parser
 
     async def run(self):
         self.load_env("api", "db", "broadcast")
         self.db_register()
 
-        logger.info("creating superuser")
-        super = factory("SuperUserFactory").create(email="jim@jim.jim")
-        logger.info("creating zones")
+        if self.option("target", False) == False:
+            self.set_option("target", "dev")
 
-        zone = factory("ZoneFactory").create(domain="example.com", ip="127.0.1.1")
-        dns_server_name = uuid.uuid4()
-        zone2 = factory("ZoneFactory").create(
-            domain="potato.com", ip="127.0.1.1", dns_server_name=dns_server_name
-        )
+        if self.option("target") == "env":
+            # self.load_env("seed")
+            logger.info(f"seeding {self.option('target')}")
+            raise NotImplementedError()  # seed based on env vars
 
-        dns_server_name2 = uuid.uuid4()
-        zone3 = factory("ZoneFactory").create(
-            domain="differentzone.com", ip="127.0.1.1", dns_server_name=dns_server_name2
-        )
+        elif self.option("target") == "dev":
+            logger.info(f"seeding {self.option('target')}")
 
-        for i in range(25):
-            factory("ZoneFactory").create()
-
-        logger.info("creating api_tokens")
-
-        for i in range(65):
-            factory("ApiTokenFactory").create(dns_server_name=dns_server_name)
-
-        logger.info("creating dns_requests")
-
-        dns_request = factory("DnsRequestFactory").create(zone_id=zone.id)
-        dns_request = factory("DnsRequestFactory").create(zone_id=zone2.id)
-
-        for i in range(35):
-            dns_request = factory("DnsRequestFactory").create(
-                dns_server_name=dns_server_name
+            logger.info("creating superuser")
+            super = factory("SuperUserFactory").create(email="jim@jim.jim")
+            logger.info("creating zones")
+            zone = factory("ZoneFactory").create(domain="example.com", ip="127.0.1.1")
+            dns_server_name = uuid.uuid4()
+            zone2 = factory("ZoneFactory").create(
+                domain="potato.com", ip="127.0.1.1", dns_server_name=dns_server_name
+            )
+            dns_server_name2 = uuid.uuid4()
+            zone3 = factory("ZoneFactory").create(
+                domain="differentzone.com",
+                ip="127.0.1.1",
+                dns_server_name=dns_server_name2,
             )
 
-        for i in range(35):
-            dns_request = factory("DnsRequestFactory").create(
-                dns_server_name=dns_server_name2
-            )
+            logger.info("creating api_tokens")
+
+            for i in range(65):
+                factory("ApiTokenFactory").create(dns_server_name=dns_server_name)
+
+            logger.info("creating dns_requests")
+            dns_request = factory("DnsRequestFactory").create(zone_id=zone.id)
+            dns_request = factory("DnsRequestFactory").create(zone_id=zone2.id)
+
+            for i in range(35):
+                dns_request = factory("DnsRequestFactory").create(
+                    dns_server_name=dns_server_name
+                )
+
+            for i in range(35):
+                dns_request = factory("DnsRequestFactory").create(
+                    dns_server_name=dns_server_name2
+                )
+        else:
+            print("invalid target set for seeder")
+            self.exit(1)

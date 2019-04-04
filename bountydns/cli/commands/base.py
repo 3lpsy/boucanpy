@@ -85,6 +85,10 @@ class BaseCommand:
             return self.options.get(key)
         return self.options.get(key, default)
 
+    def set_option(self, key, val):
+        self.options[key] = val
+        return self
+
     def load_env(self, *args):
         if not self.option("no_envs", False):
             for key in args:
