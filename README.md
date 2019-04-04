@@ -2,7 +2,7 @@
 
 Status: WIP / PoC
 
-[Screenshot](screenshots/screenshot-dns-requests)
+![Screenshot](screenshots/screenshot-dns-requests)
 
 This project is an attempt to implement a lightweight burp collaborator-esc application and consists of two main components: a DNS Server (Custom Python Implemention with dnslib) and an API.
 
