@@ -48,7 +48,7 @@ class Broadcast {
         console.log(this)
         let res = event.data;
         let data = JSON.parse(res)
-        console.log("onmessage", data)
+        console.log("public onmessage", data)
         this.bus.$emit("WS_BROADCAST_MESSAGE", {
             channel: 'public',
             on: 'message',

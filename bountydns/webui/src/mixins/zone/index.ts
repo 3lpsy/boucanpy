@@ -9,8 +9,9 @@ export default class ZoneMixin extends Vue {
     loadData() {
 
     }
-    mounted() {
-        this.loadData()
+
+    registerOnBroadcastZoneCreated() {
+        console.log("registering WS_BROADCAST_MESSAGE for Zone")
         bus.$on("WS_BROADCAST_MESSAGE", (event: any) => {
             let message = event.message;
             if (message.name == "ZONE_CREATED") {

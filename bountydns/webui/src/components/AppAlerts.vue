@@ -35,7 +35,9 @@ export default class AppAlerts extends Vue {
     }
 
     mounted() {
+        console.log("registering APP_ALERT event on bus")
         bus.$on("APP_ALERT", (alert) => {
+            console.log("receving app alert", alert)
             if (alert.show === null || alert.show === undefined) {
                 alert.show = true
             }

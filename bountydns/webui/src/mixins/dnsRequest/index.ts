@@ -9,8 +9,7 @@ export default class DnsRequestMixin extends Vue {
     loadData() {
 
     }
-    mounted() {
-        this.loadData()
+    registerOnBroadcastDnsRequestCreated() {
         bus.$on("WS_BROADCAST_MESSAGE", (event: any) => {
             let message = event.message;
             if (message.name == "DNS_REQUEST_CREATED") {

@@ -37,6 +37,8 @@ async def broadcast_authed_index(websocket: WebSocket):
 
     while await channel.wait_message():
         msg = await channel.get(encoding="utf-8")
+        print("broadcasting message", msg)
+
         data = json.loads(msg)
         await websocket.send_json(data)
 

@@ -40,7 +40,7 @@ Once I'm satisfied the code is not complete trash, I'll release it as version 0.
 
 ## Phase 5: Extending the Application
 
-Once the core DNS use case is satisfied, the API will be extended to support the resolution of HTTP/S and SMTP requests. 
+Once the core DNS use case is satisfied, the API will be extended to support the resolution of HTTP/S and SMTP requests.
 
 TODO:
 
@@ -56,6 +56,7 @@ TODO:
 - [x] Incorporate ApiClient and ApiTokens into DNS Server
 - [x] Get Websockets Working
 - [x] Handle Pagination on the Front End
+- [ ] Check for refreshable WebSocket token on page load
 - [ ] Create docker compose files
 - [ ] Create Packer build
 - [ ] Create Terraform build

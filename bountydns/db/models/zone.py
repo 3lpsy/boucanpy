@@ -1,5 +1,6 @@
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
+from bountydns.broadcast import make_redis, make_broadcast_url
 
 from .base import Base
 
@@ -16,3 +17,11 @@ class Zone(Base):
         foreign_keys="bountydns.db.models.dns_request.DnsRequest.zone_id",
         back_populates="zone",
     )
+
+    @staticmethod
+    async def on_after_insert(mapper, connection, target):
+        print("on_after_insert", mapper, connection, target)
+        publisher = await make_redis()
+        res = await publisher.publish_json(
+            "channel:auth", {"type": "MESSAGE", "name": "ZONE_CREATED", "payload": ""}
+        )

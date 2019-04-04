@@ -136,6 +136,7 @@ export default class ZonesTable extends mixins(
     }
     mounted() {
         this.freshLoad();
+        this.registerOnBroadcastZoneCreated()
     }
 }
 </script>
