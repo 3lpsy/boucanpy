@@ -50,29 +50,53 @@ TODO:
 - [ ] Confirm DNS Server is as Compliant as possible
 ```
 usage: bdnsctl.py [-h]
-                  {test,tests,alembic-current,alembic-downgrade,alembic-history,alembic-init,alembic-migrate,alembic-show,alembic-stamp,alembic-upgrade,zone-create,zone,zone-list,zones,api-server,api,api-urls,urls,api-zone-list,api-zones,dns-server,dns}
+                  {db-seed,seed,db-setup,setup,db-truncate,truncate,test,tests,user-create,user,user-list,users,alembic-current,al-current,alembic-downgrade,al-downgrade,alembic-history,al-history,alembic-init,al-init,alembic-migrate,al-migrate,alembic-show,al-show,alembic-stamp,al-stamp,alembic-upgrade,al-upgrade,zone-create,zone,zone-list,zones,api-login,login,api-server,api,api-urls,urls,api-user-create,api-user,api-user-list,api-users,api-zone-create,api-zone,api-zone-list,api-zones,api-token-list,api-tokens,dns-server,dns}
                   ...
 
 positional arguments:
-  {test,tests,alembic-current,alembic-downgrade,alembic-history,alembic-init,alembic-migrate,alembic-show,alembic-stamp,alembic-upgrade,zone-create,zone,zone-list,zones,api-server,api,api-urls,urls,api-zone-list,api-zones,dns-server,dns}
+  {db-seed,seed,db-setup,setup,db-truncate,truncate,test,tests,user-create,user,user-list,users,alembic-current,al-current,alembic-downgrade,al-downgrade,alembic-history,al-history,alembic-init,al-init,alembic-migrate,al-migrate,alembic-show,al-show,alembic-stamp,al-stamp,alembic-upgrade,al-upgrade,zone-create,zone,zone-list,zones,api-login,login,api-server,api,api-urls,urls,api-user-create,api-user,api-user-list,api-users,api-zone-create,api-zone,api-zone-list,api-zones,api-token-list,api-tokens,dns-server,dns}
                         command
+    db-seed (seed)      seed db
+    db-setup (setup)    setup db
+    db-truncate (truncate)
+                        truncate db
     test (tests)        run tests
-    alembic-current     run alembic current
-    alembic-downgrade   run alembic downgrade
-    alembic-history     run alembic history
-    alembic-init        run alembic init
-    alembic-migrate     run alembic migrate
-    alembic-show        run alembic show
-    alembic-stamp       run alembic stamp
-    alembic-upgrade     run alembic upgrade
-    zone-create (zone)  create zones
-    zone-list (zones)   list zones
+    user-create (user)  create users via DB
+    user-list (users)   list users via DB
+    alembic-current (al-current)
+                        run alembic current
+    alembic-downgrade (al-downgrade)
+                        run alembic downgrade
+    alembic-history (al-history)
+                        run alembic history
+    alembic-init (al-init)
+                        run alembic init
+    alembic-migrate (al-migrate)
+                        run alembic migrate
+    alembic-show (al-show)
+                        run alembic show
+    alembic-stamp (al-stamp)
+                        run alembic stamp
+    alembic-upgrade (al-upgrade)
+                        run alembic upgrade
+    zone-create (zone)  create zones via DB
+    zone-list (zones)   list zones via DB
+    api-login (login)   login via API
     api-server (api)    run api server
     api-urls (urls)     list api urls
+    api-user-create (api-user)
+                        create user via API
+    api-user-list (api-users)
+                        list users via API
+    api-zone-create (api-zone)
+                        create user via API
     api-zone-list (api-zones)
                         list zones via API
+    api-token-list (api-tokens)
+                        list api-tokens via DB
     dns-server (dns)    run dns server
 
 optional arguments:
   -h, --help            show this help message and exit
+
 ```
