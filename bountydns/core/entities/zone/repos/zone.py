@@ -7,3 +7,10 @@ from bountydns.core.entities.zone.data import ZoneData
 class ZoneRepo(BaseRepo):
     default_model = Zone
     default_data_model = ZoneData
+
+    def filter_dns_server_name(self, dns_server_name):
+        self._query = self.query().filter_or(
+            self.model().dns_server_name == dns_server_name,
+            self.model().dns_server_name.is_(None),
+        )
+        return self

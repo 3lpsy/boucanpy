@@ -1,3 +1,3 @@
 module.exports = {
-    publicPath: '/webui/assets',
+    publicPath: 'webui/assets',
 };

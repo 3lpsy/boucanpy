@@ -69,35 +69,39 @@ async def webui_redir():
 
 
 # served by nginx
-@api.get("/landing/")
-async def web_index():
-    return FileResponse(landing_dir("index.html"))
+if Path(landing_dir("index.html")).is_file():
 
+    @api.get("/landing/")
+    async def web_index():
+        return FileResponse(landing_dir("index.html"))
 
-api.mount("/landing", StaticFiles(directory=landing_dir()))
+    api.mount("/landing", StaticFiles(directory=landing_dir()))
 
 # served by nginx
-@api.get("/webui")
-async def webui_redir():
-    return RedirectResponse(url="/webui/", status_code=302)
+if Path(webui_dir("dist")).is_dir():
 
+    # served by nginx
+    @api.get("/webui")
+    async def webui_redir():
+        return RedirectResponse(url="/webui/", status_code=302)
 
-# served by nginx w/ slight rewrite
-@api.get("/webui/assets")
-async def webui_index():
-    return FileResponse(webui_dir(join("dist", "index.html")))
+    # served by nginx w/ slight rewrite
+    @api.get("/webui/assets")
+    async def webui_index():
+        return FileResponse(webui_dir(join("dist", "index.html")))
 
-
-api.mount("/webui/assets", StaticFiles(directory=webui_dir("dist")))
+    api.mount("/webui/assets", StaticFiles(directory=webui_dir("dist")))
 
 # TODO: make core handler
-
-
 @api.exception_handler(404)
 async def http_exception(request, exc):
     url = urlparse(str(request.url))
     if not url.path.startswith("/api/v1"):
-        return FileResponse(webui_dir(join("dist", "index.html")))
+        if (
+            Path(webui_dir("dist")).is_dir()
+            and Path(webui_dir(join("dist", "index.html"))).is_file()
+        ):
+            return FileResponse(webui_dir(join("dist", "index.html")))
     return JSONResponse({"detail": "Not Found"}, status_code=404)
 
 

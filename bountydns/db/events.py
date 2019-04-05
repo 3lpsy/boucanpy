@@ -23,3 +23,8 @@ def db_register_model_events(models):
             event_cb = "on_" + event_name
             if hasattr(m, event_cb):
                 listen(m, event_name, make_event(getattr(m, event_cb)))
+
+
+def db_register_search_events(session, mixin):
+    listen(session, "before_commit", mixin.before_commit)
+    listen(session, "before_commit", mixin.after_commit)

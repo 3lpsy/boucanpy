@@ -1,0 +1,30 @@
+version: '3.3'
+services:
+  bountydns:
+    build:
+      context: ./../../
+      dockerfile: ./infra/docker/bountydns.dockerfile
+    image: 3lpsy/bountydns:latest
+  webui:
+    build:
+      context: ./../../bountydns
+      dockerfile: ./../infra/docker/webui.dockerfile
+    image: 3lpsy/bountydns-webui:latest
+  proxy:
+    build:
+      context: ./../proxy
+      dockerfile: ./../docker/proxy.dockerfile
+    image: 3lpsy/bountydns-proxy:latest
+    depends_on:
+      -  webui
+  broadcast:
+    build:
+      context: ./../broadcast
+      dockerfile: ./../docker/broadcast.dockerfile
+    image: 3lpsy/bountydns-broadcast:latest
+  db:
+    image: postgres:latest
+  # dbui:
+  #   image: dpage/pgadmin4
+  # search:
+  #   image: amazon/opendistro-for-elasticsearch:latest

@@ -4,6 +4,7 @@ from bountydns.db.models.zone import Zone
 from bountydns.core.entities import (
     SortQS,
     PaginationQS,
+    SearchQS,
     ZoneRepo,
     ZonesResponse,
     ZoneResponse,
@@ -20,14 +21,15 @@ options = {"prefix": "/dns-server/{dns_server_name}"}
 async def index(
     dns_server_name: str,
     sort_qs: SortQS = Depends(SortQS),
+    search_qs: SortQS = Depends(SearchQS),
     pagination: PaginationQS = Depends(PaginationQS),
     zone_repo: ZoneRepo = Depends(ZoneRepo),
     token: TokenPayload = ScopedTo("zone:list"),
 ):
+    # any other queries to filter by or do anythign can be done here
     pg, items = (
-        zone_repo.filter_or(
-            Zone.dns_server_name == dns_server_name, Zone.dns_server_name.is_(None)
-        )
+        zone_repo.search(search_qs)
+        .filter("dns_server_name", dns_server_name)
         .sort(sort_qs)
         .paginate(pagination)
         .data()

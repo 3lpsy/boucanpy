@@ -19,5 +19,5 @@ async def index(
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
     token: TokenPayload = ScopedTo("dns-request:list"),
 ):
-    pg, items = dns_server_repo.sort(sort_qs).paginate(pagination).data()
+    pg, items = dns_server_repo.paginate(pagination).data()
     return DnsServersResponse(pagination=pg, dns_servers=items)

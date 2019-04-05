@@ -1,0 +1,4 @@
+version: '3.3'
+services:
+  broadcast:
+    restart: on-failure:5

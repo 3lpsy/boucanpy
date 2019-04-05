@@ -20,10 +20,10 @@ async def login(
     user = db.query(User).filter_by(email=form.username).first()
     if not user or not user.hashed_password:
         logger.warning(f"user exists failed for {form.username}")
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
     if not verify_password(form.password, user.hashed_password):
         logger.warning(f"hash verification failed for {form.username}")
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
 
     if user.mfa_secret:  # mfa is enabled
         scopes = "profile mfa_required"

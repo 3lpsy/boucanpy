@@ -22,5 +22,5 @@ async def is_broadcast_up():
                     str(seconds), str(e.__class__.__name__)
                 )
             )
-        seconds = seconds + 1
-        sleep(1)
+        seconds = seconds + 2
+        sleep(2)

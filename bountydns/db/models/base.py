@@ -4,6 +4,7 @@ from bountydns.db.session import _session
 
 
 class CustomBase(object):
+    __searchable__ = []
     sub_field = "id"
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 

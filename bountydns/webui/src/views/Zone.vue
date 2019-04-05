@@ -20,7 +20,7 @@
             <div class="row">
                 <div class="col-md-12 col-xs-12">
                     <zones-table></zones-table>
-                </div>r
+                </div>
             </div>
         </b-container>
         <zone-create-modal modal-id="create-zone"> </zone-create-modal>

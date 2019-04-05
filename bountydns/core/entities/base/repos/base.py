@@ -2,7 +2,7 @@ from typing import Optional, List
 from fastapi import Depends
 from sqlalchemy.dialects import postgresql
 from sqlalchemy import or_, desc
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from bountydns.core import logger
 from bountydns.db.session import session
 from bountydns.db.pagination import Pagination
@@ -12,6 +12,8 @@ from bountydns.core.entities.pagination.responses import PaginationData
 class BaseRepo:
     default_model = None
     default_data_model = None
+    default_loads = []
+    default_fitlers = []
 
     def __init__(self, db: Session = Depends(session)):
         self.db = db
@@ -21,6 +23,7 @@ class BaseRepo:
         self._model = None
         self._is_paginated = False
         self._is_list = False  # check at runtime instead (?)
+        self._filters = {}
 
     ## RESULTS
     def results(self):
@@ -29,6 +32,14 @@ class BaseRepo:
     def set_results(self, results):
         # TODO: not compatible with list / pagination / see above
         self._results = results
+        return self
+
+    def load(self, loads):
+        for load in loads:
+            if hasattr(self, "load_" + load):
+                self._query = hasattr(self, "load_" + load)()
+            else:
+                self_query = self.query().options(joinedload(load))
         return self
 
     ## DATA
@@ -107,11 +118,32 @@ class BaseRepo:
 
     ## FILTERS / MODIFICATION
 
+    def search(self, search_qs):
+        if not search_qs:
+            return self
+        # TODO: implement search functionality
+        return self
+
     def sort(self, sort_qs):
-        sort = self.label(sort_qs.sort_by)
+        sort = self.get_sort_by(sort_qs.sort_by)
         if sort_qs.sort_dir.lower() == "desc":
             sort = desc(sort)
         self._query = self.query().order_by(sort)
+        return self
+
+    def get_sort_by(self, key):
+        return self.label(key)
+
+    def filters(self, key, *args, **kwargs):
+        if hasattr(self, "filter_" + key):
+            getattr(self, "filter_" + key)(*args, **kwargs)
+        elif key in self._filters:
+            if callable(self._filters[key]):
+                self.query = self.self._filters[key](self.query(), *args, **kwargs)
+        return self
+
+    def add_filter(self, key, filter):
+        self._filters[key] = filter
         return self
 
     def filter_or(self, *args, **kwargs):
@@ -121,7 +153,6 @@ class BaseRepo:
     def filter_by(self, **kwargs):
         self._query = self.query().filter_by(**kwargs)
         self.debug(f"adding filters {kwargs} to query {self.compiled()}")
-
         return self
 
     def filter(self, *args, **kwargs):
@@ -167,6 +198,7 @@ class BaseRepo:
         if not self._query:
             self.debug(f"making query for repo: {self.__class__.__name__}")
             self._query = self.db.query(self.model())
+            self.load(self.default_loads)
         return self._query
 
     def compiled(self):

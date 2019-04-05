@@ -1,0 +1,10 @@
+version: '3.3'
+services:
+  bountydns:
+    depends_on:
+      - db
+      - broadcast
+  proxy:
+    depends_on:
+      - webui
+      - bountydns

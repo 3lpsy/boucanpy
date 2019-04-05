@@ -6,3 +6,4 @@ from bountydns.core.entities.dns_request.data import DnsRequestData
 class DnsRequestRepo(BaseRepo):
     default_model = DnsRequest
     default_data_model = DnsRequestData
+    default_loads = ['zone']
