@@ -29,7 +29,7 @@ async def index(
     # any other queries to filter by or do anythign can be done here
     pg, items = (
         zone_repo.search(search_qs)
-        .filter("dns_server_name", dns_server_name)
+        .filters("dns_server_name", dns_server_name)
         .sort(sort_qs)
         .paginate(pagination)
         .data()

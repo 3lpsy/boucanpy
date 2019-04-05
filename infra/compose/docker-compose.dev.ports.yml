@@ -1,5 +1,9 @@
 version: '3.3'
 services:
+  dns:
+    ports:
+      - "127.0.0.1:53:53/udp"
+      - "127.0.0.1:53:53/tcp"
   proxy:
     ports:
       - "127.0.0.1:8080:80"

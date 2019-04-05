@@ -1,5 +1,6 @@
 from sys import exit
 from bountydns.core import load_env, set_log_level, make_logger
+from bountydns.core.security import create_bearer_token
 from bountydns.db.session import db_register, session
 from bountydns.db.utils import make_db_url
 

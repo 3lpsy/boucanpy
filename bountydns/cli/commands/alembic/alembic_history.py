@@ -17,6 +17,6 @@ class AlembicHistory(BaseCommand):
         return parser
 
     async def run(self):
-        load_env("db")
+        load_env("api")
         db_register(make_db_url())
         history(self.migration_dir)

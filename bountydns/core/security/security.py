@@ -27,7 +27,8 @@ def hash_password(password: str):
 def create_bearer_token(*, data: dict, expires_delta: timedelta = None):
     from bountydns.api import config  # environment must be loaded
 
-    expires_delta = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
+    if not expires_delta:
+        expires_delta = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta

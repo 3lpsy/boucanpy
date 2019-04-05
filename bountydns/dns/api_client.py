@@ -1,6 +1,9 @@
 import jwt
+from time import sleep
 import requests
 from dnslib import QTYPE, RCODE, RR
+
+from bountydns.core.logger import logger
 
 from bountydns.core.entities.zone.data import ZoneData
 
@@ -10,7 +13,30 @@ class ApiClient:
         self.api_url = api_url
         self.api_token = api_token
         payload = jwt.decode(api_token, verify=False)  # do not trust
+        if not "dns_server_name" in payload.keys() or not payload["dns_server_name"]:
+            print("DNS SERVER PAYLOAD", payload)
+            logger.critical("no dns_server_name on api token")
+            raise Exception("no dns_server_name on api token")
         self.dns_server_name = payload["dns_server_name"]
+
+    def wait_for_up(self):
+        seconds = 0
+        while True:
+            if seconds > 60:
+                logger.warning("could not connect to api. api not up")
+                return False
+            logger.info("checking for api status")
+            try:
+                self.get_status()
+                return True
+            except Exception as e:
+                logger.info(
+                    "api check not ready after {} seconds: {}".format(
+                        str(seconds), str(e.__class__.__name__)
+                    )
+                )
+            seconds = seconds + 1
+            sleep(1)
 
     def url(self, url):
         return self.api_url + "/api/v1" + url
@@ -34,6 +60,9 @@ class ApiClient:
             "Authorization": f"Bearer {self.api_token}",
             "Content-Accept": "application/json",
         }
+
+    def get_status(self):
+        return self.get("/status")
 
     def get_zones(self):
         dm = ZoneData

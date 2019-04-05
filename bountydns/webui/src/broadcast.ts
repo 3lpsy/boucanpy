@@ -26,12 +26,23 @@ class Broadcast {
         let res = event.data;
         let data = JSON.parse(res)
         console.log("authed ws on message", data)
+        console.log('emitting WS_BROADCAST_MESSAGE')
         this.bus.$emit("WS_BROADCAST_MESSAGE", {
             channel: 'auth',
             on: 'message',
             event: event,
             message: data
         })
+        if (data.name) {
+            console.log('emitting ' + data.name)
+            this.bus.$emit(data.name, {
+                channel: 'auth',
+                on: 'message',
+                event: event,
+                message: data
+            })
+        }
+
     }
 
     public registerAuthedWS(wsTokenRaw: string) {
@@ -55,6 +66,15 @@ class Broadcast {
             event: event,
             message: data
         })
+        if (data.name) {
+            console.log('emitting ' + data.name)
+            this.bus.$emit(data.name, {
+                channel: 'public',
+                on: 'message',
+                event: event,
+                message: data
+            })
+        }
     };
 
     public publicOnOpen(event: any) {

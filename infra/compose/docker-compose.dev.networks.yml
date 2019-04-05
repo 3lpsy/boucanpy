@@ -1,0 +1,11 @@
+version: '3.3'
+networks:
+  bountydnspub:
+    # Use a custom driver
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.28.20.0/24
+    driver_opts:
+      com.docker.network.bridge.name: bountdnspub0

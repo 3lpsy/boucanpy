@@ -1,8 +1,11 @@
 import uvicorn
+from os import environ
 from bountydns.core import logger, set_log_level
 from bountydns.core.utils import project_dir, load_env
+from bountydns.core.security import hash_password
 from bountydns.cli.commands.base import BaseCommand
 from bountydns.cli.commands.db_setup import DbSetup
+from bountydns.db.factories import factory
 
 
 class ApiServer(BaseCommand):
@@ -38,6 +41,10 @@ class ApiServer(BaseCommand):
         )
 
         parser.add_argument(
+            "--db-seed-env", action="store_true", help="seed data from env variables"
+        )
+
+        parser.add_argument(
             "--no-bcast-check",
             action="store_true",
             help="do not wait for broadcast service",
@@ -47,7 +54,7 @@ class ApiServer(BaseCommand):
     async def run(self):
         args = ["bountydns.api.main:api"]
         kwargs = self.get_kwargs()
-        self.load_env("db", "api", "broadcast")
+        self.load_env("api")
 
         if self.option("import_check", False):
             logger.info("performing import check")
@@ -79,6 +86,9 @@ class ApiServer(BaseCommand):
             if not bcast_up:
                 logger.critical("broadcast (queue) not up error. please check logs")
                 return self.exit(1)
+
+        if self.option("db_seed_env", False):
+            self.seed_from_env()
         return uvicorn.run(*args, **kwargs)
 
     def get_kwargs(self):
@@ -106,3 +116,28 @@ class ApiServer(BaseCommand):
             logger.critical("Canot use debug or reload with workers. Skipping.")
             return None
         return self.option("workers", 5)
+
+    def seed_from_env(self):
+        from bountydns.core.entities.user import UserRepo
+
+        for i in range(9):
+            i = str(i)
+            user_data = {}
+            email_key = f"SEED_USER_{i}_EMAIL"
+            email = environ.get(email_key, None)
+            password_key = f"SEED_USER_{i}_PASSWORD"
+            password = environ.get(password_key, None)
+            superuser_key = f"SEED_USER_{i}_SUPERUSER"
+            is_superuser = int(environ.get(superuser_key, 0))
+            if email and password:
+                hashed_password = hash_password(password)
+                repo = UserRepo(db=self.session())
+                if not repo.exists(email=email):
+                    logger.info(f"seeding user {email}")
+                    user = factory("UserFactory").create(
+                        email=email,
+                        hashed_password=hashed_password,
+                        is_superuser=is_superuser,
+                    )
+                else:
+                    logger.info(f"seeded user {email} already exists")

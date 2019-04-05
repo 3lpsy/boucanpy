@@ -33,7 +33,7 @@ class UserCreate(BaseCommand):
         return parser
 
     async def run(self):
-        self.load_env("db")
+        self.load_env("api")
         self.db_register()
         email = self.option("email")
         password = self.get_password()

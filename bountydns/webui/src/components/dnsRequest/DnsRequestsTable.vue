@@ -91,9 +91,11 @@ export default class DnsRequestsTable extends mixins(
                 this.isLoaded = true;
             });
     }
-    mounted() {
-        this.loadData()
+    created() {
         this.registerOnBroadcastDnsRequestCreated()
+    }
+    mounted() {
+      this.loadData()
     }
 
 }

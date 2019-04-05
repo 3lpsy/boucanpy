@@ -20,7 +20,7 @@ class ZoneCreate(BaseCommand):
         return parser
 
     async def run(self):
-        self.load_env("db")
+        self.load_env("api")
         self.db_register()
         ip = self.get_ip()
         domain = self.get_domain()

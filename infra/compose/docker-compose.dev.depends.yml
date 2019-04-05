@@ -4,6 +4,10 @@ services:
     depends_on:
       - db
       - broadcast
+  dns:
+    depends_on:
+      - bountydns
+      - broadcast
   proxy:
     depends_on:
       - webui

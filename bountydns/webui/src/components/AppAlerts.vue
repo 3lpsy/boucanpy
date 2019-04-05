@@ -2,7 +2,6 @@
 <template>
   <div class="alerts-section row">
       <div class="container-fluid">
-
       <b-alert
         dismissible
         fade
@@ -27,6 +26,7 @@ import bus from '@/bus';
 @Component
 export default class AppAlerts extends Vue {
     alerts = []
+    registeredEvents = []
 
     removeAlert(alert) {
         console.log("Remving alert", alert)
@@ -34,21 +34,29 @@ export default class AppAlerts extends Vue {
         alert.show = false
     }
 
-    mounted() {
+    registerOnAlert() {
         console.log("registering APP_ALERT event on bus")
-        bus.$on("APP_ALERT", (alert) => {
-            console.log("receving app alert", alert)
-            if (alert.show === null || alert.show === undefined) {
-                alert.show = true
-            }
-            if (alert.timeout === null || alert.timeout === undefined) {
-                alert.timeout = 10
-            }
-            this.alerts.push(alert)
-            setTimeout(function(){
-                this.removeAlert(alert)
-            }.bind(this), alert.timeout * 1000);
-        })
+        if (! this.registeredEvents.includes("APP_ALERT")) {
+            console.log("registering APP_ALERT event on bus")
+            bus.$on("APP_ALERT", (alert) => {
+                console.log("receving app alert", alert)
+                if (alert.show === null || alert.show === undefined) {
+                    alert.show = true
+                }
+                if (alert.timeout === null || alert.timeout === undefined) {
+                    alert.timeout = 10
+                }
+                this.alerts.push(alert)
+                setTimeout(function(){
+                    this.removeAlert(alert)
+                }.bind(this), alert.timeout * 1000);
+            })
+            this.registeredEvents.push("APP_ALERT")
+        }
+    }
+
+    created() {
+        this.registerOnAlert()
     }
 }
 </script>

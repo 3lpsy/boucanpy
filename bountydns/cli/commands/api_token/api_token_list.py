@@ -13,7 +13,7 @@ class ApiTokenList(BaseCommand):
         return parser
 
     async def run(self):
-        self.load_env("db")
+        self.load_env("api")
         self.db_register()
         for zone in self.session().query(ApiToken).all():
             print(zone.id, zone.scopes, zone.token)

@@ -12,7 +12,7 @@ class ApiUrls(BaseCommand):
         return parser
 
     async def run(self):
-        load_env("db")
+        load_env("api")
         load_env("api")
         from bountydns.api.main import api
 

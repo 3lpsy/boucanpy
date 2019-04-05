@@ -13,7 +13,7 @@ class UserList(BaseCommand):
         return parser
 
     async def run(self):
-        self.load_env("db")
+        self.load_env("api")
         self.db_register()
         for user in self.session().query(User).all():
             print(user.id, user.email, user.is_superuser)

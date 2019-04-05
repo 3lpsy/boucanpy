@@ -5,17 +5,16 @@ import bus from '@/bus';
 // You can declare a mixin as the same style as components.
 @Component
 export default class DnsRequestMixin extends Vue {
+    registeredEvents = []
     loadData() {}
     registerOnBroadcastDnsRequestCreated() {
-        bus.$on('WS_BROADCAST_MESSAGE', (event: any) => {
-            let message = event.message;
-            if (message.name == 'DNS_REQUEST_CREATED') {
-                this.loadData();
-                bus.$emit('APP_ALERT', {
-                    text: 'New DNS Request Added!',
-                    type: 'info',
-                });
-            }
+        console.log("registering DNS_REQUEST_CREATED on dns request table")
+        bus.$on('DNS_REQUEST_CREATED', (event: any) => {
+            this.loadData();
+            bus.$emit('APP_ALERT', {
+                text: 'New DNS Request Added!',
+                type: 'info',
+            });
         });
     }
 }

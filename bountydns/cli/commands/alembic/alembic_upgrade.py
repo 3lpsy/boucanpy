@@ -17,6 +17,6 @@ class AlembicUpgrade(BaseCommand):
         return parser
 
     async def run(self):
-        load_env("db")
+        load_env("api")
         db_register(make_db_url())
         upgrade(self.migration_dir)

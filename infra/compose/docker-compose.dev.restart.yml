@@ -2,3 +2,5 @@ version: '3.3'
 services:
   broadcast:
     restart: on-failure:5
+  dns:
+    restart: on-failure:2
