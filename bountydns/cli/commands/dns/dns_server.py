@@ -32,6 +32,11 @@ class DnsServer(BaseCommand):
         parser.add_argument(
             "-l", "--listen", action="store", default="127.0.0.1", help="bind address"
         )
+        parser.add_argument(
+            "--sync-api-token",
+            action="store_true",
+            help="sync api token back to database",
+        )
         return parser
 
     async def run(self):
@@ -43,6 +48,9 @@ class DnsServer(BaseCommand):
         if not api_client.wait_for_up():
             logger.critical("could not connect to api. quitting")
             self.exit(1)
+
+        if self.option("sync_api_token"):
+            api_client.sync_api_token()
 
         resolver = Resolver(api_client)
         udp_server = DNSServer(

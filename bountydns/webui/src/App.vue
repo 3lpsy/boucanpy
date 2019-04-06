@@ -12,6 +12,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import AppFooter from '@/components/AppFooter.vue';
 import AppNavbar from '@/components/AppNavbar.vue';
 import AppAlerts from '@/components/AppAlerts.vue';
+import bus from '@/bus';
 
 @Component({
     components: {
@@ -21,8 +22,19 @@ import AppAlerts from '@/components/AppAlerts.vue';
     },
 })
 export default class App extends Vue {
-    mounted() {
-
+    created() {
+        bus.$on('DNS_REQUEST_CREATED', (event: any) => {
+            bus.$emit('APP_ALERT', {
+                text: 'New DNS Request Added!',
+                type: 'info',
+            });
+        });
+        bus.$on("ZONE_CREATED", (event: any) => {
+            bus.$emit('APP_ALERT', { text: 'New Zone Added!', type: 'info' });
+        })
+        bus.$on("API_TOKEN_CREATED", (event: any) => {
+            bus.$emit('API_TOKEN_CREATED', { text: 'New Api Token Created!', type: 'info' });
+        })
     }
 }
 </script>

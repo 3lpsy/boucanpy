@@ -1,0 +1,16 @@
+version: '3.3'
+services:
+  bountydns:
+    volumes:
+      - ./../../bountydns:/bountydns/bountydns
+      - ./../../bdnsctl.py:/bountydns/bdnsctl.py
+      - ./../../requirements.txt:/bountydns/requirements.tx
+  dns:
+    volumes:
+      - ./../../bountydns:/bountydns/bountydns
+      - ./../../bdnsctl.py:/bountydns/bdnsctl.py
+      - ./../../requirements.txt:/bountydns/requirements.tx
+  proxy:
+    volumes:
+      - ./../../bountydns/webui/dist:/var/www/app/webui
+      - ./../../bountydns/landing:/var/www/app/landing

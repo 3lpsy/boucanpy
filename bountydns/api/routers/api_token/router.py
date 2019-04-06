@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from bountydns.core import logger, only
 from bountydns.core.security import (
@@ -24,6 +25,34 @@ router = APIRouter()
 options = {"prefix": ""}
 
 
+@router.post("/api-token/sync", name="api_token.sync", response_model=ApiTokenResponse)
+async def index(
+    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
+    token: TokenPayload = ScopedTo("api-token:syncable"),
+):
+    scopes = token.scopes
+    if "api-token" in scopes or "api-token:syncable" in scopes:
+        api_token = None
+        if not api_token_repo.exists(token=token.token):
+            api_token_repo.clear()
+            logger.info("saving api token from auth token")
+            api_token = api_token_repo.create(
+                dict(
+                    token=token.token,
+                    scopes=" ".join(scopes),
+                    dns_server_name=token.payload.dns_server_name,
+                    expires_at=datetime.utcfromtimestamp(float(token.exp)),
+                )
+            ).data()
+        else:
+            logger.info("token already exists in database")
+            api_token = api_token_repo.first()
+        return ApiTokenResponse(api_token=api_token)
+
+    else:
+        raise HTTPException(403, detail="Not found")
+
+
 @router.get("/api-token", name="api_token.index", response_model=ApiTokensResponse)
 async def index(
     sort_qs: SortQS = Depends(SortQS),
@@ -45,7 +74,7 @@ async def store(
     scopes = []
     for requested_scope in form.scopes.split(" "):
         request_scope_satisfied = False
-        for user_token in token["scopes"]:
+        for user_token in token.scopes:
             # TODO: double check this, pretty lenient
             # if a:b in a:b:c
             if user_token in requested_scope:

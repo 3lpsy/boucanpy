@@ -8,6 +8,7 @@ services:
     depends_on:
       - bountydns
       - broadcast
+      - proxy
   proxy:
     depends_on:
       - webui

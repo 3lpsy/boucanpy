@@ -228,3 +228,13 @@ class BaseRepo:
     def debug(self, msg):
         pass
         # logger.debug(msg)
+
+    def clear(self):
+        self._query = None
+        self._results = None
+        self._data_model = None
+        self._model = None
+        self._is_paginated = False
+        self._is_list = False  # check at runtime instead (?)
+        self._filters = {}
+        return self

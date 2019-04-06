@@ -100,7 +100,7 @@ export default class ApiTokensCreateForm extends mixins(
                 text: 'Api Token Created',
                 type: 'success',
             });
-            bus.$emit('API_TOKEN_ADDED', data.token);
+            bus.$emit('API_TOKEN_CREATED', data.token);
             console.log('emiting formComplete event');
             this.$emit('form-complete');
         });

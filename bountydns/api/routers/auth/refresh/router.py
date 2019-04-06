@@ -18,5 +18,7 @@ options = {"prefix": "/auth"}
 async def login(
     token: TokenPayload = ScopedTo("refresh"), user: User = Depends(current_user)
 ):
-    token = create_bearer_token(data={"sub": token["sub"], "scopes": token["scopes"]})
+    token = create_bearer_token(
+        data={"sub": token.sub, "scopes": " ".join(token.scopes)}
+    )
     return PasswordAuthResponse(token_type="bearer", access_token=str(token.decode()))

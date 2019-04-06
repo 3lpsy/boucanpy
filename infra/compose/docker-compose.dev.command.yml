@@ -3,4 +3,4 @@ services:
   bountydns:
     command: api-server --debug --reload --no-envs --db-setup -l 0.0.0.0 --db-seed-env
   dns:
-    command: dns-server -l 0.0.0.0 -p 53
+    command: dns-server -l 0.0.0.0 -p 53 --sync-api-token

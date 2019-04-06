@@ -24,16 +24,19 @@ def hash_password(password: str):
     return context.hash(password)
 
 
-def create_bearer_token(*, data: dict, expires_delta: timedelta = None):
+def create_bearer_token(
+    *, data: dict, expires_delta: timedelta = None, expire: datetime = None
+):
     from bountydns.api import config  # environment must be loaded
 
     if not expires_delta:
         expires_delta = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=60)
+    if not expire:
+        if expires_delta:
+            expire = datetime.utcnow() + expires_delta
+        else:
+            expire = datetime.utcnow() + timedelta(minutes=60)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
         to_encode, config.API_SECRET_KEY, algorithm=config.JWT_ALGORITHM
@@ -42,7 +45,7 @@ def create_bearer_token(*, data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-def verify_jwt_token(token: str, bl_token_repo=None, leeway=0):
+def verify_jwt_token(token: str, bl_token_repo=None, leeway=0) -> TokenPayload:
     from bountydns.api import config  # environment must be loaded
 
     if bl_token_repo:
@@ -56,13 +59,18 @@ def verify_jwt_token(token: str, bl_token_repo=None, leeway=0):
         )
     except jwt.PyJWTError:
         raise HTTPException(status_code=403, detail="Forbidden")
-    return payload
+
+    return TokenPayload(
+        payload=payload,
+        scopes=payload.get("scopes", "").split(" "),
+        token=token,
+        sub=payload.get("sub", ""),
+        exp=payload.get("exp", ""),
+    )
 
 
 def token_has_required_scopes(token_payload: TokenPayload, scopes: List[str]):
-    token_scopes = []
-    if "scopes" in token_payload.keys():
-        token_scopes = token_payload["scopes"].split(" ")
+    token_scopes = token_payload.scopes
     required_scopes = scopes or []
     for required_scope in required_scopes:
         satisfied = False
@@ -103,7 +111,7 @@ class ScopedTo(Depends):
 def current_user(
     token: TokenPayload = ScopedTo(), user_repo: UserRepo = Depends(UserRepo)
 ) -> User:
-    user = user_repo.get_by_sub(token["sub"])
+    user = user_repo.get_by_sub(token.sub)
     if not user:
         raise HTTPException(404, detail="Not Found")
     return user

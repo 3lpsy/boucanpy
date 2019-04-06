@@ -12,13 +12,8 @@ export default class ZoneMixin extends Vue {
 
     registerOnBroadcastZoneCreated() {
         console.log("registering WS_BROADCAST_MESSAGE for Zone")
-        bus.$on("WS_BROADCAST_MESSAGE", (event: any) => {
-            let message = event.message;
-            if (message.name == "ZONE_CREATED") {
+        bus.$on("ZONE_CREATED", (event: any) => {
                 this.loadData()
-                bus.$emit('APP_ALERT', { text: 'New Zone Added!', type: 'info' });
-            }
-
         })
     }
 }

@@ -29,6 +29,10 @@ sed -i "s/API_BACKEND_PROTO/$API_BACKEND_PROTO/g" /etc/nginx/nginx.conf
 sed -i "s/API_BACKEND_HOST/$API_BACKEND_HOST/g" /etc/nginx/nginx.conf
 sed -i "s/API_BACKEND_PORT/$API_BACKEND_PORT/g" /etc/nginx/nginx.conf
 
+sed -i "s/INSECURE_LISTEN_PORT/$INSECURE_LISTEN_PORT/g" /etc/nginx/nginx.conf
+
+sed -i "s/SSL_LISTEN_PORT/$SSL_LISTEN_PORT/g" /etc/nginx/nginx.conf
+
 if [[ "$DEBUG_CONF" == "1" ]]; then
     cat /etc/nginx/nginx.conf;
 fi
