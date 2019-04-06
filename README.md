@@ -8,6 +8,67 @@ This project is an attempt to implement a lightweight burp collaborator-esc appl
 
 When answering queries, the DNS server hits the API with information regarding the DNS query. The API will then serve the log of the DNS queries via a RESTful HTTP API as well as front-end (HTML/JS) web GUI.
 
+## Building and Running
+
+As of now the project can only automatically build for development. The build system uses docker and docker-compose to raise multiple services which the application requires.
+
+### Building the Containers
+
+Run the following to build and pull the containers.
+
+```
+$ ./compose.sh dev build
+```
+
+### Before Running any Commands
+
+Go into the .env folder and copy all the examples to files with the ".example" extension removed. You will need to reference the next section to create a DNS API Token for the "dns.env" folder.
+
+### Creating a DNS Token
+
+Run the following to generate the API_TOKEN.
+
+```
+$ ./api-token.sh
+```
+
+Copy the relevant output to dns.env to set the API_TOKEN variable.
+
+
+### Build the Frontend application
+
+This is only required for development containers where the front end code is mounted.
+
+```
+$ cd bountydns/webui
+$ npm install
+$ npm run build
+
+# alternatively, you can run watch to automatically rebuild the frontend
+
+$ npm run watch
+```
+### Running the Services
+
+Run the following to run the containers.
+
+```
+$ ./compose.sh dev up
+```
+
+## Developing and Hacking
+
+The development Docker Compose project uses mounts to mount the correct folders and files onto the "bountydns" and "dns" containers. In addition, the command uses "--reload" so you can edit the python project on your host and automatically refresh the servers inside the containers.
+
+The frontend WebUI application is also mounted. To setup automatic rebuilding, run the following:
+
+```
+$ cd bountydns/webui
+$ npm run watch
+```
+
+You will still need to refresh the browser to view changes.
+
 ## Phase 1: Build the PoC
 
 The first iteration of the project will be a proof of concept to demonstrate the project's viability. At this point, the project should not be considered stable, secure, or feature complete.
