@@ -27,6 +27,7 @@ class ApiClient:
                 return False
             logger.info("checking for api status")
             try:
+                # sleep(15)
                 self.get_status()
                 return True
             except Exception as e:
