@@ -1,0 +1,45 @@
+
+makeHttpRequest
+
+byte[] makeHttpRequest(java.lang.String host,
+                     int port,
+                     boolean useHttps,
+                     byte[] request)
+
+This method can be used to issue HTTP requests and retrieve their responses.
+
+Parameters:
+    host - The hostname of the remote HTTP server.
+    port - The port of the remote HTTP server.
+    useHttps - Flags whether the protocol is HTTPS or HTTP.
+    request - The full HTTP request.
+Returns:
+    The full response retrieved from the remote server.
+
+
+IHttpService buildHttpService(java.lang.String host,
+                            int port,
+                            java.lang.String protocol)
+
+This method constructs an IHttpService object based on the details provided.
+
+Parameters:
+    host - The HTTP service host.
+    port - The HTTP service port.
+    protocol - The HTTP service protocol.
+Returns:
+    An IHttpService object based on the details provided.
+
+
+IHttpService buildHttpService(java.lang.String host,
+                            int port,
+                            boolean useHttps)
+
+This method constructs an IHttpService object based on the details provided.
+
+Parameters:
+    host - The HTTP service host.
+    port - The HTTP service port.
+    useHttps - Flags whether the HTTP service protocol is HTTPS or HTTP.
+Returns:
+    An IHttpService object based on the details provided.

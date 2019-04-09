@@ -46,7 +46,7 @@ async def index(
             ).data()
         else:
             logger.info("token already exists in database")
-            api_token = api_token_repo.first()
+            api_token = api_token_repo.data()
         return ApiTokenResponse(api_token=api_token)
 
     else:

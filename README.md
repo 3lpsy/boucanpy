@@ -69,6 +69,10 @@ $ npm run watch
 
 You will still need to refresh the browser to view changes.
 
+## About the Project
+
+The following details the general outline for the future of this project.
+
 ## Phase 1: Build the PoC
 
 The first iteration of the project will be a proof of concept to demonstrate the project's viability. At this point, the project should not be considered stable, secure, or feature complete.
@@ -117,8 +121,8 @@ TODO:
 - [x] Incorporate ApiClient and ApiTokens into DNS Server
 - [x] Get Websockets Working
 - [x] Handle Pagination on the Front End
+- [x] Create docker compose files
 - [ ] Check for refreshable WebSocket token on page load
-- [ ] Create docker compose files
 - [ ] Create Packer build
 - [ ] Create Terraform build
 - [ ] Transfer record creation to the API
