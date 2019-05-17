@@ -1,4 +1,5 @@
 from sys import exit
+from os import environ
 from bountydns.core import load_env, set_log_level, make_logger
 from bountydns.core.security import create_bearer_token
 from bountydns.db.session import db_register, session
@@ -96,6 +97,12 @@ class BaseCommand:
                 load_env(key)
             return True
         return False
+
+    def env(self, key, default=None, int_=False):
+        val = environ.get(key, default)
+        if int_:
+            return int(val)
+        return val
 
     @classmethod
     def db_register(cls):

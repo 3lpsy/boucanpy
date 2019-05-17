@@ -7,4 +7,4 @@ class DnsRequestCreateForm(BaseModel):
     source_port: int
     type: str
     protocol: str
-    dns_server_name: str
+    dns_server_id: int

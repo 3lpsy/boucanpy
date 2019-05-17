@@ -14,6 +14,7 @@ from bountydns.core.entities import (
     ApiTokensResponse,
     ApiTokenResponse,
     ApiTokenRepo,
+    DnsServerRepo,
     ApiTokenCreateForm,
     SensitiveApiTokenResponse,
     SensitiveApiTokenData,
@@ -28,26 +29,45 @@ options = {"prefix": ""}
 @router.post("/api-token/sync", name="api_token.sync", response_model=ApiTokenResponse)
 async def index(
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
     token: TokenPayload = ScopedTo("api-token:syncable"),
 ):
     scopes = token.scopes
     if "api-token" in scopes or "api-token:syncable" in scopes:
         api_token = None
-        if not api_token_repo.exists(token=token.token):
+        dns_server = None
+        if not dns_server_repo.exists(name=token.payload.dns_server_name):
+            dns_server_repo.clear()
+            logger.info("saving dns server from api token")
+            dns_server = dns_server_repo.create(
+                dict(name=token.payload.dns_server_name)
+            ).results()
+        else:
+            dns_server = dns_server_repo.results()
+
+        if not api_token_repo.loads("dns_server").exists(token=token.token):
             api_token_repo.clear()
             logger.info("saving api token from auth token")
-            api_token = api_token_repo.create(
+            item = api_token_repo.create(
                 dict(
                     token=token.token,
                     scopes=" ".join(scopes),
-                    dns_server_name=token.payload.dns_server_name,
+                    dns_server=dns_server,
                     expires_at=datetime.utcfromtimestamp(float(token.exp)),
                 )
             ).data()
+            api_token_id = item.id
+            item = (
+                api_token_repo.clear()
+                .loads("dns_server")
+                .get(api_token_id)
+                .include("dns_server")
+                .data()
+            )
         else:
             logger.info("token already exists in database")
-            api_token = api_token_repo.data()
-        return ApiTokenResponse(api_token=api_token)
+            item = api_token_repo.loads("dns_server").include("dns_server").data()
+        return ApiTokenResponse(api_token=item)
 
     else:
         raise HTTPException(403, detail="Not found")

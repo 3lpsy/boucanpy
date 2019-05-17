@@ -10,5 +10,5 @@ class DnsRequestData(BaseModel):
     source_port: int
     type: str
     protocol: str
-    dns_server_name: str
+    dns_server_id: int
     created_at: datetime

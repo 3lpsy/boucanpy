@@ -7,10 +7,20 @@ services:
     image: 3lpsy/bountydns:latest
     networks:
       bountydnspub:
+    command: api-server --debug --reload --no-envs --db-setup -l 0.0.0.0 --db-seed-env
+    depends_on:
+      - db
+      - broadcast
   dns:
     image: 3lpsy/bountydns:latest
     networks:
       bountydnspub:
+    command: dns-server -l 0.0.0.0 -p 53
+    restart: on-failure:2
+    depends_on:
+      - bountydns
+      - broadcast
+      - proxy
   webui:
     build:
       context: ./../../bountydns
@@ -25,6 +35,9 @@ services:
     image: 3lpsy/bountydns-proxy:latest
     networks:
       bountydnspub:
+    depends_on:
+      - webui
+      - bountydns
   broadcast:
     build:
       context: ./../broadcast
@@ -32,6 +45,8 @@ services:
     image: 3lpsy/bountydns-broadcast:latest
     networks:
       bountydnspub:
+    restart: on-failure:5
+
   db:
     image: postgres:latest
     networks:

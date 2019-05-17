@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from bountydns.core import logger
 from bountydns.broadcast import make_redis, make_broadcast_url
@@ -8,11 +8,20 @@ from .base import Base
 
 class Zone(Base):
     __tablename__ = "zones"
+    __searchable__ = ["domain", "ip"]
+
     id = Column(Integer, primary_key=True, index=True)
     domain = Column(String, unique=True, index=True)
     ip = Column(String, unique=False, index=True)
     is_active = Column(Boolean(), default=True)
-    dns_server_name = Column(String, nullable=True)
+
+    dns_server_id = Column(ForeignKey("dns_servers.id"), nullable=True)
+    dns_server = relationship(
+        "bountydns.db.models.dns_server.DnsServer",
+        foreign_keys="bountydns.db.models.zone.Zone.dns_server_id",
+        back_populates="zones",
+    )
+
     dns_requests = relationship(
         "bountydns.db.models.dns_request.DnsRequest",
         foreign_keys="bountydns.db.models.dns_request.DnsRequest.zone_id",

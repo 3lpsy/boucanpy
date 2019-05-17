@@ -20,7 +20,13 @@ class DnsRequest(Base):
     source_port = Column(Integer)
     type = Column(String, index=True)
     protocol = Column(String, index=True)
-    dns_server_name = Column(String, index=True)
+
+    dns_server_id = Column(ForeignKey("dns_servers.id"), nullable=True)
+    dns_server = relationship(
+        "bountydns.db.models.dns_server.DnsServer",
+        foreign_keys="bountydns.db.models.dns_request.DnsRequest.dns_server_id",
+        back_populates="dns_requests",
+    )
 
     @staticmethod
     async def on_after_insert(mapper, connection, target):

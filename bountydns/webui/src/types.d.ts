@@ -18,7 +18,7 @@ export interface ApiToken {
     id: number;
     scopes: string;
     is_active: boolean;
-    dns_server_name: string;
+    dns_server_id: number;
     created_at: number;
 }
 
@@ -37,7 +37,7 @@ export interface ApiTokensResponse {
 export interface ApiTokenCreateForm {
     scopes: string;
     expires_at: number;
-    dns_server_name: string;
+    dns_server_id: number;
 }
 
 export interface SensitiveApiToken {
@@ -45,7 +45,7 @@ export interface SensitiveApiToken {
     token?: string | null;
     scopes: string;
     is_active: boolean;
-    dns_server_name: string;
+    dns_server_id: number;
     created_at: number;
 }
 
@@ -90,7 +90,7 @@ export interface DnsRequest {
     source_port: number;
     type: string;
     protocol: string;
-    dns_server_name: string;
+    dns_server_id: number;
     created_at: number;
 }
 
@@ -112,7 +112,7 @@ export interface TokenPayload {
 }
 
 export interface DnsServer {
-    dns_server_name: string;
+    dns_server_id: number;
 }
 
 export interface DnsServersResponse {

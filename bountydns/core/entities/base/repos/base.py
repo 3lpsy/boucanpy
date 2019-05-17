@@ -1,8 +1,10 @@
 from typing import Optional, List
 from fastapi import Depends
+
+from sqlalchemy import or_, desc, func
 from sqlalchemy.dialects import postgresql
-from sqlalchemy import or_, desc
 from sqlalchemy.orm import Session, joinedload
+
 from bountydns.core import logger
 from bountydns.db.session import session
 from bountydns.db.pagination import Pagination
@@ -23,7 +25,8 @@ class BaseRepo:
         self._model = None
         self._is_paginated = False
         self._is_list = False  # check at runtime instead (?)
-        self._filters = {}
+        self._options = []
+        self._includes = {}
 
     ## RESULTS
     def results(self):
@@ -34,12 +37,63 @@ class BaseRepo:
         self._results = results
         return self
 
-    def load(self, loads):
-        for load in loads:
+    def loads(self, load):
+        if not load:
+            return self
+        if isinstance(load, list):
+            for _load in load:
+                self._options.append(self._loader(_load))
+        else:
+            self._options.append(self._loader(load))
+        return self
+
+    def _loader(self, load):
+        if isinstance(load, str):
             if hasattr(self, "load_" + load):
-                self._query = hasattr(self, "load_" + load)()
+                return getattr(self, "load_" + load)()
+            elif "." in load:
+                under_load = load.replace(".", "_")
+                if hasattr(self, "load_" + under_load):
+                    return getattr(self, "load_" + under_load)()
+                return self._loader_chain(load)
+            elif load in self.model().__mapper__.relationships.keys():
+                return joinedload(self.label(load))
             else:
-                self_query = self.query().options(joinedload(load))
+                raise Exception(f"Loader failed for repo: {load}")
+        return load
+
+    def _loader_chain(self, load):
+        chain = None
+        parent = self.model()
+        for part in load.split("."):
+            chain = (
+                chain.joinedload(getattr(parent, part))
+                if chain
+                else joinedload(getattr(parent, part))
+            )
+            parent = self._get_relationship_model(part, parent)
+
+        return chain
+
+    def _get_relationship_model(self, name, model=None):
+        model = model or self.model()
+        return getattr(model.__mapper__.relationships, name).mapper.class_
+
+    def raiseload(self):
+        self._options.append(raiseload(target))
+        return self
+
+    def include(self, prop, key=None):
+        if isinstance(prop, list):
+            for _prop in prop:
+                if isinstance(_prop, tuple):
+                    self._includes[_prop[0]] = _prop[1]
+                else:
+                    self._includes[_prop] = _prop
+
+        else:
+            key = key or prop
+            self._includes[prop] = key
         return self
 
     ## DATA
@@ -66,7 +120,14 @@ class BaseRepo:
         return self.data_model()(**self.to_dict(item))
 
     def to_dict(self, item):
-        return item.as_dict() if hasattr(item, "as_dict") else dict(item)
+        root_data = item.as_dict() if hasattr(item, "as_dict") else dict(item)
+        for name in self._includes.keys():
+            if name not in root_data:
+                prop = getattr(item, name)
+                prop_data = prop.as_dict() if hasattr(prop, "as_dict") else dict(prop)
+                prop_key = self._includes[name]
+                root_data[prop_key] = prop_data
+        return root_data
 
     ## EXECUTION
     def exists(self, id=None, **kwargs):
@@ -77,7 +138,7 @@ class BaseRepo:
         self.debug(
             f"executing first (exists) query {self.compiled()} in {self.__class__.__name__}"
         )
-        results = self.query().first()
+        results = self.final().first()
         self._results = results
         return bool(self._results)
 
@@ -87,14 +148,14 @@ class BaseRepo:
         self.debug(
             f"executing first query {self.compiled()} in {self.__class__.__name__}"
         )
-        self._results = self.query().first()
+        self._results = self.final().first()
         return self
 
     def get(self, id):
         self.debug(
             f"executing get query {self.compiled()} in {self.__class__.__name__}"
         )
-        return self.query().get(id)
+        return self.first(id=id)
 
     def all(self, **kwargs):
         if kwargs:
@@ -102,7 +163,7 @@ class BaseRepo:
         self.debug(
             f"executing all query {self.compiled()} in {self.__class__.__name__}"
         )
-        self._results = self.query().all()
+        self._results = self.final().all()
         self._is_list = True
         return self
 
@@ -110,7 +171,7 @@ class BaseRepo:
         self.debug(
             f"executing page query {self.compiled()} in {self.__class__.__name__}"
         )
-        self._results = self.query().paginate(
+        self._results = self.final().paginate(
             page=pagination.page, per_page=pagination.per_page, count=True
         )
         self._is_paginated = True
@@ -118,10 +179,24 @@ class BaseRepo:
 
     ## FILTERS / MODIFICATION
 
-    def search(self, search_qs):
-        if not search_qs:
+    def search(self, search_qs, searchable=None):
+        if not search_qs or not search_qs.search:
             return self
-        # TODO: implement search functionality
+
+        if not searchable:
+            searchable = self.model().__searchable__
+
+        if not searchable:
+            raise Exception(f"No search models found for query: {search_qs}")
+
+        search = search_qs.search
+        # TODO: implement search functionality in elasticsearch
+        clauses = []
+        for col in searchable:
+            clauses.append(func.lower(self.label(col)).contains(search))
+
+        self.filter_or(*clauses)
+
         return self
 
     def sort(self, sort_qs):
@@ -137,13 +212,10 @@ class BaseRepo:
     def filters(self, key, *args, **kwargs):
         if hasattr(self, "filter_" + key):
             getattr(self, "filter_" + key)(*args, **kwargs)
-        elif key in self._filters:
-            if callable(self._filters[key]):
-                self.query = self.self._filters[key](self.query(), *args, **kwargs)
         return self
 
-    def add_filter(self, key, filter):
-        self._filters[key] = filter
+    def filter_sa(self, *args, **kwargs):
+        self._query = self.query().filter(*args, **kwargs)
         return self
 
     def filter_or(self, *args, **kwargs):
@@ -194,11 +266,16 @@ class BaseRepo:
             raise e
 
     ## GETTERS
+
+    def final(self, attach=True):
+        self._query = self.query().options(*self._options)
+        return self.query()
+
     def query(self):
         if not self._query:
             self.debug(f"making query for repo: {self.__class__.__name__}")
             self._query = self.db.query(self.model())
-            self.load(self.default_loads)
+            self.loads(self.default_loads)
         return self._query
 
     def compiled(self):
@@ -214,20 +291,26 @@ class BaseRepo:
         return self
 
     def label(self, key):
-        return getattr(self.model(), key)
+        if "." not in key:
+            return getattr(self.model(), key)
+        parent = self.model()
+        parts = key.split(".")
+        final_index = len(parts) - 1
+        for i, part in enumerate(parts):
+            if i == final_index:
+                return getattr(parent, part)
+            parent = self._get_relationship_model(part, parent)
+        raise Exception(f"Unable to decipher label for key: {key}")
 
     def model(self):
         return self._model or self.default_model
-
-    def model_column(self, key):
-        return getattr(self.model(), key)
 
     def data_model(self):
         return self._data_model or self.default_data_model
 
     def debug(self, msg):
-        pass
-        # logger.debug(msg)
+        # pass
+        logger.info(msg)
 
     def clear(self):
         self._query = None
@@ -236,5 +319,6 @@ class BaseRepo:
         self._model = None
         self._is_paginated = False
         self._is_list = False  # check at runtime instead (?)
-        self._filters = {}
+        self._options = []
+        self._includes = {}
         return self

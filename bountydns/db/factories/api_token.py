@@ -1,9 +1,17 @@
 import uuid
 from datetime import timedelta, datetime
-from factory import Faker, LazyFunction, LazyAttribute, Sequence, lazy_attribute
+from factory import (
+    Faker,
+    LazyFunction,
+    LazyAttribute,
+    Sequence,
+    lazy_attribute,
+    SubFactory,
+)
 from .base import BaseFactory
 from bountydns.db.models.api_token import ApiToken
 from bountydns.core.security import create_bearer_token
+from bountydns.db.factories.dns_server import DnsServerFactory
 
 
 def random_expires_at():
@@ -28,7 +36,7 @@ class ApiTokenFactory(BaseFactory):
     # TODO: better randomness
     is_active = True
     expires_at = LazyFunction(random_expires_at)
-    dns_server_name = LazyFunction(uuid.uuid4)
+    dns_server = SubFactory(DnsServerFactory)
 
     @lazy_attribute
     def token(self):

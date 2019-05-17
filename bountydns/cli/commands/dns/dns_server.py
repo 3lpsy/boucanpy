@@ -33,7 +33,7 @@ class DnsServer(BaseCommand):
             "-l", "--listen", action="store", default="127.0.0.1", help="bind address"
         )
         parser.add_argument(
-            "--sync-api-token",
+            "--no-sync-api-token",
             action="store_true",
             help="sync api token back to database",
         )
@@ -49,7 +49,9 @@ class DnsServer(BaseCommand):
             logger.critical("could not connect to api. quitting")
             self.exit(1)
 
-        if self.option("sync_api_token"):
+        if self.option("no_sync_api_token"):
+            logger.info("skipping syncing api token")
+        else:
             api_client.sync_api_token()
 
         resolver = Resolver(api_client)

@@ -23,6 +23,7 @@ class ApiServer(BaseCommand):
         parser.add_argument(
             "-l", "--listen", action="store", default="127.0.0.1", help="bind address"
         )
+
         parser.add_argument("-r", "--reload", action="store_true", help="reload")
         parser.add_argument("-w", "--workers", action="store", help="workers")
         parser.add_argument(
@@ -56,13 +57,14 @@ class ApiServer(BaseCommand):
         kwargs = self.get_kwargs()
         self.load_env("api")
 
-        if self.option("import_check", False):
+        if self.should_import_check():
             logger.info("performing import check")
             from bountydns.api.main import api
+
         logger.critical("starting api server with options: {}".format(str(kwargs)))
         from bountydns.db.checks import is_db_up, is_db_setup
 
-        if not self.option("no_db_check", False):
+        if self.should_db_check():
             self.db_register()
             db_up = is_db_up()
             if not db_up:
@@ -73,7 +75,7 @@ class ApiServer(BaseCommand):
             logger.critical("running database migration")
             await DbSetup.make(self.options).run()
 
-        if not self.option("no_db_check", False):
+        if self.should_db_check():
             db_setup = is_db_setup()
             if not db_setup:
                 logger.critical("database not setup error. please check logs")
@@ -81,7 +83,7 @@ class ApiServer(BaseCommand):
 
         from bountydns.broadcast import is_broadcast_up
 
-        if not self.option("no_bcast_check", False):
+        if self.should_bcast_check():
             bcast_up = await is_broadcast_up()
             if not bcast_up:
                 logger.critical("broadcast (queue) not up error. please check logs")
@@ -116,6 +118,26 @@ class ApiServer(BaseCommand):
             logger.critical("Canot use debug or reload with workers. Skipping.")
             return None
         return self.option("workers", 5)
+
+    def should_import_check(self):
+        return (
+            self.option("import_check", False)
+            or self.env("API_IMPORT_CHECK", 0, int_=True) == 1
+        )
+
+    def should_db_check(self):
+        if not self.option("no_db_check", False):
+            return True
+        elif self.env("API_NO_DB_CHECK", 1, int_=True) == 0:
+            return True
+        return False
+
+    def should_bcast_check(self):
+        if not self.option("no_bcast_check", False):
+            return True
+        elif self.env("API_NO_BROADCAST_CHECK", 1, int_=True) == 0:
+            return True
+        return False
 
     def seed_from_env(self):
         from bountydns.core.entities.user import UserRepo

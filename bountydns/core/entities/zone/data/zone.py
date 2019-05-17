@@ -8,5 +8,5 @@ class ZoneData(BaseModel):
     ip: str
     domain: str
     is_active: bool
-    dns_server_name: Optional[str]
+    dns_server_id: int
     created_at: datetime
