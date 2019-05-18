@@ -46,6 +46,8 @@ class ApiClient:
         headers = self.get_default_headers()
         res = requests.get(self.url(url), headers=headers)
         if fail:
+            if res.status_code != 200:
+                print(res.json())
             res.raise_for_status()
         return res.json()
 
@@ -54,6 +56,8 @@ class ApiClient:
         headers = self.get_default_headers()
         res = requests.post(self.url(url), json=data, headers=headers)
         if fail:
+            if res.status_code != 200:
+                print(res.json())
             res.raise_for_status()
         return res.json()
 

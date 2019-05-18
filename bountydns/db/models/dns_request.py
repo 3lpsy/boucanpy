@@ -21,7 +21,7 @@ class DnsRequest(Base):
     type = Column(String, index=True)
     protocol = Column(String, index=True)
 
-    dns_server_id = Column(ForeignKey("dns_servers.id"), nullable=True)
+    dns_server_id = Column(ForeignKey("dns_servers.id"), nullable=False)
     dns_server = relationship(
         "bountydns.db.models.dns_server.DnsServer",
         foreign_keys="bountydns.db.models.dns_request.DnsRequest.dns_server_id",
@@ -31,9 +31,12 @@ class DnsRequest(Base):
     @staticmethod
     async def on_after_insert(mapper, connection, target):
         logger.warning("on_after_insert: DnsRequest")
-        print("on_after_insert", mapper, connection, target)
-        publisher = await make_redis()
-        res = await publisher.publish_json(
-            "channel:auth",
-            {"type": "MESSAGE", "name": "DNS_REQUEST_CREATED", "payload": ""},
-        )
+        # print("on_after_insert", mapper, connection, target)
+        try:
+            publisher = await make_redis()
+            res = await publisher.publish_json(
+                "channel:auth",
+                {"type": "MESSAGE", "name": "DNS_REQUEST_CREATED", "payload": ""},
+            )
+        except Exception as e:
+            logger.warning(f"on_after_insert error: {str(e)}")

@@ -27,6 +27,7 @@
         "qs": "^6.7.0",
         "underscore": "^1.9.1",
         "uuid4": "^1.1.4",
+        "vee-validate": "^2.2.7",
         "vue": "^2.6.6",
         "vue-bootstrap-typeahead": "^0.2.6",
         "vue-class-component": "^6.0.0",

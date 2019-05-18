@@ -91,6 +91,7 @@ export interface DnsRequest {
     type: string;
     protocol: string;
     dns_server_id: number;
+    dns_server?: DnsServer
     created_at: number;
 }
 
@@ -112,7 +113,8 @@ export interface TokenPayload {
 }
 
 export interface DnsServer {
-    dns_server_id: number;
+    id: number;
+    name: string;
 }
 
 export interface DnsServersResponse {

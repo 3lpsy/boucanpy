@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from bountydns.core import logger
 from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.core.entities import (
@@ -18,6 +18,11 @@ async def index(
     pagination: PaginationQS = Depends(PaginationQS),
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
     token: TokenPayload = ScopedTo("dns-request:list"),
+    search: str = Query(None),
 ):
-    pg, items = dns_server_repo.paginate(pagination).data()
+    pg, items = (
+        dns_server_repo.search(search, searchable=["name", "id"])
+        .paginate(pagination)
+        .data()
+    )
     return DnsServersResponse(pagination=pg, dns_servers=items)

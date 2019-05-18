@@ -8,6 +8,8 @@ services:
     networks:
       bountydnspub:
     command: api-server --debug --reload --no-envs --db-setup -l 0.0.0.0 --db-seed-env
+    env_file:
+      - ./../../.env/api.env
     depends_on:
       - db
       - broadcast
@@ -16,6 +18,8 @@ services:
     networks:
       bountydnspub:
     command: dns-server -l 0.0.0.0 -p 53
+    env_file:
+      - ./../../.env/dns.env
     restart: on-failure:2
     depends_on:
       - bountydns
@@ -33,6 +37,8 @@ services:
       context: ./../proxy
       dockerfile: ./../docker/proxy.dockerfile
     image: 3lpsy/bountydns-proxy:latest
+    env_file:
+      - ./../../.env/proxy.env
     networks:
       bountydnspub:
     depends_on:
@@ -43,15 +49,39 @@ services:
       context: ./../broadcast
       dockerfile: ./../docker/broadcast.dockerfile
     image: 3lpsy/bountydns-broadcast:latest
+    env_file:
+      - ./../../.env/broadcast.env
     networks:
       bountydnspub:
     restart: on-failure:5
-
   db:
     image: postgres:latest
+    env_file:
+      - ./../../.env/db.env
     networks:
       bountydnspub:
-  # dbui:
-  #   image: dpage/pgadmin4
+  dbui:
+    image: dpage/pgadmin4
+    env_file:
+      - ./../../.env/dbui.env
+    networks:
+      bountydnspub:
+    volumes:
+      - ./../dbui/dev.servers.json:/pgadmin4/servers.json
+      - ./../dbui/dev.pass.txt:/dbpass.txt
+    logging:
+      driver: none
+
   # search:
   #   image: amazon/opendistro-for-elasticsearch:latest
+
+networks:
+  bountydnspub:
+    # Use a custom driver
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.28.20.0/24
+    driver_opts:
+      com.docker.network.bridge.name: bountdnspub0

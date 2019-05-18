@@ -4,11 +4,15 @@ import { store } from '@/store';
 import router from '@/router';
 
 import moment from 'moment';
+import qs from 'qs';
 
 import { API_URL } from '@/config';
 
 export const http = axios.create({
     baseURL: API_URL,
+    paramsSerializer: function(params) {
+     return qs.stringify(params, { indices: false })
+   }
 });
 
 let refreshRegistration = -1;

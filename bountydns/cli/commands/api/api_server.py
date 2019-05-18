@@ -140,8 +140,10 @@ class ApiServer(BaseCommand):
         return False
 
     def seed_from_env(self):
-        from bountydns.core.entities.user import UserRepo
+        from bountydns.core.entities import UserRepo, ZoneRepo, DnsServerRepo
+        from bountydns.db.session import _scoped_session
 
+        session = _scoped_session
         for i in range(9):
             i = str(i)
             user_data = {}
@@ -153,7 +155,7 @@ class ApiServer(BaseCommand):
             is_superuser = int(environ.get(superuser_key, 0))
             if email and password:
                 hashed_password = hash_password(password)
-                repo = UserRepo(db=self.session())
+                repo = UserRepo(db=session)
                 if not repo.exists(email=email):
                     logger.info(f"seeding user {email}")
                     user = factory("UserFactory").create(
@@ -163,3 +165,41 @@ class ApiServer(BaseCommand):
                     )
                 else:
                     logger.info(f"seeded user {email} already exists")
+
+        for i in range(9):
+            i = str(i)
+            name_key = f"SEED_DNS_SERVER_{i}_NAME"
+            name = environ.get(name_key, None)
+            if name:
+                repo = DnsServerRepo(db=session)
+                if not repo.exists(name=name):
+                    logger.info(f"seeding domain {name}")
+                    domain = factory("DnsServerFactory").create(name=name)
+        for i in range(9):
+            i = str(i)
+            ip_key = f"SEED_ZONE_{i}_IP"
+            domain_key = f"SEED_ZONE_{i}_DOMAIN"
+            dns_server_name_key = f"SEED_ZONE_{i}_DNS_SERVER_NAME"
+            ip = environ.get(ip_key, None)
+            domain = environ.get(domain_key, None)
+            if domain:
+                domain = domain.lower()
+            dns_server_name = environ.get(dns_server_name_key, None)
+            if ip and domain:
+                if dns_server_name:
+                    dns_server_repo = DnsServerRepo(db=session)
+                    if dns_server_repo.exists(name=dns_server_name):
+                        dns_server = dns_server_repo.results()
+                    else:
+                        logger.info(f"seeding dns server as zone dependency: {name}")
+                        dns_server = factory("DnsServerFactory").create(
+                            name=dns_server_name
+                        )
+                    factory("ZoneFactory").create(
+                        ip=ip, domain=domain, dns_server=dns_server
+                    )
+                else:
+                    repo = ZoneRepo(db=session)
+                    if not repo.exists(ip=ip, domain=domain):
+                        logger.info(f"seeding zone without dns server: {ip}, {domain}")
+                        factory("GlobalZoneFactory").create(ip=ip, domain=domain)

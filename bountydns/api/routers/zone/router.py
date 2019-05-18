@@ -1,5 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
+from typing import List
 from bountydns.core.security import ScopedTo, TokenPayload
+from bountydns.core import logger
+
 from bountydns.core.entities import (
     SortQS,
     PaginationQS,
@@ -21,8 +24,16 @@ async def index(
     pagination: PaginationQS = Depends(PaginationQS),
     zone_repo: ZoneRepo = Depends(ZoneRepo),
     token: TokenPayload = ScopedTo("zone:list"),
+    includes: List[str] = Query(None),
 ):
-    pg, items = zone_repo.sort(sort_qs).paginate(pagination).data()
+    pg, items = (
+        zone_repo.loads("dns_server")
+        .strict()  # TODO: handle eagerloading when including
+        .sort(sort_qs)
+        .paginate(pagination)
+        .includes(includes)
+        .data()
+    )
     return ZonesResponse(pagination=pg, zones=items)
 
 

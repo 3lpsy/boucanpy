@@ -11,6 +11,6 @@ services:
   broadcast:
     ports:
       - "127.0.0.1:6379:6379"
-  # dbui:
-  #   ports:
-  #     - "5000:5000"
+  dbui:
+    ports:
+      - "5000:5000"

@@ -61,12 +61,12 @@ async def index(
                 api_token_repo.clear()
                 .loads("dns_server")
                 .get(api_token_id)
-                .include("dns_server")
+                .includes("dns_server")
                 .data()
             )
         else:
             logger.info("token already exists in database")
-            item = api_token_repo.loads("dns_server").include("dns_server").data()
+            item = api_token_repo.loads("dns_server").includes("dns_server").data()
         return ApiTokenResponse(api_token=item)
 
     else:

@@ -31,8 +31,15 @@ class Zone(Base):
     @staticmethod
     async def on_after_insert(mapper, connection, target):
         logger.warning("on_after_insert: Zone")
-        print("on_after_insert", mapper, connection, target)
-        publisher = await make_redis()
-        res = await publisher.publish_json(
-            "channel:auth", {"type": "MESSAGE", "name": "ZONE_CREATED", "payload": ""}
-        )
+        # print("on_after_insert", mapper, connection, target)
+        try:
+            publisher = await make_redis()
+            res = await publisher.publish_json(
+                "channel:auth",
+                {"type": "MESSAGE", "name": "ZONE_CREATED", "payload": ""},
+            )
+        except Exception as e:
+            log.warning(f"on_after_insert error: {str(e)}")
+
+    def __repr__(self):
+        return f"<{str(self.__class__.__name__)}(id={str(self.id)},ip={str(self.ip)},domain={str(self.domain)},dns_server_id={str(self.dns_server_id)})>"

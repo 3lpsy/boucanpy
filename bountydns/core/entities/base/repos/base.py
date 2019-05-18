@@ -1,9 +1,9 @@
 from typing import Optional, List
 from fastapi import Depends
 
-from sqlalchemy import or_, desc, func
+from sqlalchemy import or_, desc, func, cast, String
 from sqlalchemy.dialects import postgresql
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, raiseload
 
 from bountydns.core import logger
 from bountydns.db.session import session
@@ -43,8 +43,10 @@ class BaseRepo:
         if isinstance(load, list):
             for _load in load:
                 self._options.append(self._loader(_load))
-        else:
+        elif isinstance(load, str):
             self._options.append(self._loader(load))
+        else:
+            raise Exception(f"Loader failed for repo: {load}")
         return self
 
     def _loader(self, load):
@@ -77,20 +79,26 @@ class BaseRepo:
 
     def _get_relationship_model(self, name, model=None):
         model = model or self.model()
+        # TODO: add some __loadable__ attribute to base model to prevent dangerous loads
+        #       or add some _loadable whitelist to each repo
         return getattr(model.__mapper__.relationships, name).mapper.class_
 
-    def raiseload(self):
-        self._options.append(raiseload(target))
+    def strict(self, rel="*"):
+        self._options.append(raiseload(rel))
         return self
 
-    def include(self, prop, key=None):
+    def includes(self, prop, key=None):
+        if not prop:
+            return self
         if isinstance(prop, list):
             for _prop in prop:
                 if isinstance(_prop, tuple):
                     self._includes[_prop[0]] = _prop[1]
                 else:
                     self._includes[_prop] = _prop
-
+        elif isinstance(prop, dict):
+            for include_prop, include_key in prop.items():
+                self._includes[include_prop] = include_key
         else:
             key = key or prop
             self._includes[prop] = key
@@ -121,10 +129,20 @@ class BaseRepo:
 
     def to_dict(self, item):
         root_data = item.as_dict() if hasattr(item, "as_dict") else dict(item)
+        self.debug(
+            f"attaching includables {str(self._includes)} in {self.__class__.__name__}"
+        )
         for name in self._includes.keys():
             if name not in root_data:
                 prop = getattr(item, name)
-                prop_data = prop.as_dict() if hasattr(prop, "as_dict") else dict(prop)
+                self.debug(f"getting attr {str(name)} on item {str(item)}")
+                if not prop:
+                    self.debug(f"cannot find attr {str(name)} on item {str(item)}")
+                    continue
+                else:
+                    prop_data = (
+                        prop.as_dict() if hasattr(prop, "as_dict") else dict(prop)
+                    )
                 prop_key = self._includes[name]
                 root_data[prop_key] = prop_data
         return root_data
@@ -179,8 +197,8 @@ class BaseRepo:
 
     ## FILTERS / MODIFICATION
 
-    def search(self, search_qs, searchable=None):
-        if not search_qs or not search_qs.search:
+    def search(self, search, searchable=None):
+        if not search:
             return self
 
         if not searchable:
@@ -189,11 +207,14 @@ class BaseRepo:
         if not searchable:
             raise Exception(f"No search models found for query: {search_qs}")
 
-        search = search_qs.search
         # TODO: implement search functionality in elasticsearch
         clauses = []
         for col in searchable:
-            clauses.append(func.lower(self.label(col)).contains(search))
+            if col == "id" or col.endswith((".id", "_id")):
+                label = cast(self.label(col), String)
+            else:
+                label = func.lower(self.label(col))
+            clauses.append(label.contains(search))
 
         self.filter_or(*clauses)
 
@@ -224,12 +245,12 @@ class BaseRepo:
 
     def filter_by(self, **kwargs):
         self._query = self.query().filter_by(**kwargs)
-        self.debug(f"adding filters {kwargs} to query {self.compiled()}")
+        # self.debug(f"adding filters {kwargs} to query {self.compiled()}")
         return self
 
     def filter(self, *args, **kwargs):
         self._query = self.query().filter(*args, **kwargs)
-        self.debug(f"adding filters {args} and {kwargs} to query {self.compiled()}")
+        # self.debug(f"adding filters {args} and {kwargs} to query {self.compiled()}")
         return self
 
     ## COMMITTING / UPDATING
@@ -273,7 +294,7 @@ class BaseRepo:
 
     def query(self):
         if not self._query:
-            self.debug(f"making query for repo: {self.__class__.__name__}")
+            # self.debug(f"making query for repo: {self.__class__.__name__}")
             self._query = self.db.query(self.model())
             self.loads(self.default_loads)
         return self._query

@@ -88,7 +88,7 @@ export default class ZonesTable extends mixins(
             sortable: true,
         },
         {
-            key: 'dns_server_name',
+            key: 'dns_server.name',
             label: 'Server',
         },
         {
@@ -121,7 +121,7 @@ export default class ZonesTable extends mixins(
     }
 
     loadData() {
-        return zone.getZones(this.currentPage || 1, this.perPage, this.sortBy, this.sortDesc ? 'desc' : 'asc')
+        return zone.getZones(this.currentPage || 1, this.perPage, this.sortBy, this.sortDesc ? 'desc' : 'asc', ["dns_server"])
         .then((res) => {
             this.currentPage = res.pagination.page;
             this.perPage = res.pagination.per_page;

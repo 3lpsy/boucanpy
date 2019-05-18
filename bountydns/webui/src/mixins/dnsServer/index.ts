@@ -6,8 +6,5 @@ import dnsServer from '@/services/dnsServer';
 // You can declare a mixin as the same style as components.
 @Component
 export default class DnsServersMixin extends Vue {
-    getDnsServers(name: any): Promise<DnsServersResponse> {
-        console.log('getDnsServerNames');
-        return dnsServer.getDnsServers();
-    }
+
 }
