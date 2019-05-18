@@ -16,7 +16,7 @@ options = {"prefix": "/auth"}
 @router.get("/user", name="auth.user.show", response_model=UserResponse)
 async def show(
     user_repo: UserRepo = Depends(UserRepo),
-    token: TokenPayload = ScopedTo("profile"),
+    token: TokenPayload = Depends(ScopedTo("profile")),
     user: User = Depends(current_user),
 ):
     item = user_repo.set_results(user).data()

@@ -1,7 +1,7 @@
 <template>
     <div class="page home-page row">
         <b-container style="padding-top: 10px" class="page">
-            <div class="row">
+            <div class="row" style="margin-bottom: 10px;">
                 <div class="col-md-9 col-xs-12">
                     <h2>Zones</h2>
                 </div>

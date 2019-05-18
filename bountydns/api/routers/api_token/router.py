@@ -30,7 +30,7 @@ options = {"prefix": ""}
 async def index(
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
-    token: TokenPayload = ScopedTo("api-token:syncable"),
+    token: TokenPayload = Depends(ScopedTo("api-token:syncable")),
 ):
     scopes = token.scopes
     if "api-token" in scopes or "api-token:syncable" in scopes:
@@ -78,7 +78,7 @@ async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
-    token: TokenPayload = ScopedTo("api-token:list"),
+    token: TokenPayload = Depends(ScopedTo("api-token:list")),
 ):
     pg, items = api_token_repo.sort(sort_qs).paginate(pagination).data()
     return ApiTokensResponse(pagination=pg, api_tokens=items)
@@ -88,7 +88,7 @@ async def index(
 async def store(
     form: ApiTokenCreateForm,
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
-    token: TokenPayload = ScopedTo("api-token:create"),
+    token: TokenPayload = Depends(ScopedTo("api-token:create")),
     user: User = Depends(current_user),
 ):
     scopes = []
@@ -132,7 +132,7 @@ async def store(
 async def index(
     api_token_id: int,
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
-    token: TokenPayload = ScopedTo("api-token:read"),
+    token: TokenPayload = Depends(ScopedTo("api-token:read")),
 ):
     if not api_token_repo.exists(api_token_id):
         raise HTTPException(404, detail="Not found")
@@ -148,7 +148,7 @@ async def index(
 async def index(
     api_token_id: int,
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
-    token: TokenPayload = ScopedTo("api-token:read"),
+    token: TokenPayload = Depends(ScopedTo("api-token:read")),
 ):
     # TODO: require stronger scope
     if not api_token_repo.exists(api_token_id):
@@ -161,7 +161,7 @@ async def index(
 async def destroy(
     api_token_id: int,
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
-    token: TokenPayload = ScopedTo("api-token:destroy"),
+    token: TokenPayload = Depends(ScopedTo("api-token:destroy")),
 ):
     messages = [{"text": "Deactivation Succesful", "type": "success"}]
     if not api_token_repo.exists(api_token_id):

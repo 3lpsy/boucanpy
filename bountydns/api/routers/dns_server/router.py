@@ -17,7 +17,7 @@ async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
-    token: TokenPayload = ScopedTo("dns-request:list"),
+    token: TokenPayload = Depends(ScopedTo("dns-request:list")),
     search: str = Query(None),
 ):
     pg, items = (

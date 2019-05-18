@@ -88,9 +88,8 @@ def token_has_required_scopes(token_payload: TokenPayload, scopes: List[str]):
     return True
 
 
-class ScopedTo(Depends):
+class ScopedTo:
     def __init__(self, *scopes, leeway=0) -> None:
-        super().__init__(self.__call__)
         self._scopes = scopes
         self._leeway = leeway
 
@@ -109,7 +108,7 @@ class ScopedTo(Depends):
 
 
 def current_user(
-    token: TokenPayload = ScopedTo(), user_repo: UserRepo = Depends(UserRepo)
+    token: TokenPayload = Depends(ScopedTo()), user_repo: UserRepo = Depends(UserRepo)
 ) -> User:
     user = user_repo.get_by_sub(token.sub)
     if not user:

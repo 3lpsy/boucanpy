@@ -23,7 +23,7 @@ async def index(
     search: str = Query(None),
     pagination: PaginationQS = Depends(PaginationQS),
     zone_repo: ZoneRepo = Depends(ZoneRepo),
-    token: TokenPayload = ScopedTo("zone:list"),
+    token: TokenPayload = Depends(ScopedTo("zone:list")),
 ):
 
     # Support ability to either submit dns_server.name or dns_server.id as dns_server_id

@@ -124,8 +124,11 @@ class BaseRepo:
 
     def to_data(self, item):
         if not item:
+            logger.critical(f"REMOVE: to_data is none {item}")
             return None
-        return self.data_model()(**self.to_dict(item))
+        attrs = self.to_dict(item)
+        logger.critical(f"REMOVE: tranforming attrs to data model: {attrs}")
+        return self.data_model()(**attrs)
 
     def to_dict(self, item):
         root_data = item.as_dict() if hasattr(item, "as_dict") else dict(item)
@@ -276,7 +279,9 @@ class BaseRepo:
 
     def create(self, data):
         try:
-            instance = self.model()(**dict(data))
+            if not isinstance(data, dict):
+                data = dict(data)
+            instance = self.model()(**data)
             self.db.add(instance)
             self.db.commit()
             self.db.flush()

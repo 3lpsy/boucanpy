@@ -19,7 +19,7 @@ async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
     user_repo: UserRepo = Depends(UserRepo),
-    token: TokenPayload = ScopedTo("user:list"),
+    token: TokenPayload = Depends(ScopedTo("user:list")),
 ):
     pg, items = user_repo.sort(sort_qs).paginate(pagination).data()
     return UsersResponse(pagination=pg, users=items)
@@ -29,7 +29,7 @@ async def index(
 async def post(
     form: UserCreateForm,
     user_repo: UserRepo = Depends(UserRepo),
-    token: TokenPayload = ScopedTo("user:create", "super"),
+    token: TokenPayload = Depends(ScopedTo("user:create", "super")),
 ):
     # TODO: data validation against current db & perm checks
     data = {

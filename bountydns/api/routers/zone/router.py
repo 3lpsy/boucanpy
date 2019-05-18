@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, Query
 from typing import List
 from bountydns.core.security import ScopedTo, TokenPayload
-from bountydns.core import logger
+from bountydns.core import logger, only
 
 from bountydns.core.entities import (
     SortQS,
     PaginationQS,
+    DnsServerRepo,
     ZoneRepo,
     ZonesResponse,
     ZoneResponse,
@@ -23,7 +24,7 @@ async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
     zone_repo: ZoneRepo = Depends(ZoneRepo),
-    token: TokenPayload = ScopedTo("zone:list"),
+    token: TokenPayload = Depends(ScopedTo("zone:list")),
     includes: List[str] = Query(None),
 ):
     pg, items = (
@@ -41,10 +42,15 @@ async def index(
 async def store(
     form: ZoneCreateForm,
     zone_repo: ZoneRepo = Depends(ZoneRepo),
-    token: TokenPayload = ScopedTo("zone:create"),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
+    token: TokenPayload = Depends(ScopedTo("zone:create")),
 ):
-
-    zone = zone_repo.create(form).data()
+    data = only(dict(form), ["ip", "domain"])
+    if form.dns_server_id:
+        if dns_server_repo.exists(id=form.dns_server_id):
+            dns_server = dns_server_repo.results()
+            data["dns_server"] = dns_server
+    zone = zone_repo.create(data).data()
     return ZoneResponse(zone=zone)
 
 
@@ -54,7 +60,7 @@ async def store(
 async def activate(
     zone_id: int,
     zone_repo: ZoneRepo = Depends(ZoneRepo),
-    token: TokenPayload = ScopedTo("zone:update"),
+    token: TokenPayload = Depends(ScopedTo("zone:update")),
 ):
     zone = zone_repo.get(zone_id).update({"is_active": True}).data()
     return ZoneResponse(zone=zone)
@@ -64,7 +70,7 @@ async def activate(
 async def destroy(
     zone_id: int,
     zone_repo: ZoneRepo = Depends(ZoneRepo),
-    token: TokenPayload = ScopedTo("zone:destroy"),
+    token: TokenPayload = Depends(ScopedTo("zone:destroy")),
 ):
     messages = [{"text": "Deactivation Succesful", "type": "success"}]
     if not zone_repo.exists(zone_id):

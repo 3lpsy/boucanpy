@@ -25,7 +25,7 @@ async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
     dns_request_repo: DnsRequestRepo = Depends(DnsRequestRepo),
-    token: TokenPayload = ScopedTo("dns-request:list"),
+    token: TokenPayload = Depends(ScopedTo("dns-request:list")),
 ):
     pg, items = (
         dns_request_repo.loads("dns_server")
@@ -44,7 +44,7 @@ async def index(
     form: DnsRequestCreateForm,
     dns_request_repo: DnsRequestRepo = Depends(DnsRequestRepo),
     zone_repo: ZoneRepo = Depends(ZoneRepo),
-    token: str = ScopedTo("dns-request:create"),
+    token: str = Depends(ScopedTo("dns-request:create")),
 ):
 
     data = dict(form)

@@ -2,9 +2,10 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from '@/views/Home.vue';
 import Zone from '@/views/Zone.vue';
+import ZoneEdit from '@/views/ZoneEdit.vue';
+
 import ApiToken from '@/views/ApiToken.vue';
 import Login from '@/views/Login.vue';
-import Chat from '@/views/Chat.vue';
 
 import NotFound from '@/views/errors/NotFound.vue';
 
@@ -34,15 +35,15 @@ export default new Router({
             beforeEnter: AUTHED_GUARDS,
         },
         {
-            path: '/webui/api-token',
-            name: 'api-token',
-            component: ApiToken,
+            path: '/webui/zone/:zoneId',
+            name: 'zone.edit',
+            component: ZoneEdit,
             beforeEnter: AUTHED_GUARDS,
         },
         {
-            path: '/webui/chat',
-            name: 'chat',
-            component: Chat,
+            path: '/webui/api-token',
+            name: 'api-token',
+            component: ApiToken,
             beforeEnter: AUTHED_GUARDS,
         },
         {

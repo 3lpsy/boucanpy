@@ -22,7 +22,6 @@ import ZoneCreateForm from '@/components/zone/ZoneCreateForm.vue';
 export default class ZoneCreateModal extends mixins(CommonMixin, ZoneMixin) {
 
     closeModal() {
-        console.log("Closing modal")
         this.$refs['form-modal'].hide()
      }
 

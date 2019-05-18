@@ -27,7 +27,6 @@
             label-for="input-ip"
             description="The IP to Answer with for Relevant DNS Requests."
             :disabled="disabled"
-
         >
             <b-form-input
                 id="input-ip"
@@ -66,27 +65,6 @@
             >
             </vue-bootstrap-typeahead>
         </b-form-group>
-<!--
-        <fieldset class="form-group">
-            <label for="input-domain">DNS Server Name</label>
-            <vue-bootstrap-typeahead
-                :data="dnsServers"
-                v-model="dnsServersSearch"
-                size="lg"
-                placeholder="Type a DNS Server Name"
-                @hit="form.dns_server_id = $event.id"
-                :min-matching-chars="0"
-                :serializer="(item) => item.id.toString() + ': ' + item.name"
-                :disabled="disabled"
-                v-validate="'numeric'"
-
-            >
-            </vue-bootstrap-typeahead>
-            <small>
-                The DNS Server which will use the zone. If left blank, all DNS
-                Servers will use the zone.
-            </small>
-        </fieldset> -->
         <ul class="error-messages" v-if="formError">
             <li>{{ formError }}</li>
         </ul>
@@ -115,7 +93,7 @@ import _ from 'underscore';
 @Component({
     watch: {
         dnsServersSearch(value) {
-            this.query.search = value
+            this.query.searchv = value
             dnsServer.getDnsServers(this.query).then((res) => {
                 this.dnsServers = res.dns_servers
             });
@@ -139,21 +117,74 @@ export default class ZoneCreateForm extends mixins(
         dns_server_id: '',
     };
 
+    collectForm() {
+        return new Promise((resolve, reject) => {
+            let form = Object.keys(this.form)
+              .filter(key => {
+                  if (key == "dns_server_id") {
+                      return this.form[key] && this.form[key] > 0;
+                  }
+                  else {
+                      return true
+                  }
+              }).reduce((obj, key) => {
+                  obj[key] = this.form[key];
+                  return obj;
+              }, {});
+
+             resolve(form)
+        })
+    }
+
+    confirmDataIfRequired() {
+        return new Promise((resolve, reject) => {
+            if (this.form.dns_server_id && this.form.dns_server_id > 0) {
+                resolve(true)
+            } else {
+                this.$bvModal.msgBoxConfirm('Please confirm that you want to delete everything.', {
+                      title: 'Please Confirm',
+                      size: 'sm',
+                      buttonSize: 'sm',
+                      okVariant: 'info',
+                      okTitle: 'YES',
+                      cancelTitle: 'NO',
+                      footerClass: 'p-2',
+                      hideHeaderClose: false,
+                      centered: true
+                }).then((answer) => {
+                    resolve(answer)
+                })
+            }
+        })
+    }
+
     onSubmit() {
         this.$validator.validateAll().then((valid) => {
             if (valid) {
                 this.disabled = true
                 console.log('submitting data', this.form);
-                zone.createZone(this.form).then(() => {
-                    console.log('emiting app event');
-                    bus.$emit('APP_ALERT', { text: 'Zone Created', type: 'success' });
-                    console.log('emiting formComplete event');
-                    this.$emit('form-complete');
-                    this.disabled = false
-                }).catch((error) => {
-                    this.disabled = false
-                    throw error;
-                });
+                this.confirmDataIfRequired().then((answer) => {
+                    if (answer) {
+                        this.collectForm().then((form) => {
+                            zone.createZone(form).then(() => {
+                                bus.$emit('APP_ALERT', { text: 'Zone Created', type: 'success' });
+                                this.$emit('form-complete');
+                                this.form = {
+                                    domain: '',
+                                    ip: '',
+                                    dns_server_id: '',
+                                }
+                                this.disabled = false
+                            }).catch((error) => {
+                                this.disabled = false
+                                throw error;
+                            });
+                        })
+                    } else {
+                        this.disabled = false
+                    }
+                })
+
             }
        });
     }
