@@ -136,9 +136,10 @@ TODO:
 - [ ] Create DNS Record Page
 - [ ] Create DNS Create Record Form
 - [ ] Create DNS Edit Record Form
+- [ ] Change DNS Server to Pull Records from API
+
 - [ ] Create DNS Payloads Page
 - [ ] Create DNS Payloads Form
-- [ ] Change DNS Server to Pull Records from API
 - [ ] Perform Validation on the Front End for other prages
 - [ ] Perform Better Validation on the Backend
 - [ ] Handle Errors on the Front End
