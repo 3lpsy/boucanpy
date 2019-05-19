@@ -1,8 +1,9 @@
 import qs from 'qs';
 import * as api from '@/services/api';
-import { DnsServersResponse} from '@/types';
+import { DnsServersResponse } from '@/types';
 
-import {IGeneralQS} from "@/queries"
+import { IGeneralQS } from '@/queries';
+
 class DnsServerService {
     getDnsServers(query: IGeneralQS): Promise<DnsServersResponse> {
         return new Promise((resolve, reject) => {

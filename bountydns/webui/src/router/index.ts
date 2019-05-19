@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from '@/views/Home.vue';
+import Server from '@/views/Server.vue';
+
 import Zone from '@/views/Zone.vue';
 import ZoneEdit from '@/views/ZoneEdit.vue';
 
@@ -26,6 +28,12 @@ export default new Router({
             path: '/webui',
             name: 'home',
             component: Home,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/server',
+            name: 'server',
+            component: Server,
             beforeEnter: AUTHED_GUARDS,
         },
         {

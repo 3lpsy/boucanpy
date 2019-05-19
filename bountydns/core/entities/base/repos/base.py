@@ -1,5 +1,5 @@
 from typing import Optional, List
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 
 from sqlalchemy import or_, desc, func, cast, String
 from sqlalchemy.dialects import postgresql
@@ -124,10 +124,8 @@ class BaseRepo:
 
     def to_data(self, item):
         if not item:
-            logger.critical(f"REMOVE: to_data is none {item}")
             return None
         attrs = self.to_dict(item)
-        logger.critical(f"REMOVE: tranforming attrs to data model: {attrs}")
         return self.data_model()(**attrs)
 
     def to_dict(self, item):
@@ -163,20 +161,27 @@ class BaseRepo:
         self._results = results
         return bool(self._results)
 
-    def first(self, **kwargs):
+    def first(self, or_fail=False, **kwargs):
         if kwargs:
             self.filter_by(**kwargs)
         self.debug(
             f"executing first query {self.compiled()} in {self.__class__.__name__}"
         )
-        self._results = self.final().first()
+        results = self.final().first()
+        if or_fail:
+            if not results:
+                raise HTTPException(status_code=404, detail="Item not found")
+        self._results = results
         return self
 
-    def get(self, id):
-        self.debug(
-            f"executing get query {self.compiled()} in {self.__class__.__name__}"
-        )
-        return self.first(id=id)
+    def first_or_fail(self, or_fail=False, **kwargs):
+        return self.first(or_fail=True, **kwargs)
+
+    def get(self, id, or_fail=False):
+        return self.first(id=id, or_fail=or_fail)
+
+    def get_or_fail(self, id):
+        return self.get(id, or_fail=True)
 
     def all(self, **kwargs):
         if kwargs:
@@ -266,7 +271,9 @@ class BaseRepo:
         # TODO: make work with list
         try:
             instance = self.results()
-            for attr, value in dict(data).items():
+            if not isinstance(data, dict):
+                data = dict(data)
+            for attr, value in data.items():
                 setattr(instance, attr, value)
             self.db.add(instance)
             self.db.commit()

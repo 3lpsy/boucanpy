@@ -54,6 +54,45 @@ async def store(
     return ZoneResponse(zone=zone)
 
 
+@router.get("/zone/{zone_id}", name="zone.show", response_model=ZoneResponse)
+async def show(
+    zone_id: int,
+    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    token: TokenPayload = Depends(ScopedTo("zone:update")),
+    includes: List[str] = Query(None),
+):
+    zone = zone_repo.loads("dns_server").get_or_fail(zone_id).includes(includes).data()
+    return ZoneResponse(zone=zone)
+
+
+# TODO: make custom update form for zone
+@router.put("/zone/{zone_id}", name="zone.update", response_model=ZoneResponse)
+async def show(
+    zone_id: int,
+    form: ZoneCreateForm,
+    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
+    token: TokenPayload = Depends(ScopedTo("zone:update")),
+    includes: List[str] = Query(None),
+):
+    data = only(dict(form), ["ip", "domain"])
+    if form.dns_server_id is not None:
+        if form.dns_server_id is 0:
+            data["dns_server_id"] = None
+        elif dns_server_repo.exists(id=form.dns_server_id):
+            dns_server = dns_server_repo.results()
+            data["dns_server"] = dns_server
+
+    zone = (
+        zone_repo.loads("dns_server")
+        .get_or_fail(zone_id)
+        .update(data)
+        .includes(includes)
+        .data()
+    )
+    return ZoneResponse(zone=zone)
+
+
 @router.put(
     "/zone/{zone_id}/activate", name="zone.activate", response_model=ZoneResponse
 )

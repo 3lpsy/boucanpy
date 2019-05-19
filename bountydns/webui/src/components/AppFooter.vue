@@ -2,7 +2,7 @@
     <footer class="footer row">
         <div class="container text-center">
             <a href="https://twitter.com/3lpsy" class="logo-font">@bountydns</a>
-            <span class="attribution"> </span>
+            <span class="attribution"></span>
         </div>
     </footer>
 </template>

@@ -11,8 +11,8 @@ import { API_URL } from '@/config';
 export const http = axios.create({
     baseURL: API_URL,
     paramsSerializer: function(params) {
-     return qs.stringify(params, { indices: false })
-   }
+        return qs.stringify(params, { indices: false, arrayFormat: 'repeat' });
+    },
 });
 
 let refreshRegistration = -1;

@@ -5,8 +5,8 @@
             hover
             :items="items"
             :fields="fields"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
+            :sort-by.sync="query.sort_by"
+            :sort-desc.sync="query.sort_dir == 'desc'"
             v-on:sort-changed="changeSort"
             :responsive="true"
             :busy="isLoading || !isLoaded"
@@ -37,7 +37,11 @@
             <template slot="edit" slot-scope="row">
                 <router-link
                     :to="{ name: 'zone.edit', params: { zoneId: row.item.id } }"
-                ></router-link>
+                    tag="button"
+                    class="btn btn-info btn-sm"
+                >
+                    Edit
+                </router-link>
             </template>
         </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">
@@ -49,10 +53,10 @@
         </div>
 
         <b-pagination
-            v-if="currentPage > 0 && items.length > 0"
-            v-model="currentPage"
+            v-if="query.page > 0 && items.length > 0"
+            v-model="query.page"
             :total-rows="total"
-            :per-page="perPage"
+            :per-page="query.per_page"
             aria-controls="my-table"
             @change="changePage"
             style="margin-top:10px;"
@@ -66,6 +70,7 @@ import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
 import ZoneMixin from '@/mixins/zone';
 import DataTableMixin from '@/mixins/dataTable';
+import { GeneralQS } from '@/queries';
 
 import zone from '@/services/zone';
 
@@ -76,8 +81,8 @@ export default class ZonesTable extends mixins(
     ZoneMixin,
     DataTableMixin,
 ) {
+    query = new GeneralQS();
     isLoading = true;
-    sortBy = 'id';
     revealed = {
         id: 0,
         token: '',
@@ -115,13 +120,18 @@ export default class ZonesTable extends mixins(
     ];
 
     changeSort(sort) {
-        this.sortBy = sort.sortBy;
-        this.sortDesc = sort.sortDesc;
+        console.log('change sort', sort, this.query);
+        this.query.sort_by = sort.sortBy;
+        if (sort.sortDesc) {
+            this.query.sort_dir = 'desc';
+        } else {
+            this.query.sort_dir = 'asc';
+        }
         this.loadData();
     }
 
     changePage(page) {
-        this.currentPage = page;
+        this.query.page = page;
         this.loadData();
     }
 
@@ -139,17 +149,16 @@ export default class ZonesTable extends mixins(
 
     loadData() {
         this.isLoading = true;
+        this.query.includes = 'dns_server';
         return zone
-            .getZones(
-                this.currentPage || 1,
-                this.perPage,
-                this.sortBy,
-                this.sortDesc ? 'desc' : 'asc',
-                ['dns_server'],
-            )
+            .getZones(this.query)
             .then((res) => {
-                this.currentPage = res.pagination.page;
-                this.perPage = res.pagination.per_page;
+                let query = new GeneralQS();
+                query.page = res.pagination.page;
+                query.per_page = res.pagination.per_page;
+                query.sort_by = this.query.sort_by;
+                query.sort_dir = this.query.sort_dir;
+                this.query = query;
                 this.total = res.pagination.total;
                 this.items = res.zones;
                 this.isLoaded = true;
@@ -157,6 +166,7 @@ export default class ZonesTable extends mixins(
             })
             .catch((error) => {
                 this.isLoading = false;
+                throw error;
             });
     }
 
@@ -164,6 +174,8 @@ export default class ZonesTable extends mixins(
         return this.loadData();
     }
     mounted() {
+        this.query = new GeneralQS();
+
         this.freshLoad();
         this.registerOnBroadcastZoneCreated();
     }

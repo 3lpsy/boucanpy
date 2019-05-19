@@ -33,5 +33,5 @@ import ZonesTable from '@/components/zone/ZonesTable.vue';
 import ZoneCreateModal from '@/components/zone/ZoneCreateModal.vue';
 
 @Component({ components: { ZonesTable, ZoneCreateModal } })
-export default class Home extends Vue {}
+export default class Zone extends Vue {}
 </script>

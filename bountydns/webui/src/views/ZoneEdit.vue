@@ -3,13 +3,13 @@
         <b-container style="padding-top: 10px" class="page">
             <div class="row" style="margin-bottom: 10px;">
                 <div class="col-md-9 col-xs-12">
-                    <h2>Edit ZOne</h2>
+                    <h2 v-if="zoneId">Edit Zone: {{ zoneId }}</h2>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-md-12 col-xs-12">
-                    <p>form</p>
+                <div class="col-md-12 col-xs-12" v-if="zoneId && zoneId > 0">
+                    <zone-form mode="edit" :zone-id="zoneId"></zone-form>
                 </div>
             </div>
         </b-container>
@@ -18,7 +18,33 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
+import ZoneForm from '@/components/zone/ZoneForm.vue';
 
-@Component({})
-export default class ZoneEdit extends Vue {}
+@Component({ components: { ZoneForm } })
+export default class ZoneEdit extends Vue {
+    isLoading = true;
+    isLoaded = false;
+
+    get zoneId() {
+        if (!this.$route.params || !this.$route.params.zoneId) {
+            return 0;
+        }
+        try {
+            return parseInt(this.$route.params.zoneId);
+        } catch (e) {
+            return 0;
+        }
+    }
+    loadZone() {
+        if (!this.zoneId || this.zoneId == 0) {
+            this.$router.push({ name: 'home' });
+        }
+    }
+    mounted() {
+        if (!this.zoneId) {
+            this.$router.push({ name: 'home' });
+        }
+        this.loadZone();
+    }
+}
 </script>

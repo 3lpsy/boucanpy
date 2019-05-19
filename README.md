@@ -122,6 +122,22 @@ TODO:
 - [x] Get Websockets Working
 - [x] Handle Pagination on the Front End
 - [x] Create docker compose files
+
+- [ ] Create Server Page
+- [ ] Create DNS Server Create Form
+- [ ] Create DNS Server Edit Form
+
+- [ ] Create DNS Payloads Page
+- [ ] Create DNS Payloads Form
+
+- [ ] Create DNS Record Page
+- [ ] Create DNS Create Record Form
+- [ ] Create DNS Edit Record Form
+
+- [ ] Change DNS Server to Pull Records from API
+
+- [ ] Fix WebSockets
+
 - [ ] Check for refreshable WebSocket token on page load
 - [ ] Create Packer build
 - [ ] Create Terraform build

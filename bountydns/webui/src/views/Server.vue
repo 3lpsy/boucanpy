@@ -19,20 +19,20 @@
             </div>
             <div class="row">
                 <div class="col-md-12 col-xs-12">
-                    <dns-server-table></dns-server-table>
+                    <dns-servers-table></dns-servers-table>
                 </div>
             </div>
         </b-container>
-        <dns-server-create-modal modal-id="create-dns-server">
-        </dns-server-create-modal>
+        <!-- <dns-server-create-modal modal-id="create-dns-server">
+        </dns-server-create-modal> -->
     </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import DnsServerTable from '@/components/dnsServer/DnsServerTable.vue';
+import DnsServersTable from '@/components/dnsServer/DnsServersTable.vue';
 import DnsServerCreateModal from '@/components/dnsServer/DnsServerCreateModal.vue';
 
-@Component({ components: { DnsServerTable, DnsServerCreateModal } })
+@Component({ components: { DnsServersTable, DnsServerCreateModal } })
 export default class Home extends Vue {}
 </script>

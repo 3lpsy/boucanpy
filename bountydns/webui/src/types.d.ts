@@ -55,12 +55,18 @@ export interface SensitiveApiTokenResponse {
     pagination?: object;
 }
 
+export interface ZoneFormData {
+    ip: string;
+    domain: string;
+    dns_server_id?: string;
+}
+
 export interface Zone {
     id: number;
     domain: string;
     ip: string;
     is_active: boolean;
-    dns_server_name?: string;
+    dns_server_id?: string;
     created_at: number;
 }
 
@@ -91,7 +97,7 @@ export interface DnsRequest {
     type: string;
     protocol: string;
     dns_server_id: number;
-    dns_server?: DnsServer
+    dns_server?: DnsServer;
     created_at: number;
 }
 
