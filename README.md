@@ -6,6 +6,8 @@ Status: WIP / PoC
 
 This project is an attempt to implement a lightweight burp collaborator-esc application and consists of two main components: a DNS Server (Custom Python Implemention with dnslib) and an API.
 
+For more information on Burp Collaborator, checkout [burp's documentation](https://portswigger.net/burp/documentation/collaborator)
+
 When answering queries, the DNS server hits the API with information regarding the DNS query. The API will then serve the log of the DNS queries via a RESTful HTTP API as well as front-end (HTML/JS) web GUI.
 
 ## Building and Running
@@ -34,7 +36,6 @@ $ ./api-token.sh
 
 Copy the relevant output to dns.env to set the API_TOKEN variable.
 
-
 ### Build the Frontend application
 
 This is only required for development containers where the front end code is mounted.
@@ -48,6 +49,7 @@ $ npm run build
 
 $ npm run watch
 ```
+
 ### Running the Services
 
 Run the following to run the containers.
@@ -78,6 +80,7 @@ The following details the general outline for the future of this project.
 The first iteration of the project will be a proof of concept to demonstrate the project's viability. At this point, the project should not be considered stable, secure, or feature complete.
 
 Features:
+
 - Create API Tokens via WebUI / CLI for Dns Servers
 - Create Zones for Specific DNS Servers
 - Log DNS Resolution
@@ -87,6 +90,7 @@ Features:
 After demonstrating that the project is worth dedicating time to, Phase 2 will involve making the project feature complete with all clients (WebUI / CLI) and features (webhooks / email / queue) completed. At this point, the project should not be considered stable nor secure.
 
 Features:
+
 - Manage DNS Records through WebUI / API
 - Ability to update the DNS server's records for running DNS Server (WebSocket)
 - Receive Notifications on DNS Resolution via email or webhook
@@ -97,6 +101,7 @@ Features:
 Next, sanity checks and proper handlers will be put in place so that API calls fail gracefully. At this point the project should not be considered secure.
 
 Features:
+
 - Actual validation & Error Handling
 
 ## Phase 4: Release 0.1.0-alpha
