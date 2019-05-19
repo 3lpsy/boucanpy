@@ -16,11 +16,8 @@
                 v-model="form.domain"
                 v-validate="'required|ip_or_fqdn'"
                 :state="getInputState('domain')"
-            >
-            </b-form-input>
-            <template v-slot:invalid-feedback>
-                {{ errors.first('domain') }}
-            </template>
+            ></b-form-input>
+            <template v-slot:invalid-feedback>{{ errors.first('domain') }}</template>
         </b-form-group>
         <b-form-group
             label="Resolve IP"
@@ -37,11 +34,8 @@
                 v-model="form.ip"
                 v-validate="'required|ip'"
                 :state="getInputState('ip')"
-            >
-            </b-form-input>
-            <template v-slot:invalid-feedback>
-                {{ errors.first('ip') }}
-            </template>
+            ></b-form-input>
+            <template v-slot:invalid-feedback>{{ errors.first('ip') }}</template>
         </b-form-group>
         <b-form-group
             label="DNS Server Name"
@@ -55,22 +49,19 @@
                 id="input-dns-server-id"
                 name="dns_server_id"
                 :data="dnsServers"
-                v-model.sync="dnsServersSearch"
+                v-model="dnsServersSearch"
                 size="lg"
                 placeholder="Type a DNS Server Name or ID"
                 @hit="form.dns_server_id = $event.id"
                 :min-matching-chars="0"
                 :serializer="(item) => item.id.toString() + ': ' + item.name"
                 :disabled="disabled"
-            >
-            </vue-bootstrap-typeahead>
+            ></vue-bootstrap-typeahead>
         </b-form-group>
         <ul class="error-messages" v-if="formError">
             <li>{{ formError }}</li>
         </ul>
-        <button class="btn btn-lg btn-primary pull-right">
-            Submit
-        </button>
+        <button class="btn btn-lg btn-primary pull-right">Submit</button>
     </b-form>
 </template>
 
@@ -133,20 +124,6 @@ export default class ZoneForm extends mixins(
     collectForm() {
         return new Promise((resolve, reject) => {
             resolve(this.form);
-            // let form = Object.keys(this.form)
-            //     .filter((key) => {
-            //         if (key == 'dns_server_id') {
-            //             return this.form[key] && this.form[key] > 0;
-            //         } else {
-            //             return true;
-            //         }
-            //     })
-            //     .reduce((obj, key) => {
-            //         obj[key] = this.form[key];
-            //         return obj;
-            //     }, {});
-            //
-            // resolve(form);
         });
     }
 
@@ -232,15 +209,6 @@ export default class ZoneForm extends mixins(
                 });
             }
         });
-    }
-
-    getInputState(fieldName) {
-        if (this.errors.has(fieldName)) {
-            return 'invalid';
-        } else if (this.inputs.domain && this.inputs.domain.valid) {
-            return 'valid';
-        }
-        return null;
     }
 
     boot() {

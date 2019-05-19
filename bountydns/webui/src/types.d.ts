@@ -123,6 +123,15 @@ export interface DnsServer {
     name: string;
 }
 
+export interface DnsServerCreateForm {
+    name: string;
+}
+
+export interface DnsServerResponse {
+    dns_server: DnsServer;
+    messages?: Message[];
+}
+
 export interface DnsServersResponse {
     dns_servers: DnsServer[];
     messages?: Message[];

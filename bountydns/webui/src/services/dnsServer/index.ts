@@ -1,6 +1,10 @@
 import qs from 'qs';
 import * as api from '@/services/api';
-import { DnsServersResponse } from '@/types';
+import {
+    DnsServersResponse,
+    DnsServerResponse,
+    DnsServerCreateForm,
+} from '@/types';
 
 import { IGeneralQS } from '@/queries';
 
@@ -10,8 +14,49 @@ class DnsServerService {
             api.http
                 .get('/dns-server', { params: query })
                 .then((response: any) => {
-                    let responseData = response.data as DnsServersResponse;
-                    resolve(responseData);
+                    let data = response.data as DnsServersResponse;
+                    resolve(data);
+                });
+        });
+    }
+
+    createDnsServer(form: DnsServerCreateForm): Promise<DnsServerResponse> {
+        return new Promise((resolve, reject) => {
+            api.http.post('/dns-server', form).then((response: any) => {
+                let data = response.data as DnsServerResponse;
+                resolve(data);
+            });
+        });
+    }
+
+    getDnsServer(
+        dnsServerId: number,
+        includes?: string[],
+    ): Promise<DnsServerResponse> {
+        return new Promise((resolve, reject) => {
+            let query = { includes: includes };
+            api.http
+                .get(`/dns-server/${dnsServerId}`, { params: query })
+                .then((response: any) => {
+                    let data = response.data as DnsServerResponse;
+                    resolve(data);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+
+    updateDnsServer(
+        dnsServerId: number,
+        form: DnsServerCreateForm,
+    ): Promise<DnsServerResponse> {
+        return new Promise((resolve, reject) => {
+            api.http
+                .put(`/dns-server/${dnsServerId}`, form)
+                .then((response: any) => {
+                    let data = response.data as DnsServerResponse;
+                    resolve(data);
                 });
         });
     }

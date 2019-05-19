@@ -1,11 +1,11 @@
 from typing import Optional, List
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 
 from sqlalchemy import or_, desc, func, cast, String
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Session, joinedload, raiseload
 
-from bountydns.core import logger
+from bountydns.core import logger, abort
 from bountydns.db.session import session
 from bountydns.db.pagination import Pagination
 from bountydns.core.entities.pagination.responses import PaginationData
@@ -170,7 +170,7 @@ class BaseRepo:
         results = self.final().first()
         if or_fail:
             if not results:
-                raise HTTPException(status_code=404, detail="Item not found")
+                abort(404, "Item not found")
         self._results = results
         return self
 
@@ -241,10 +241,6 @@ class BaseRepo:
     def filters(self, key, *args, **kwargs):
         if hasattr(self, "filter_" + key):
             getattr(self, "filter_" + key)(*args, **kwargs)
-        return self
-
-    def filter_sa(self, *args, **kwargs):
-        self._query = self.query().filter(*args, **kwargs)
         return self
 
     def filter_or(self, *args, **kwargs):

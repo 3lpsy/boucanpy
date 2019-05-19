@@ -27,7 +27,7 @@ options = {"prefix": ""}
 
 
 @router.post("/api-token/sync", name="api_token.sync", response_model=ApiTokenResponse)
-async def index(
+async def sync(
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
     token: TokenPayload = Depends(ScopedTo("api-token:syncable")),
@@ -36,11 +36,11 @@ async def index(
     if "api-token" in scopes or "api-token:syncable" in scopes:
         api_token = None
         dns_server = None
-        if not dns_server_repo.exists(name=token.payload.dns_server_name):
+        if not dns_server_repo.exists(name=token.payload.dns_server_name.lower()):
             dns_server_repo.clear()
             logger.info("saving dns server from api token")
             dns_server = dns_server_repo.create(
-                dict(name=token.payload.dns_server_name)
+                dict(name=token.payload.dns_server_name.lower())
             ).results()
         else:
             dns_server = dns_server_repo.results()

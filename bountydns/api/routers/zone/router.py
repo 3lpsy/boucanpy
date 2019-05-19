@@ -45,6 +45,7 @@ async def store(
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
     token: TokenPayload = Depends(ScopedTo("zone:create")),
 ):
+
     data = only(dict(form), ["ip", "domain"])
     if form.dns_server_id:
         if dns_server_repo.exists(id=form.dns_server_id):

@@ -1,5 +1,5 @@
 <template id="">
-    <div class="" v-if="isAuthenticated">
+    <div class v-if="isAuthenticated">
         <b-table
             striped
             hover
@@ -23,25 +23,19 @@
                         deactivateAction(row.item, row.index, $event.target)
                     "
                     v-if="row.item.is_active"
-                >
-                    Deactivate
-                </b-button>
+                >Deactivate</b-button>
                 <b-button
                     size="sm"
                     @click="activateAction(row.item, row.index, $event.target)"
                     v-if="!row.item.is_active"
-                >
-                    Activate
-                </b-button>
+                >Activate</b-button>
             </template>
             <template slot="edit" slot-scope="row">
                 <router-link
                     :to="{ name: 'zone.edit', params: { zoneId: row.item.id } }"
                     tag="button"
                     class="btn btn-info btn-sm"
-                >
-                    Edit
-                </router-link>
+                >Edit</router-link>
             </template>
         </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">

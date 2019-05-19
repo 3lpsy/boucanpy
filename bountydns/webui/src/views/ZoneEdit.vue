@@ -35,11 +35,13 @@ export default class ZoneEdit extends Vue {
             return 0;
         }
     }
+
     loadZone() {
         if (!this.zoneId || this.zoneId == 0) {
             this.$router.push({ name: 'home' });
         }
     }
+
     mounted() {
         if (!this.zoneId) {
             this.$router.push({ name: 'home' });

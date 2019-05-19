@@ -2,6 +2,8 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from '@/views/Home.vue';
 import Server from '@/views/Server.vue';
+import DnsServerCreate from '@/views/DnsServerCreate.vue';
+import DnsServerEdit from '@/views/DnsServerEdit.vue';
 
 import Zone from '@/views/Zone.vue';
 import ZoneEdit from '@/views/ZoneEdit.vue';
@@ -37,13 +39,25 @@ export default new Router({
             beforeEnter: AUTHED_GUARDS,
         },
         {
+            path: '/webui/dns-server/:dnsServerId/edit',
+            name: 'dns-server.edit',
+            component: DnsServerEdit,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/dns-server/create',
+            name: 'dns-server.create',
+            component: DnsServerCreate,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
             path: '/webui/zone',
             name: 'zone',
             component: Zone,
             beforeEnter: AUTHED_GUARDS,
         },
         {
-            path: '/webui/zone/:zoneId',
+            path: '/webui/zone/:zoneId/edit',
             name: 'zone.edit',
             component: ZoneEdit,
             beforeEnter: AUTHED_GUARDS,

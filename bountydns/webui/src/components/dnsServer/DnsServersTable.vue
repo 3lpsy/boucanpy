@@ -1,5 +1,5 @@
 <template id="">
-    <div class="" v-if="isAuthenticated">
+    <div class v-if="isAuthenticated">
         <b-table
             v-if="items.length > 0"
             striped
@@ -10,6 +10,13 @@
             :sort-desc.sync="sortDesc"
             v-on:sort-changed="changeSort"
         >
+            <template slot="edit" slot-scope="row">
+                <router-link
+                    :to="{ name: 'dns-server.edit', params: { dnsServerId: row.item.id } }"
+                    tag="button"
+                    class="btn btn-info btn-sm"
+                >Edit</router-link>
+            </template>
         </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">
             <span class="text-center">No Data Found :(</span>
@@ -56,22 +63,32 @@ export default class DnsServersTable extends mixins(
             key: 'name',
             label: 'Name',
             sortable: true,
-        }
+        },
+        {
+            key: 'edit',
+            label: 'Edit',
+        },
     ];
 
-
     loadData() {
-        return dnsServer.getDnsServers(this.currentPage || 1, this.perPage, this.sortBy, this.sortDesc ? 'desc' : 'asc').then((res) => {
-            this.currentPage = res.pagination.page;
-            this.perPage = res.pagination.per_page;
-            this.total = res.pagination.total;
-            this.items = res.dns_servers;
-            this.isLoaded = true;
-        });
+        return dnsServer
+            .getDnsServers(
+                this.currentPage || 1,
+                this.perPage,
+                this.sortBy,
+                this.sortDesc ? 'desc' : 'asc',
+            )
+            .then((res) => {
+                this.currentPage = res.pagination.page;
+                this.perPage = res.pagination.per_page;
+                this.total = res.pagination.total;
+                this.items = res.dns_servers;
+                this.isLoaded = true;
+            });
     }
 
     freshLoad() {
-        this.loadData()
+        this.loadData();
     }
 
     mounted() {

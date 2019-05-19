@@ -127,33 +127,33 @@ TODO:
 - [x] Get Websockets Working
 - [x] Handle Pagination on the Front End
 - [x] Create docker compose files
+- [x] Create Server Page
+- [x] Create DNS Server Create Form
+- [x] Create DNS Server Edit Form
 
-- [ ] Create Server Page
-- [ ] Create DNS Server Create Form
-- [ ] Create DNS Server Edit Form
-
+- [ ] Fix API Tokens Page (validation, etc)
 - [ ] Create DNS Payloads Page
 - [ ] Create DNS Payloads Form
-
 - [ ] Create DNS Record Page
 - [ ] Create DNS Create Record Form
 - [ ] Create DNS Edit Record Form
-
 - [ ] Change DNS Server to Pull Records from API
-
-- [ ] Fix WebSockets
-
-- [ ] Check for refreshable WebSocket token on page load
-- [ ] Create Packer build
-- [ ] Create Terraform build
-- [ ] Transfer record creation to the API
-- [ ] Implement websocket in DNS server to receive updates regarding records
-- [ ] Build ability for webhook's / events
-- [ ] Perform Validation on the Front End
+- [ ] Perform Validation on the Front End for other prages
 - [ ] Perform Better Validation on the Backend
 - [ ] Handle Errors on the Front End
-- [ ] Confirm DNS Server is as Compliant as possible
+- [ ] Fix WebSockets
+- [ ] Check for refreshable WebSocket token on page load
+- [ ] Add tests to API
 - [ ] Use vuex store for datatable data
+- [ ] Make relationsips sortable in repo
+
+* [ ] Create Packer build
+* [ ] Create Terraform build
+* [ ] Transfer record creation to the API
+* [ ] Implement websocket in DNS server to receive updates regarding records
+* [ ] Build ability for webhook's / events
+* [ ] Confirm DNS Server is as Compliant as possible
+* [ ] Divide the project into submodules
 
 ```
 usage: bdnsctl.py [-h]
