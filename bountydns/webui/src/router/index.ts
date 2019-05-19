@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from '@/views/Home.vue';
+
 import Server from '@/views/Server.vue';
 import DnsServerCreate from '@/views/DnsServerCreate.vue';
 import DnsServerEdit from '@/views/DnsServerEdit.vue';
@@ -9,6 +10,9 @@ import Zone from '@/views/Zone.vue';
 import ZoneEdit from '@/views/ZoneEdit.vue';
 
 import ApiToken from '@/views/ApiToken.vue';
+import ApiTokenCreate from '@/views/ApiTokenCreate.vue';
+import ApiTokenEdit from '@/views/ApiTokenEdit.vue';
+
 import Login from '@/views/Login.vue';
 
 import NotFound from '@/views/errors/NotFound.vue';
@@ -60,6 +64,18 @@ export default new Router({
             path: '/webui/zone/:zoneId/edit',
             name: 'zone.edit',
             component: ZoneEdit,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/api-token/:apiTokenId/edit',
+            name: 'api-token.edit',
+            component: ApiTokenEdit,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/api-token/create',
+            name: 'api-token.create',
+            component: ApiTokenCreate,
             beforeEnter: AUTHED_GUARDS,
         },
         {

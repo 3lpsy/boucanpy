@@ -77,12 +77,6 @@ export default class ZonesTable extends mixins(
 ) {
     query = new GeneralQS();
     isLoading = true;
-    revealed = {
-        id: 0,
-        token: '',
-    };
-    editZone = {};
-    editZoneId = 0;
     fields = [
         {
             key: 'id',
@@ -114,7 +108,6 @@ export default class ZonesTable extends mixins(
     ];
 
     changeSort(sort) {
-        console.log('change sort', sort, this.query);
         this.query.sort_by = sort.sortBy;
         if (sort.sortDesc) {
             this.query.sort_dir = 'desc';

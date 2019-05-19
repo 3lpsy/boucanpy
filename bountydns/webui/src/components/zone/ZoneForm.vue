@@ -74,7 +74,7 @@ import DataTableMixin from '@/mixins/dataTable';
 import DnsServersMixin from '@/mixins/dnsServer';
 import zone from '@/services/zone';
 import dnsServer from '@/services/dnsServer';
-import { GeneralQS, IGeneralQS } from '@/queries';
+import { GeneralQS } from '@/queries';
 
 import bus from '@/bus';
 

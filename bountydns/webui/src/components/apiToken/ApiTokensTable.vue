@@ -1,14 +1,15 @@
 <template id="">
-    <div class="" v-if="isAuthenticated">
+    <div class v-if="isAuthenticated">
         <b-table
             v-if="items.length > 0"
             striped
             hover
             :items="items"
             :fields="fields"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
+            :sort-by.sync="query.sort_by"
+            :sort-desc.sync="query.sort_dir == 'desc'"
             v-on:sort-changed="changeSort"
+            :busy="isLoading || !isLoaded"
         >
             <!-- TODO: don't use expires_at, use expires delta -->
             <template slot="actions" slot-scope="row">
@@ -18,25 +19,24 @@
                         deactivateAction(row.item, row.index, $event.target)
                     "
                     v-if="row.item.is_active"
-                >
-                    Deactivate
-                </b-button>
-                <span v-else>
-                    Dead
-                </span>
+                >Deactivate</b-button>
+                <span v-else>Dead</span>
             </template>
             <template slot="reveal" slot-scope="row">
                 <b-button
                     size="sm"
                     @click="revealAction(row.item, row.index, $event.target)"
                     v-if="row.item.is_active"
-                >
-                    Reveal
-                </b-button>
+                >Reveal</b-button>
 
-                <span v-else>
-                    Dead
-                </span>
+                <span v-else>Dead</span>
+            </template>
+            <template slot="edit" slot-scope="row">
+                <router-link
+                    :to="{ name: 'api-token.edit', params: { apiTokenId: row.item.id } }"
+                    tag="button"
+                    class="btn btn-info btn-sm"
+                >Edit</router-link>
             </template>
         </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">
@@ -48,12 +48,13 @@
         </div>
 
         <b-pagination
-            v-if="currentPage > 0 && items.length > 0"
-            v-model="currentPage"
+            v-if="query.page > 0 && items.length > 0"
+            v-model="query.page"
             :total-rows="total"
-            :per-page="perPage"
+            :per-page="query.per_page"
             aria-controls="my-table"
             @change="changePage"
+            style="margin-top:10px;"
         ></b-pagination>
 
         <b-modal
@@ -66,13 +67,15 @@
             <div class="container">
                 <p class="text-left" style="word-wrap: break-word">
                     <span>
-                        <strong>Server Name (ID):</strong><br />
+                        <strong>Server Name (ID):</strong>
+                        <br>
                         {{ revealed.dns_server_name }}
                     </span>
-                    <br /><br />
+                    <br>
+                    <br>
                     <span>
-                        <strong>Token:</strong><br />
-
+                        <strong>Token:</strong>
+                        <br>
                         {{ revealed.token }}
                     </span>
                 </p>
@@ -89,6 +92,7 @@ import ApiTokenMixin from '@/mixins/apiToken';
 import DataTableMixin from '@/mixins/dataTable';
 import apiToken from '@/services/apiToken';
 import bus from '@/bus';
+import { GeneralQS } from '@/queries';
 
 // TODO: move to vuex / persistent data
 @Component
@@ -97,6 +101,8 @@ export default class ApiTokensTable extends mixins(
     ApiTokenMixin,
     DataTableMixin,
 ) {
+    query = new GeneralQS();
+    isLoading = false;
     revealed = {
         id: 0,
         token: '',
@@ -114,7 +120,7 @@ export default class ApiTokensTable extends mixins(
             sortable: true,
         },
         {
-            key: 'dns_server_name',
+            key: 'dns_server.name',
             label: 'Server',
             sortable: true,
         },
@@ -132,6 +138,10 @@ export default class ApiTokensTable extends mixins(
             key: 'reveal',
             label: 'Reveal',
         },
+        {
+            key: 'edit',
+            label: 'Edit',
+        },
     ];
 
     deactivateAction(token, index, target) {
@@ -141,11 +151,13 @@ export default class ApiTokensTable extends mixins(
     }
 
     revealAction(token, index, target) {
-        apiToken.getSensitiveApiToken(token.id).then((res) => {
+        apiToken.getSensitiveApiToken(token.id, ['dns_server']).then((res) => {
             let token = res.api_token;
             this.revealed.id = token.id;
             this.revealed.token = token.token;
-            this.revealed.dns_server_name = token.dns_server_name;
+            this.revealed.dns_server_name = token.dns_server
+                ? token.dns_server.name
+                : '';
             this.openRevealedModal();
         });
     }
@@ -159,18 +171,41 @@ export default class ApiTokensTable extends mixins(
         this.$refs['token-reveal-modal'].hide();
     }
 
+    changeSort(sort) {
+        this.query.sort_by = sort.sortBy;
+        if (sort.sortDesc) {
+            this.query.sort_dir = 'desc';
+        } else {
+            this.query.sort_dir = 'asc';
+        }
+        this.loadData();
+    }
+
     loadData() {
-        return apiToken.getApiTokens(this.currentPage || 1, this.perPage, this.sortBy, this.sortDesc ? 'desc' : 'asc').then((res) => {
-            this.currentPage = res.pagination.page;
-            this.perPage = res.pagination.per_page;
-            this.total = res.pagination.total;
-            this.items = res.api_tokens;
-            this.isLoaded = true;
-        });
+        this.isLoading = true;
+        this.query.includes = ['dns_server'];
+        return apiToken
+            .getApiTokens(this.query)
+            .then((res) => {
+                let query = new GeneralQS();
+                query.page = res.pagination.page;
+                query.per_page = res.pagination.per_page;
+                query.sort_by = this.query.sort_by;
+                query.sort_dir = this.query.sort_dir;
+                this.query = query;
+                this.total = res.pagination.total;
+                this.items = res.api_tokens;
+                this.isLoaded = true;
+                this.isLoading = false;
+            })
+            .catch((error) => {
+                this.isLoading = false;
+                throw error;
+            });
     }
 
     freshLoad() {
-        this.loadData()
+        this.loadData();
     }
 
     mounted() {

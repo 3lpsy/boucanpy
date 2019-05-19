@@ -1,5 +1,7 @@
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from bountydns.core import logger, only
 from bountydns.core.security import (
     ScopedTo,
@@ -79,8 +81,16 @@ async def index(
     pagination: PaginationQS = Depends(PaginationQS),
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
     token: TokenPayload = Depends(ScopedTo("api-token:list")),
+    includes: List[str] = Query(None),
 ):
-    pg, items = api_token_repo.sort(sort_qs).paginate(pagination).data()
+    pg, items = (
+        api_token_repo.loads("dns_server")
+        .strict()
+        .sort(sort_qs)
+        .paginate(pagination)
+        .includes(includes)
+        .data()
+    )
     return ApiTokensResponse(pagination=pg, api_tokens=items)
 
 
@@ -88,9 +98,12 @@ async def index(
 async def store(
     form: ApiTokenCreateForm,
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
     token: TokenPayload = Depends(ScopedTo("api-token:create")),
     user: User = Depends(current_user),
 ):
+    dns_server = dns_server_repo.first_or_fail(id=form.dns_server_id).results()
+
     scopes = []
     for requested_scope in form.scopes.split(" "):
         request_scope_satisfied = False
@@ -111,7 +124,7 @@ async def store(
         data={
             "sub": user.id,
             "scopes": " ".join(scopes),
-            "dns_server_name": form.dns_server_name,
+            "dns_server_name": dns_server.name,
         }
     )
 
@@ -119,7 +132,7 @@ async def store(
         "scopes": " ".join(scopes),
         "token": str(token.decode()),
         "expires_at": form.expires_at,
-        "dns_server_name": form.dns_server_name,
+        "dns_server_id": form.dns_server_id,
     }
 
     api_token = api_token_repo.create(data).data()
@@ -129,12 +142,18 @@ async def store(
 @router.get(
     "/api-token/{api_token_id}", name="api_token.show", response_model=ApiTokenResponse
 )
-async def index(
+async def show(
     api_token_id: int,
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
     token: TokenPayload = Depends(ScopedTo("api-token:read")),
+    includes: List[str] = Query(None),
 ):
-    if not api_token_repo.exists(api_token_id):
+    if (
+        not api_token_repo.loads("dns_server")
+        .strict()
+        .includes(includes)
+        .exists(api_token_id)
+    ):
         raise HTTPException(404, detail="Not found")
     api_token = api_token_repo.data()
     return ApiTokenResponse(api_token=api_token)
@@ -145,15 +164,21 @@ async def index(
     name="api_token.show.sensitive",
     response_model=SensitiveApiTokenResponse,
 )
-async def index(
+async def sensitive(
     api_token_id: int,
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
     token: TokenPayload = Depends(ScopedTo("api-token:read")),
+    includes: List[str] = Query(None),
 ):
     # TODO: require stronger scope
     if not api_token_repo.exists(api_token_id):
         raise HTTPException(404, detail="Not found")
-    api_token = api_token_repo.set_data_model(SensitiveApiTokenData).data()
+    api_token = (
+        api_token_repo.loads("dns_server")
+        .set_data_model(SensitiveApiTokenData)
+        .includes(includes)
+        .data()
+    )
     return SensitiveApiTokenResponse(api_token=api_token)
 
 

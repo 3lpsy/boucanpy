@@ -130,13 +130,14 @@ TODO:
 - [x] Create Server Page
 - [x] Create DNS Server Create Form
 - [x] Create DNS Server Edit Form
+- [x] Fix API Tokens Page (validation, etc)
 
-- [ ] Fix API Tokens Page (validation, etc)
-- [ ] Create DNS Payloads Page
-- [ ] Create DNS Payloads Form
+- [ ] Create DNS Record Repo, Factory, Seed Data, etc
 - [ ] Create DNS Record Page
 - [ ] Create DNS Create Record Form
 - [ ] Create DNS Edit Record Form
+- [ ] Create DNS Payloads Page
+- [ ] Create DNS Payloads Form
 - [ ] Change DNS Server to Pull Records from API
 - [ ] Perform Validation on the Front End for other prages
 - [ ] Perform Better Validation on the Backend
@@ -146,6 +147,7 @@ TODO:
 - [ ] Add tests to API
 - [ ] Use vuex store for datatable data
 - [ ] Make relationsips sortable in repo
+- [ ] Add confirmation dialog when deactivating an api token
 
 * [ ] Create Packer build
 * [ ] Create Terraform build

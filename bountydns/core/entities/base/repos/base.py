@@ -149,7 +149,7 @@ class BaseRepo:
         return root_data
 
     ## EXECUTION
-    def exists(self, id=None, **kwargs):
+    def exists(self, id=None, or_fail=False, **kwargs):
         if id and not kwargs:
             self.filter_by(id=id)
         elif kwargs:
@@ -158,8 +158,13 @@ class BaseRepo:
             f"executing first (exists) query {self.compiled()} in {self.__class__.__name__}"
         )
         results = self.final().first()
+        if or_fail and not results:
+            abort(404, "Item not found")
         self._results = results
         return bool(self._results)
+
+    def exists_or_fail(self, **kwargs):
+        return self.exists(or_fail=True, **kwargs)
 
     def first(self, or_fail=False, **kwargs):
         if kwargs:
