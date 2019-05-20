@@ -5,6 +5,7 @@ from .base import BaseFactory, fake
 from bountydns.db.models.dns_request import DnsRequest
 from bountydns.dns.types import TYPES
 from bountydns.db.factories.dns_server import DnsServerFactory
+from bountydns.db.factories.zone import ZoneFactory
 
 
 def random_port():
@@ -21,9 +22,9 @@ class DnsRequestFactory(BaseFactory):
         model = DnsRequest
 
     name = Faker("domain_name")
-    zone_id = None
     source_address = LazyFunction(fake.ipv4_private)
     source_port = LazyFunction(random_port)
     type = "A"
     protocol = "udp"
     dns_server = SubFactory(DnsServerFactory)
+    zone = SubFactory(ZoneFactory)

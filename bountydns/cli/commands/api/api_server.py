@@ -46,6 +46,10 @@ class ApiServer(BaseCommand):
         )
 
         parser.add_argument(
+            "--db-seed", action="store_true", help="seed additional fake data"
+        )
+
+        parser.add_argument(
             "--no-bcast-check",
             action="store_true",
             help="do not wait for broadcast service",
@@ -73,7 +77,10 @@ class ApiServer(BaseCommand):
 
         if self.option("db_setup"):
             logger.critical("running database migration")
-            await DbSetup.make(self.options).run()
+            db_setup_options = self._args_to_dict(self.options)
+            if self.option("db_seed"):
+                db_setup_options["seed"] = True
+            await DbSetup(db_setup_options).run()
 
         if self.should_db_check():
             db_setup = is_db_setup()
@@ -91,6 +98,7 @@ class ApiServer(BaseCommand):
 
         if self.option("db_seed_env", False):
             self.seed_from_env()
+
         return uvicorn.run(*args, **kwargs)
 
     def get_kwargs(self):

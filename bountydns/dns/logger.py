@@ -1,4 +1,5 @@
 from dnslib.server import DNSLogger as BaseDNSLogger
+from bountydns.core import logger
 
 
 class DNSLogger(BaseDNSLogger):
@@ -10,7 +11,7 @@ class DNSLogger(BaseDNSLogger):
         print("log_pass")
 
     def log_request(self, handler, request, request_uuid):
-        print("log_request")
+        logger.critical(f"log_request: {handler}, {request}, {request_uuid}")
         self.api.create_dns_request(handler, request, request_uuid)
         super().log_request(handler, request)
 

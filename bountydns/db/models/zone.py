@@ -28,10 +28,14 @@ class Zone(Base):
         back_populates="zone",
     )
 
+    dns_records = relationship(
+        "bountydns.db.models.dns_record.DnsRecord",
+        foreign_keys="bountydns.db.models.dns_record.DnsRecord.zone_id",
+        back_populates="zone",
+    )
+
     @staticmethod
     async def on_after_insert(mapper, connection, target):
-        logger.warning("on_after_insert: Zone")
-        # print("on_after_insert", mapper, connection, target)
         try:
             publisher = await make_redis()
             res = await publisher.publish_json(

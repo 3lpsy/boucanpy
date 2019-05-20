@@ -1,6 +1,6 @@
 from sqlalchemy import literal
 from fastapi import APIRouter, Depends
-from bountydns.core import logger
+from bountydns.core import logger, abort, only
 from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.core.entities import (
     SortQS,
@@ -10,6 +10,7 @@ from bountydns.core.entities import (
     DnsRequestResponse,
     DnsRequestData,
     DnsRequestCreateForm,
+    DnsServerRepo,
     ZoneRepo,
 )
 from bountydns.broadcast import make_redis
@@ -40,20 +41,36 @@ async def index(
 @router.post(
     "/dns-request", name="dns_request.store", response_model=DnsRequestResponse
 )
-async def index(
+async def store(
     form: DnsRequestCreateForm,
     dns_request_repo: DnsRequestRepo = Depends(DnsRequestRepo),
     zone_repo: ZoneRepo = Depends(ZoneRepo),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
     token: str = Depends(ScopedTo("dns-request:create")),
 ):
 
-    data = dict(form)
-    domain_name = data["name"]
-    if zone_repo.filter(
-        literal(domain_name).contains(zone_repo.model_column("domain"))
-    ).exists():
-        data["zone_id"] = zone_repo.data().id
-    else:
-        logger.warning(f"No zone found for dns request {domain_name}")
+    dns_server_id = (
+        dns_server_repo.first_or_fail(name=form.dns_server_name.lower(), or_fail=True)
+        .results()
+        .id
+    )
+
+    zone_id = (
+        zone_repo.filter(literal(form.name.lower()).contains(zone_repo.label("domain")))
+        .first_or_fail()
+        .results()
+        .id
+    )
+
+    data = only(
+        dict(form), ["name", "source_address", "source_port", "type", "protocol"]
+    )
+
+    data["name"] = data["name"].lower()
+    data["type"] = data["type"].upper()
+
+    data["dns_server_id"] = dns_server_id
+    data["zone_id"] = zone_id
+
     dns_request = dns_request_repo.create(data).data()
     return DnsRequestResponse(dns_request=dns_request)

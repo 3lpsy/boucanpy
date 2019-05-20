@@ -14,7 +14,7 @@ class BaseCommand:
     add_debug = False
 
     def __init__(self, options):
-        self.options = options
+        self.options = self._args_to_dict(options)
 
     async def run(self):
         raise NotImplementedError()
@@ -22,8 +22,7 @@ class BaseCommand:
     @classmethod
     def make(cls, args):
         # convert namespace to dict if not dict
-        options = dict(vars(args)) if not isinstance(args, dict) else args
-        return cls(options)
+        return cls(cls._args_to_dict(args))
 
     @classmethod
     def parser(cls, parser):
@@ -114,3 +113,7 @@ class BaseCommand:
 
     def exit(self, status):
         exit(status)
+
+    @classmethod
+    def _args_to_dict(self, options):
+        return dict(vars(options)) if not isinstance(options, dict) else options

@@ -1,4 +1,4 @@
-version: '3.3'
+version: "3.3"
 services:
   bountydns:
     build:
@@ -7,7 +7,7 @@ services:
     image: 3lpsy/bountydns:latest
     networks:
       bountydnspub:
-    command: api-server --debug --reload --no-envs --db-setup -l 0.0.0.0 --db-seed-env
+    command: api-server --debug --reload --no-envs --db-setup --db-seed -l 0.0.0.0 --db-seed-env
     env_file:
       - ./../../.env/api.env
     depends_on:
@@ -82,6 +82,6 @@ networks:
     ipam:
       driver: default
       config:
-      - subnet: 172.28.20.0/24
+        - subnet: 172.28.20.0/24
     driver_opts:
       com.docker.network.bridge.name: bountdnspub0

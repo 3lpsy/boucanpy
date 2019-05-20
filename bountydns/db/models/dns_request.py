@@ -30,8 +30,6 @@ class DnsRequest(Base):
 
     @staticmethod
     async def on_after_insert(mapper, connection, target):
-        logger.warning("on_after_insert: DnsRequest")
-        # print("on_after_insert", mapper, connection, target)
         try:
             publisher = await make_redis()
             res = await publisher.publish_json(

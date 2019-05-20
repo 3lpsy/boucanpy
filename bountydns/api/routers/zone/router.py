@@ -27,6 +27,7 @@ async def index(
     token: TokenPayload = Depends(ScopedTo("zone:list")),
     includes: List[str] = Query(None),
 ):
+    includes = only(includes, ["dns_server"])
     pg, items = (
         zone_repo.loads("dns_server")
         .strict()  # TODO: handle eagerloading when including
@@ -47,10 +48,13 @@ async def store(
 ):
 
     data = only(dict(form), ["ip", "domain"])
+
+    data["domain"] = data["domain"].lower()
+
     if form.dns_server_id:
         if dns_server_repo.exists(id=form.dns_server_id):
-            dns_server = dns_server_repo.results()
-            data["dns_server"] = dns_server
+            data["dns_server_id"] = dns_server_repo.results().id
+
     zone = zone_repo.create(data).data()
     return ZoneResponse(zone=zone)
 
@@ -68,7 +72,7 @@ async def show(
 
 # TODO: make custom update form for zone
 @router.put("/zone/{zone_id}", name="zone.update", response_model=ZoneResponse)
-async def show(
+async def update(
     zone_id: int,
     form: ZoneCreateForm,
     zone_repo: ZoneRepo = Depends(ZoneRepo),

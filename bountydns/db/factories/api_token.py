@@ -40,4 +40,4 @@ class ApiTokenFactory(BaseFactory):
 
     @lazy_attribute
     def token(self):
-        return bearer_token(str(self.dns_server_name), str(self.scopes))
+        return bearer_token(str(self.dns_server.name), str(self.scopes))

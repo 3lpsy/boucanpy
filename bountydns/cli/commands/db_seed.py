@@ -34,19 +34,17 @@ class DbSeed(BaseCommand):
             logger.info(f"seeding {self.option('target')}")
 
             logger.info("creating superuser")
-            super = factory("SuperUserFactory").create(email="jim@jim.jim")
+            super = factory("SuperUserFactory").create(email="jim@jim.com")
             logger.info("creating zones")
-            zone = factory("ZoneFactory").create(domain="example.com", ip="127.0.1.1")
+            zone = factory("ZoneFactory").create(domain="othersite.com", ip="127.0.1.1")
             dns_server = factory("DnsServerFactory").create()
 
             zone2 = factory("ZoneFactory").create(
-                domain="potato.com", ip="127.0.1.1", dns_server=dns_server
+                domain="friends4life.com", ip="127.0.1.1", dns_server=dns_server
             )
-            dns_server_name2 = uuid.uuid4()
+
             zone3 = factory("ZoneFactory").create(
-                domain="differentzone.com",
-                ip="127.0.1.1",
-                dns_server_name=dns_server_name2,
+                domain="differentzone.com", ip="127.0.1.1"
             )
 
             logger.info("creating api_tokens")
@@ -55,14 +53,23 @@ class DbSeed(BaseCommand):
                 factory("ApiTokenFactory").create(dns_server=dns_server)
 
             logger.info("creating dns_requests")
-            dns_request = factory("DnsRequestFactory").create(zone_id=zone.id)
-            dns_request = factory("DnsRequestFactory").create(zone_id=zone2.id)
 
             for i in range(35):
-                dns_request = factory("DnsRequestFactory").create(dns_server=dns_server)
+                factory("DnsRequestFactory").create(dns_server=dns_server, zone=zone2)
 
             for i in range(35):
-                dns_request = factory("DnsRequestFactory").create(dns_server=dns_server)
+                factory("DnsRequestFactory").create(dns_server=dns_server, zone=zone3)
+
+            logger.info("creating dns_records")
+
+            for i in range(3):
+                factory("DnsRecordFactory").create(zone=zone)
+
+            for i in range(3):
+                factory("DnsRecordFactory").create(zone=zone2)
+
+            for i in range(3):
+                factory("DnsRecordFactory").create(zone=zone3)
         else:
             print("invalid target set for seeder")
             self.exit(1)

@@ -3,7 +3,7 @@ from time import sleep
 import requests
 from dnslib import QTYPE, RCODE, RR
 
-from bountydns.core.logger import logger
+from bountydns.core import logger
 
 from bountydns.core.entities.zone.data import ZoneData
 
@@ -14,7 +14,6 @@ class ApiClient:
         self.api_token = api_token
         payload = jwt.decode(api_token, verify=False)  # do not trust
         if not "dns_server_name" in payload.keys() or not payload["dns_server_name"]:
-            print("DNS SERVER PAYLOAD", payload)
             logger.critical("no dns_server_name on api token")
             raise Exception("no dns_server_name on api token")
         self.dns_server_name = payload["dns_server_name"]
@@ -27,8 +26,9 @@ class ApiClient:
                 return False
             logger.info("checking for api status")
             try:
-                # sleep(15)
+                sleep(1)
                 self.get_status()
+                sleep(3)
                 return True
             except Exception as e:
                 logger.info(
@@ -47,7 +47,7 @@ class ApiClient:
         res = requests.get(self.url(url), headers=headers)
         if fail:
             if res.status_code != 200:
-                print(res.json())
+                logger.critical(str(res.json()))
             res.raise_for_status()
         return res.json()
 
@@ -57,7 +57,7 @@ class ApiClient:
         res = requests.post(self.url(url), json=data, headers=headers)
         if fail:
             if res.status_code != 200:
-                print(res.json())
+                logger.critical(str(res.json()))
             res.raise_for_status()
         return res.json()
 
