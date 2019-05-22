@@ -6,7 +6,7 @@
             :items="items"
             :fields="fields"
             :sort-by.sync="query.sort_by"
-            :sort-desc.sync="query.sort_dir == 'desc'"
+            :sort-desc="query.sort_dir == 'desc'"
             v-on:sort-changed="changeSort"
             :responsive="true"
             :busy="isLoading || !isLoaded"
@@ -17,25 +17,30 @@
             </div>
             <!-- TODO: don't use expires_at, use expires delta -->
             <template slot="actions" slot-scope="row">
-                <b-button
-                    size="sm"
-                    @click="
+                <b-button-group>
+                    <b-button
+                        size="sm"
+                        @click="
                         deactivateAction(row.item, row.index, $event.target)
                     "
-                    v-if="row.item.is_active"
-                >Deactivate</b-button>
-                <b-button
-                    size="sm"
-                    @click="activateAction(row.item, row.index, $event.target)"
-                    v-if="!row.item.is_active"
-                >Activate</b-button>
-            </template>
-            <template slot="edit" slot-scope="row">
-                <router-link
-                    :to="{ name: 'zone.edit', params: { zoneId: row.item.id } }"
-                    tag="button"
-                    class="btn btn-info btn-sm"
-                >Edit</router-link>
+                        v-if="row.item.is_active"
+                    >Deactivate</b-button>
+                    <b-button
+                        size="sm"
+                        @click="activateAction(row.item, row.index, $event.target)"
+                        v-if="!row.item.is_active"
+                    >Activate</b-button>
+                    <router-link
+                        :to="{ name: 'zone.edit', params: { zoneId: row.item.id } }"
+                        tag="button"
+                        class="btn btn-warning btn-sm"
+                    >Edit</router-link>
+                    <router-link
+                        :to="{ name: 'zone.show', params: { zoneId: row.item.id } }"
+                        tag="button"
+                        class="btn btn-info btn-sm"
+                    >View</router-link>
+                </b-button-group>
             </template>
         </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">
@@ -99,11 +104,7 @@ export default class ZonesTable extends mixins(
         },
         {
             key: 'actions',
-            label: 'Status',
-        },
-        {
-            key: 'edit',
-            label: 'Edit',
+            label: 'Actions',
         },
     ];
 

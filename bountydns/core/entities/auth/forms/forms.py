@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 
 class PasswordAuthForm(BaseModel):
     username: str
-    password: str
+    password: SecretStr
 
 
 class MfaAuthForm(BaseModel):
-    token: str
+    token: SecretStr

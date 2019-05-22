@@ -1,5 +1,5 @@
 import requests
-import textwrap
+from textwrap import dedent
 import copy
 from dnslib.server import DNSServer, BaseResolver
 from dnslib import RR, QTYPE, RCODE
@@ -41,7 +41,7 @@ class Resolver(BaseResolver):
 
     def zone_to_rr(self, zone):
         z = ZONE_TEMPLATE.format(domain_name=zone.domain, domain_ip=zone.ip)
-        return RR.fromZone(textwrap.dedent(z))
+        return RR.fromZone(dedent(z))
 
     def resolve(self, request, handler):
         reply = request.reply()

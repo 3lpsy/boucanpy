@@ -194,6 +194,7 @@ class BaseRepo:
         self.debug(
             f"executing all query {self.compiled()} in {self.__class__.__name__}"
         )
+
         self._results = self.final().all()
         self._is_list = True
         return self
@@ -299,6 +300,18 @@ class BaseRepo:
             self.db.rollback()
             raise e
 
+    def delete(self):
+        try:
+            instance = self.results()
+            self.db.delete(instance)
+            self.db.commit()
+            self.db.flush()
+            self._results = instance
+            return self
+        except Exception as e:
+            self.db.rollback()
+            raise e
+
     ## GETTERS
 
     def final(self, attach=True):
@@ -332,6 +345,7 @@ class BaseRepo:
         final_index = len(parts) - 1
         for i, part in enumerate(parts):
             if i == final_index:
+                logger.critical("LABEL " + str(getattr(parent, part)))
                 return getattr(parent, part)
             parent = self._get_relationship_model(part, parent)
         raise Exception(f"Unable to decipher label for key: {key}")

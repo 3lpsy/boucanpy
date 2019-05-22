@@ -5,9 +5,13 @@ import Home from '@/views/Home.vue';
 import Server from '@/views/Server.vue';
 import DnsServerCreate from '@/views/DnsServerCreate.vue';
 import DnsServerEdit from '@/views/DnsServerEdit.vue';
+import DnsServerShow from '@/views/DnsServerShow.vue';
 
 import Zone from '@/views/Zone.vue';
 import ZoneEdit from '@/views/ZoneEdit.vue';
+import ZoneShow from '@/views/ZoneShow.vue';
+import ZoneDnsRecordCreate from '@/views/ZoneDnsRecordCreate.vue';
+import ZoneDnsRecordEdit from '@/views/ZoneDnsRecordEdit.vue';
 
 import ApiToken from '@/views/ApiToken.vue';
 import ApiTokenCreate from '@/views/ApiTokenCreate.vue';
@@ -43,21 +47,47 @@ export default new Router({
             beforeEnter: AUTHED_GUARDS,
         },
         {
-            path: '/webui/dns-server/:dnsServerId/edit',
-            name: 'dns-server.edit',
-            component: DnsServerEdit,
-            beforeEnter: AUTHED_GUARDS,
-        },
-        {
             path: '/webui/dns-server/create',
             name: 'dns-server.create',
             component: DnsServerCreate,
             beforeEnter: AUTHED_GUARDS,
         },
         {
+            path: '/webui/dns-server/:dnsServerId',
+            name: 'dns-server.show',
+            component: DnsServerShow,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/dns-server/:dnsServerId/edit',
+            name: 'dns-server.edit',
+            component: DnsServerEdit,
+            beforeEnter: AUTHED_GUARDS,
+        },
+
+        {
+            path: '/webui/zone/:zoneId/dns-record/create',
+            name: 'zone.dns-record.create',
+            component: ZoneDnsRecordCreate,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/zone/:zoneId/dns-record/:dnsRecordId/edit',
+            name: 'zone.dns-record.edit',
+            component: ZoneDnsRecordEdit,
+            beforeEnter: AUTHED_GUARDS,
+        },
+
+        {
             path: '/webui/zone',
             name: 'zone',
             component: Zone,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/zone/:zoneId',
+            name: 'zone.show',
+            component: ZoneShow,
             beforeEnter: AUTHED_GUARDS,
         },
         {

@@ -19,7 +19,7 @@ async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
-    token: TokenPayload = Depends(ScopedTo("dns-request:list")),
+    token: TokenPayload = Depends(ScopedTo("dns-server:list")),
     search: str = Query(None),
 ):
     pg, items = (
@@ -34,7 +34,7 @@ async def index(
 async def store(
     form: DnsServerCreateForm,
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
-    token: TokenPayload = Depends(ScopedTo("dns-request:create")),
+    token: TokenPayload = Depends(ScopedTo("dns-server:create")),
 ):
     if dns_server_repo.exists(name=form.name.lower()):
         abort(422, "Invalid Name")
@@ -51,7 +51,7 @@ async def store(
 async def show(
     dns_server: str,
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
-    token: TokenPayload = Depends(ScopedTo("zone:show")),
+    token: TokenPayload = Depends(ScopedTo("dns-server:show")),
 ):
 
     dns_server_id_label = dns_server_repo.label("id")
@@ -77,7 +77,7 @@ async def update(
     dns_server: str,
     form: DnsServerCreateForm,
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
-    token: TokenPayload = Depends(ScopedTo("zone:list")),
+    token: TokenPayload = Depends(ScopedTo("dns-server:update")),
 ):
 
     data = only(dict(form), ["name"])

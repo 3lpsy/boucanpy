@@ -16,16 +16,20 @@ class DnsServerService {
                 .then((response: any) => {
                     let data = response.data as DnsServersResponse;
                     resolve(data);
-                });
+                })
+                .catch((e) => reject(e));
         });
     }
 
     createDnsServer(form: DnsServerCreateForm): Promise<DnsServerResponse> {
         return new Promise((resolve, reject) => {
-            api.http.post('/dns-server', form).then((response: any) => {
-                let data = response.data as DnsServerResponse;
-                resolve(data);
-            });
+            api.http
+                .post('/dns-server', form)
+                .then((response: any) => {
+                    let data = response.data as DnsServerResponse;
+                    resolve(data);
+                })
+                .catch((e) => reject(e));
         });
     }
 
@@ -57,7 +61,8 @@ class DnsServerService {
                 .then((response: any) => {
                     let data = response.data as DnsServerResponse;
                     resolve(data);
-                });
+                })
+                .catch((e) => reject(e));
         });
     }
 }

@@ -132,12 +132,16 @@ TODO:
 - [x] Create DNS Server Edit Form
 - [x] Fix API Tokens Page (validation, etc)
 - [x] Create DNS Record Repo, Factory, Seed Data, etc
+- [x] Create DNS Server View Page
+- [x] Create DNS Zone page with Record Table
+- [x] Create DNS Create Record Form
+- [x] Create DNS Edit Record Form
+- [x] Validate DNS Records in create and edit forms
 
-- [ ] Create DNS Record Page
-- [ ] Create DNS Create Record Form
-- [ ] Create DNS Edit Record Form
 - [ ] Change DNS Server to Pull Records from API
-- [ ] Perform Validation on the Front End for other prages
+- [ ] Allow user to seed from yaml
+
+- [ ] Perform Validation on the Front End for other pages
 - [ ] Perform Better Validation on the Backend
 - [ ] Handle Errors on the Front End
 - [ ] Fix WebSockets

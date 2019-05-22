@@ -114,6 +114,8 @@ class ApiServer(BaseCommand):
         elif self.get_workers():
             kwargs["workers"] = self.get_workers()
 
+        if self.option("debug", None):
+            kwargs["debug"] = True
         return kwargs
 
     def get_reload(self):

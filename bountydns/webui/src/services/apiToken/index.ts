@@ -49,7 +49,8 @@ class ApiTokenService {
                 .then((response: any) => {
                     let responseData = response.data as SensitiveApiTokenResponse;
                     resolve(responseData);
-                });
+                })
+                .catch((e) => reject(e));
         });
     }
 

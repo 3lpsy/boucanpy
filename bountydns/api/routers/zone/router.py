@@ -27,9 +27,9 @@ async def index(
     token: TokenPayload = Depends(ScopedTo("zone:list")),
     includes: List[str] = Query(None),
 ):
-    includes = only(includes, ["dns_server"])
+    includes = only(includes, ["dns_server", "dns_records"], values=True)
     pg, items = (
-        zone_repo.loads("dns_server")
+        zone_repo.loads(includes)
         .strict()  # TODO: handle eagerloading when including
         .sort(sort_qs)
         .paginate(pagination)
@@ -66,7 +66,9 @@ async def show(
     token: TokenPayload = Depends(ScopedTo("zone:update")),
     includes: List[str] = Query(None),
 ):
-    zone = zone_repo.loads("dns_server").get_or_fail(zone_id).includes(includes).data()
+    includes = only(includes, ["dns_server", "dns_records"], values=True)
+
+    zone = zone_repo.loads(includes).get_or_fail(zone_id).includes(includes).data()
     return ZoneResponse(zone=zone)
 
 
@@ -89,7 +91,7 @@ async def update(
             data["dns_server"] = dns_server
 
     zone = (
-        zone_repo.loads("dns_server")
+        zone_repo.loads(includes)
         .get_or_fail(zone_id)
         .update(data)
         .includes(includes)
@@ -110,7 +112,7 @@ async def activate(
     return ZoneResponse(zone=zone)
 
 
-@router.delete("/zone/{zone_id}", response_model=BaseResponse)
+@router.delete("/zone/{zone_id}", name="zone.destroy", response_model=BaseResponse)
 async def destroy(
     zone_id: int,
     zone_repo: ZoneRepo = Depends(ZoneRepo),

@@ -36,17 +36,11 @@ export default class ZoneEdit extends Vue {
         }
     }
 
-    loadZone() {
-        if (!this.zoneId || this.zoneId == 0) {
-            this.$router.push({ name: 'home' });
-        }
-    }
-
     mounted() {
         if (!this.zoneId) {
             this.$router.push({ name: 'home' });
         }
-        this.loadZone();
+        this.isLoaded = true;
     }
 }
 </script>

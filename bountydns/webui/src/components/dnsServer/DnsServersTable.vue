@@ -6,16 +6,24 @@
             hover
             :items="items"
             :fields="fields"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
+            :sort-by.sync="query.sort_by"
+            :sort-desc="query.sort_dir == 'desc'"
             v-on:sort-changed="changeSort"
+            :busy="isLoading || !isLoaded"
         >
-            <template slot="edit" slot-scope="row">
-                <router-link
-                    :to="{ name: 'dns-server.edit', params: { dnsServerId: row.item.id } }"
-                    tag="button"
-                    class="btn btn-info btn-sm"
-                >Edit</router-link>
+            <template slot="actions" slot-scope="row">
+                <b-button-group>
+                    <router-link
+                        :to="{ name: 'dns-server.edit', params: { dnsServerId: row.item.id } }"
+                        tag="button"
+                        class="btn btn-info btn-sm"
+                    >Edit</router-link>
+                    <router-link
+                        :to="{ name: 'dns-server.show', params: { dnsServerId: row.item.id } }"
+                        tag="button"
+                        class="btn btn-info btn-sm"
+                    >View</router-link>
+                </b-button-group>
             </template>
         </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">
@@ -27,12 +35,13 @@
         </div>
 
         <b-pagination
-            v-if="currentPage > 0 && items.length > 0"
-            v-model="currentPage"
+            v-if="query.page > 0 && items.length > 0"
+            v-model="query.page"
             :total-rows="total"
-            :per-page="perPage"
+            :per-page="query.per_page"
             aria-controls="my-table"
             @change="changePage"
+            style="margin-top:10px;"
         ></b-pagination>
     </div>
 </template>
@@ -45,6 +54,7 @@ import DnsServerMixin from '@/mixins/dnsServer';
 import DataTableMixin from '@/mixins/dataTable';
 import dnsServer from '@/services/dnsServer';
 import bus from '@/bus';
+import { GeneralQS } from '@/queries';
 
 // TODO: move to vuex / persistent data
 @Component
@@ -53,6 +63,10 @@ export default class DnsServersTable extends mixins(
     DnsServerMixin,
     DataTableMixin,
 ) {
+    items = [];
+    query = new GeneralQS();
+    isLoading = false;
+    isLoaded = false;
     fields = [
         {
             key: 'id',
@@ -65,26 +79,35 @@ export default class DnsServersTable extends mixins(
             sortable: true,
         },
         {
-            key: 'edit',
-            label: 'Edit',
+            key: 'actions',
+            label: 'Actions',
         },
     ];
 
+    changeSort(sort) {
+        this.query.sort_by = sort.sortBy;
+        if (sort.sortDesc) {
+            this.query.sort_dir = 'desc';
+        } else {
+            this.query.sort_dir = 'asc';
+        }
+        this.loadData();
+    }
+
     loadData() {
-        return dnsServer
-            .getDnsServers(
-                this.currentPage || 1,
-                this.perPage,
-                this.sortBy,
-                this.sortDesc ? 'desc' : 'asc',
-            )
-            .then((res) => {
-                this.currentPage = res.pagination.page;
-                this.perPage = res.pagination.per_page;
-                this.total = res.pagination.total;
-                this.items = res.dns_servers;
-                this.isLoaded = true;
-            });
+        this.isLoading = true;
+        return dnsServer.getDnsServers(this.query).then((res) => {
+            let query = new GeneralQS();
+            query.page = res.pagination.page;
+            query.per_page = res.pagination.per_page;
+            query.sort_by = this.query.sort_by;
+            query.sort_dir = this.query.sort_dir;
+            this.query = query;
+            this.total = res.pagination.total;
+            this.items = res.dns_servers;
+            this.isLoaded = true;
+            this.isLoading = false;
+        });
     }
 
     freshLoad() {

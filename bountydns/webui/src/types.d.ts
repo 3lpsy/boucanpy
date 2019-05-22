@@ -138,6 +138,36 @@ export interface DnsServersResponse {
     pagination?: object;
 }
 
+export interface DnsRecordForZoneCreateForm {
+    record: string;
+    sort: number;
+}
+
+export interface DnsRecordCreateForm {
+    record: string;
+    sort: number;
+    zone_id: number;
+}
+
+export interface DnsRecord {
+    id: number;
+    record: string;
+    sort: number;
+    zone_id: number;
+    zone?: Zone;
+}
+
+export interface DnsRecordResponse {
+    dns_record: DnsRecord;
+    messages?: Message[];
+}
+
+export interface DnsRecordsResponse {
+    dns_records: DnsRecord[];
+    messages?: Message[];
+    pagination?: object;
+}
+
 export interface Token {
     sub: string;
     exp: string;

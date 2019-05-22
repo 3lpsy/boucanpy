@@ -3,8 +3,9 @@ from pydantic import BaseModel
 from bountydns.core.entities.zone import ZoneData
 
 
-class DnsRecord(BaseModel):
+class DnsRecordData(BaseModel):
     id: int
     record: str
+    sort: int
     zone_id: int
     zone: Optional[ZoneData]

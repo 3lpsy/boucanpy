@@ -28,11 +28,9 @@ async def login(
     if user.mfa_secret:  # mfa is enabled
         scopes = "profile mfa_required"
     elif user.is_superuser:
-        scopes = (
-            "profile super zone user dns-request api-token refresh"
-        )  # grant access to super routes
+        scopes = "profile super zone user dns-request api-token refresh dns-record dns-server"  # grant access to super routes
     else:
-        scopes = "profile zone user:list dns-request api-token:list api-token:create api-token:destroy refresh"
+        scopes = "profile zone user:list dns-request api-token:list api-token:create api-token:destroy refresh dns-record:list dns-record:show dns-server:list dns-server:show"
     logger.warning(f"creating token with scopes {scopes}")
     token = create_bearer_token(data={"sub": user.id, "scopes": scopes})
     data = {"token_type": "bearer", "access_token": str(token.decode())}

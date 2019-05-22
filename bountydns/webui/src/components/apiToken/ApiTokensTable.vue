@@ -7,7 +7,7 @@
             :items="items"
             :fields="fields"
             :sort-by.sync="query.sort_by"
-            :sort-desc.sync="query.sort_dir == 'desc'"
+            :sort-desc="query.sort_dir == 'desc'"
             v-on:sort-changed="changeSort"
             :busy="isLoading || !isLoaded"
         >
@@ -204,14 +204,14 @@ export default class ApiTokensTable extends mixins(
             });
     }
 
-    freshLoad() {
+    boot() {
         this.loadData();
     }
 
     mounted() {
-        this.freshLoad();
+        this.boot();
         bus.$on('API_TOKEN_ADDED', (payload) => {
-            this.freshLoad();
+            this.boot();
         });
     }
 }
