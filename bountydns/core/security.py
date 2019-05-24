@@ -13,8 +13,8 @@ from bountydns.core.black_listed_token import BlackListedTokenRepo
 from bountydns.db.models.user import User
 
 DEFAULT_TOKEN_URL = "/api/v1/auth/token"
-oauth2 = OAuth2PasswordBearer(tokenUrl=DEFAULT_TOKEN_URL)
 
+oauth2 = OAuth2PasswordBearer(tokenUrl=DEFAULT_TOKEN_URL)
 
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

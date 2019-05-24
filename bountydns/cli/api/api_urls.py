@@ -12,8 +12,7 @@ class ApiUrls(BaseCommand):
         return parser
 
     async def run(self):
-        load_env("api")
-        load_env("api")
+        self.load_env("api")
         from bountydns.api.main import api
 
         for route in api.routes:

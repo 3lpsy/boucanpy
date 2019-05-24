@@ -38,5 +38,5 @@ def extact_commands(parent_dir, parent_mod):
     return _commands
 
 
-for c in extact_commands(cli_dir("commands"), "bountydns.cli.commands"):
+for c in extact_commands(cli_dir(), "bountydns.cli"):
     commands.append(c)

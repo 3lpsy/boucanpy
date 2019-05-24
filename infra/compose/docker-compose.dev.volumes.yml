@@ -1,4 +1,4 @@
-version: '3.3'
+version: "3.3"
 services:
   bountydns:
     volumes:
@@ -12,5 +12,5 @@ services:
       - ./../../requirements.txt:/bountydns/requirements.tx
   proxy:
     volumes:
-      - ./../../bountydns/webui/dist:/var/www/app/webui
-      - ./../../bountydns/landing:/var/www/app/landing
+      - ./../../webui/dist:/var/www/app/webui
+      - ./../../landing:/var/www/app/landing

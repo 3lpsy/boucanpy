@@ -1,7 +1,7 @@
 import uvicorn
 from os import environ
 from bountydns.core import logger, set_log_level
-from bountydns.core.utils import project_dir, load_env
+from bountydns.core.utils import project_dir
 from bountydns.core.security import hash_password
 from bountydns.cli.commands.base import BaseCommand
 from bountydns.cli.commands.db_setup import DbSetup
