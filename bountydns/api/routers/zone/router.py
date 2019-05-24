@@ -3,9 +3,9 @@ from typing import List
 from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.core import logger, only
 
-from bountydns.core.entities import SortQS, PaginationQS, BaseResponse
-from bountydns.core.entities.dns_server import DnsServerRepo
-from bountydns.core.entities.zone import (
+from bountydns.core import SortQS, PaginationQS, BaseResponse
+from bountydns.core.dns_server import DnsServerRepo
+from bountydns.core.zone import (
     ZoneRepo,
     ZonesResponse,
     ZoneResponse,

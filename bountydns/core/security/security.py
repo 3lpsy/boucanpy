@@ -6,9 +6,9 @@ from fastapi import HTTPException, Security, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from bountydns.core import logger
-from bountydns.core.entities.token import TokenPayload
-from bountydns.core.entities.user import UserRepo
-from bountydns.core.entities.black_listed_token import BlackListedTokenRepo
+from bountydns.core.token import TokenPayload
+from bountydns.core.user import UserRepo
+from bountydns.core.black_listed_token import BlackListedTokenRepo
 
 from bountydns.db.models.user import User
 

@@ -17,7 +17,7 @@ services:
     image: 3lpsy/bountydns:latest
     networks:
       bountydnspub:
-    command: dns-server -l 0.0.0.0 -p 53
+    command: dns-server -l 0.0.0.0 -p 53 --debug
     env_file:
       - ./../../.env/dns.env
     restart: on-failure:2
@@ -27,8 +27,8 @@ services:
       - proxy
   webui:
     build:
-      context: ./../../bountydns
-      dockerfile: ./../infra/docker/webui.dockerfile
+      context: ./../../
+      dockerfile: ./infra/docker/webui.dockerfile
     image: 3lpsy/bountydns-webui:latest
     networks:
       bountydnspub:

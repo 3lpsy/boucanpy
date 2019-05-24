@@ -150,9 +150,9 @@ class ApiServer(BaseCommand):
         return False
 
     def seed_from_env(self):
-        from bountydns.core.entities.user import UserRepo
-        from bountydns.core.entities.zone import ZoneRepo
-        from bountydns.core.entities.dns_server import DnsServerRepo
+        from bountydns.core.user import UserRepo
+        from bountydns.core.zone import ZoneRepo
+        from bountydns.core.dns_server import DnsServerRepo
         from bountydns.db.session import _scoped_session
 
         session = _scoped_session

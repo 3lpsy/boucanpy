@@ -10,8 +10,8 @@ from bountydns.core.security import (
     token_has_required_scopes,
     current_user,
 )
-from bountydns.core.entities import TokenPayload
-from bountydns.core.entities.user import UserRepo
+from bountydns.core import TokenPayload
+from bountydns.core.user import UserRepo
 
 from bountydns.db import session
 from bountydns.broadcast import make_redis, make_broadcast_url, make_subscriber

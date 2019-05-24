@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from bountydns.core import logger
-from bountydns.core.entities.auth import PasswordAuthResponse
+from bountydns.core.auth import PasswordAuthResponse
 from bountydns.core.security import verify_password, create_bearer_token
 from bountydns.db.models.user import User
 from bountydns.db.session import session

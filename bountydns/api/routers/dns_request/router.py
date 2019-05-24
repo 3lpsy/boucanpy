@@ -2,11 +2,11 @@ from sqlalchemy import literal
 from fastapi import APIRouter, Depends
 from bountydns.core import logger, abort, only
 from bountydns.core.security import ScopedTo, TokenPayload
-from bountydns.core.entities import SortQS, PaginationQS
-from bountydns.core.entities.dns_server import DnsServerRepo
-from bountydns.core.entities.zone import ZoneRepo
+from bountydns.core import SortQS, PaginationQS
+from bountydns.core.dns_server import DnsServerRepo
+from bountydns.core.zone import ZoneRepo
 
-from bountydns.core.entities.dns_request import (
+from bountydns.core.dns_request import (
     DnsRequestRepo,
     DnsRequestsResponse,
     DnsRequestResponse,

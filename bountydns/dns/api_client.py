@@ -5,7 +5,7 @@ from dnslib import QTYPE, RCODE, RR
 
 from bountydns.core import logger
 
-from bountydns.core.entities.zone.data import ZoneData
+from bountydns.core.zone.data import ZoneData
 
 
 class ApiClient:

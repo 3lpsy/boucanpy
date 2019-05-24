@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from bountydns.core.security import ScopedTo, hash_password, TokenPayload
-from bountydns.core.entities import PaginationQS, SortQS
-from bountydns.core.entities.user import (
+from bountydns.core import PaginationQS, SortQS
+from bountydns.core.user import (
     UserRepo,
     UsersResponse,
     UserResponse,

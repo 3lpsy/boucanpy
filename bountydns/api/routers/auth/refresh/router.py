@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from bountydns.core.entities.auth import PasswordAuthResponse
+from bountydns.core.auth import PasswordAuthResponse
 from bountydns.db.models.user import User
 
 from bountydns.core.security import (

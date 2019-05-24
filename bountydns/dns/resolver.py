@@ -21,17 +21,22 @@ class Resolver(BaseResolver):
         zones = self.api_client.get_zones()
         records = []
         for zone in zones:
-            logger.info(f"loading zone: {zone.domain} ({zone.id})")
+            logger.info(f"loading zone: {zone.domain}/{zone.ip} ({zone.id})")
             dns_records = zone.dns_records or []
             # if the zone has no records, create some default ones
             if not dns_records:
                 logger.warning(
-                    f"zone has not dns_records. loading default: {zone.id} ({zone.domain})"
+                    f"zone has no dns_records. loading defaults: {zone.domain}/{zone.ip} ({zone.id})"
                 )
                 rrs = RR.fromZone(
                     ZONE_TEMPLATE.format(domain_name=zone.domain, domain_ip=zone.ip)
                 )
-                zone_records = zone_records + [Record(zone, rr) for rr in rrs]
+                zone_records = [Record(zone, rr) for rr in rrs]
+                for zr in zone_records:
+                    # TODO: make this clean on output
+                    rrstr = str(dedent(str(zr.rr)))
+
+                    logger.debug(f"loading record: {rrstr}")
             else:
                 # loop over each dns_record of the zone and convert it to RR record
                 dns_records = sorted(zone.dns_records, key=lambda x: x.sort)
@@ -39,7 +44,11 @@ class Resolver(BaseResolver):
                 for dns_record in dns_records:
                     try:
                         rrs = zone_records + RR.fromZone(dns_record.record)
-                        zone_records = zone_records + [Record(zone, rr) for rr in rrs]
+                        _zone_records = [Record(zone, rr) for rr in rrs]
+                        for zr in _zone_records:
+                            rrstr = str(dedent(str(zr.rr)))
+                            logger.debug(f"loading record: {rrstr}")
+                        zone_records = zone_records + _zone_records
                     except Exception as e:
                         raise RuntimeError(
                             f'Error processing line ({e.__class__.__name__}: {e}) "{dns_record.id}:{dns_record.record}"'

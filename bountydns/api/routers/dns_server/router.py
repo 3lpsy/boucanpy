@@ -2,8 +2,8 @@ from typing import List
 from fastapi import APIRouter, Depends, Query
 from bountydns.core import logger, only, abort
 from bountydns.core.security import ScopedTo, TokenPayload
-from bountydns.core.entities import PaginationQS, SortQS
-from bountydns.core.entities.dns_server import (
+from bountydns.core import PaginationQS, SortQS
+from bountydns.core.dns_server import (
     DnsServerRepo,
     DnsServersResponse,
     DnsServerResponse,

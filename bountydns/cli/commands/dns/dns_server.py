@@ -15,6 +15,8 @@ class DnsServer(BaseCommand):
     name = "dns-server"
     aliases = ["dns"]
     description = "run dns server"
+    add_log_level = True
+    add_debug = True
 
     @classmethod
     def parser(cls, parser):

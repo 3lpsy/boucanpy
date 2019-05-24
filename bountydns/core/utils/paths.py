@@ -19,6 +19,12 @@ def project_dir(path=None):
     return _ajoin(project_dir(), path)
 
 
+def root_dir(path=None):
+    if not path:
+        return _ajoin(project_dir(), "..")
+    return _ajoin(root_dir(), path)
+
+
 def cli_dir(path=None):
     if not path:
         return project_dir("cli")
@@ -45,13 +51,13 @@ def db_dir(path=None):
 
 def webui_dir(path=None):
     if not path:
-        return project_dir("webui")
+        return root_dir("webui")
     return _ajoin(webui_dir(), path)
 
 
 def landing_dir(path=None):
     if not path:
-        return project_dir("landing")
+        return root_dir("landing")
     return _ajoin(landing_dir(), path)
 
 
@@ -59,12 +65,6 @@ def test_dir(path=None):
     if not path:
         return project_dir("tests")
     return _ajoin(test_dir(), path)
-
-
-def root_dir(path=None):
-    if not path:
-        return _ajoin(project_dir(), "..")
-    return _ajoin(root_dir(), path)
 
 
 def env_dir(path=None):

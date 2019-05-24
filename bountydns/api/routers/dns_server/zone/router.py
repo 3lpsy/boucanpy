@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, Query
 from bountydns.core import only
 from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.db.models.zone import Zone
-from bountydns.core.entities import SortQS, PaginationQS, BaseResponse
-from bountydns.core.entities.zone import (
+from bountydns.core import SortQS, PaginationQS, BaseResponse
+from bountydns.core.zone import (
     ZoneRepo,
     ZonesResponse,
     ZoneResponse,

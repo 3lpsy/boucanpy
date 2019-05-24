@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 import uuid
 from bountydns.core.utils import load_env
 from bountydns.core.security import create_bearer_token
-from bountydns.core.entities.api_token import ApiTokenRepo
+from bountydns.core.api_token import ApiTokenRepo
 from bountydns.cli.commands.base import BaseCommand
 from bountydns.db.models.api_token import ApiToken
 

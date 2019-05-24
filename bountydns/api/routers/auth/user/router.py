@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from bountydns.core.security import ScopedTo, current_user, TokenPayload
 from bountydns.db.models.user import User
-from bountydns.core.entities import PaginationQS
-from bountydns.core.entities.user import UserRepo, UsersResponse, UserCreateForm
+from bountydns.core import PaginationQS
+from bountydns.core.user import UserRepo, UserResponse, UserCreateForm
 
 
 router = APIRouter()
