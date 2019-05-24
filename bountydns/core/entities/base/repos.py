@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session, joinedload, raiseload
 from bountydns.core import logger, abort
 from bountydns.db.session import session
 from bountydns.db.pagination import Pagination
-from bountydns.core.entities.pagination.responses import PaginationData
+from bountydns.core.entities.pagination.data import PaginationData
 
 
 class BaseRepo:

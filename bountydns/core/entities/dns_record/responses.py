@@ -10,4 +10,3 @@ class DnsRecordResponse(BaseResponse):
 
 class DnsRecordsResponse(BaseResponse):
     dns_records: List[DnsRecordData]
-

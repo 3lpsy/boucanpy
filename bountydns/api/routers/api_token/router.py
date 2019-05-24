@@ -10,18 +10,17 @@ from bountydns.core.security import (
     current_user,
 )
 from bountydns.db.models.user import User
-from bountydns.core.entities import (
-    SortQS,
-    PaginationQS,
+from bountydns.core.entities.api_token import (
     ApiTokensResponse,
     ApiTokenResponse,
     ApiTokenRepo,
-    DnsServerRepo,
     ApiTokenCreateForm,
     SensitiveApiTokenResponse,
     SensitiveApiTokenData,
-    BaseResponse,
 )
+from bountydns.core.entities.dns_server import DnsServerRepo
+
+from bountydns.core.entities import SortQS, PaginationQS, BaseResponse
 
 
 router = APIRouter()

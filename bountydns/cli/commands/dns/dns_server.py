@@ -33,15 +33,14 @@ class DnsServer(BaseCommand):
             "-l", "--listen", action="store", default="127.0.0.1", help="bind address"
         )
         parser.add_argument(
-            "--no-sync-api-token",
-            action="store_true",
-            help="sync api token back to database",
+            "--no-sync", action="store_true", help="sync api token back to database"
         )
         return parser
 
     async def run(self):
         port = self.get_port()
         listen = self.get_listen()
+
         # TODO: thread issues?
         api_client = ApiClient(self.get_api_url(), self.get_api_token())
 
@@ -49,10 +48,10 @@ class DnsServer(BaseCommand):
             logger.critical("could not connect to api. quitting")
             self.exit(1)
 
-        if self.option("no_sync_api_token"):
+        if self.option("no_sync"):
             logger.info("skipping syncing api token")
         else:
-            api_client.sync_api_token()
+            api_client.sync()
 
         resolver = Resolver(api_client)
         udp_server = DNSServer(

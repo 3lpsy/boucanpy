@@ -1,4 +1,4 @@
 from .repos import *
-from .responses import *
-from .data import *
-from .forms import *
+from .responses import DnsServerResponse, DnsServersResponse
+from .data import DnsServerData
+from .forms import DnsServerCreateForm

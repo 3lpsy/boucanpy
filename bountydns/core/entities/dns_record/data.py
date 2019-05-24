@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
-from bountydns.core.entities.zone import ZoneData
+
+from bountydns.core.entities.zone.data import ZoneData
 
 
 class DnsRecordData(BaseModel):

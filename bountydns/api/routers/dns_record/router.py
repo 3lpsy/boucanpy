@@ -5,15 +5,14 @@ from starlette.requests import Request
 from bountydns.core import only, logger
 from bountydns.core.security import ScopedTo, TokenPayload
 
-from bountydns.core.entities import (
+from bountydns.core.entities.dns_record import (
     DnsRecordsResponse,
     DnsRecordResponse,
     DnsRecordRepo,
     DnsRecordForZoneCreateForm,
-    SortQS,
-    PaginationQS,
-    BaseResponse,
 )
+
+from bountydns.core.entities import SortQS, PaginationQS, BaseResponse
 
 router = APIRouter()
 options = {"prefix": ""}

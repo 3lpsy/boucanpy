@@ -3,16 +3,14 @@ from typing import List
 from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.core import logger, only
 
-from bountydns.core.entities import (
-    SortQS,
-    PaginationQS,
-    DnsServerRepo,
+from bountydns.core.entities import SortQS, PaginationQS, BaseResponse
+from bountydns.core.entities.dns_server import DnsServerRepo
+from bountydns.core.entities.zone import (
     ZoneRepo,
     ZonesResponse,
     ZoneResponse,
     ZoneData,
     ZoneCreateForm,
-    BaseResponse,
 )
 
 router = APIRouter()
@@ -28,9 +26,10 @@ async def index(
     includes: List[str] = Query(None),
 ):
     includes = only(includes, ["dns_server", "dns_records"], values=True)
+
     pg, items = (
         zone_repo.loads(includes)
-        .strict()  # TODO: handle eagerloading when including
+        .strict()
         .sort(sort_qs)
         .paginate(pagination)
         .includes(includes)

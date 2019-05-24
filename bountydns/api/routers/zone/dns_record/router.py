@@ -5,16 +5,15 @@ from dnslib.dns import DNSError
 from fastapi import APIRouter, Depends, Query
 from bountydns.core import only
 from bountydns.core.security import ScopedTo, TokenPayload
+from bountydns.core.entities import SortQS, PaginationQS
 
-from bountydns.core.entities import (
+from bountydns.core.entities.dns_record import (
     DnsRecordsResponse,
     DnsRecordResponse,
     DnsRecordRepo,
     DnsRecordForZoneCreateForm,
-    ZoneRepo,
-    SortQS,
-    PaginationQS,
 )
+from bountydns.core.entities.zone import ZoneRepo
 
 router = APIRouter()
 options = {"prefix": "/zone/{zone_id}"}

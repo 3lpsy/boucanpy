@@ -1,9 +1,9 @@
+from typing import List
 from fastapi import APIRouter, Depends, Query
 from bountydns.core import logger, only, abort
 from bountydns.core.security import ScopedTo, TokenPayload
-from bountydns.core.entities import (
-    PaginationQS,
-    SortQS,
+from bountydns.core.entities import PaginationQS, SortQS
+from bountydns.core.entities.dns_server import (
     DnsServerRepo,
     DnsServersResponse,
     DnsServerResponse,
@@ -21,10 +21,15 @@ async def index(
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
     token: TokenPayload = Depends(ScopedTo("dns-server:list")),
     search: str = Query(None),
+    includes: List[str] = Query(None),
 ):
+    includes = only(includes, ["zones"], values=True)
+
     pg, items = (
-        dns_server_repo.search(search, searchable=["name", "id"])
+        dns_server_repo.loads(includes)
+        .search(search, searchable=["name", "id"])
         .paginate(pagination)
+        .includes(includes)
         .data()
     )
     return DnsServersResponse(pagination=pg, dns_servers=items)
@@ -52,7 +57,9 @@ async def show(
     dns_server: str,
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
     token: TokenPayload = Depends(ScopedTo("dns-server:show")),
+    includes: List[str] = Query(None),
 ):
+    includes = only(includes, ["zones"], values=True)
 
     dns_server_id_label = dns_server_repo.label("id")
 
@@ -62,7 +69,13 @@ async def show(
     except ValueError:
         label = dns_server_repo.label("name")
 
-    item = dns_server_repo.filter(label == dns_server).first_or_fail().data()
+    item = (
+        dns_server_repo.loads(includes)
+        .filter(label == dns_server)
+        .first_or_fail()
+        .includes(includes)
+        .data()
+    )
 
     return DnsServerResponse(dns_server=item)
 

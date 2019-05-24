@@ -1,15 +1,15 @@
+from typing import List
 from fastapi import APIRouter, Depends, Query
+from bountydns.core import only
 from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.db.models.zone import Zone
-from bountydns.core.entities import (
-    SortQS,
-    PaginationQS,
+from bountydns.core.entities import SortQS, PaginationQS, BaseResponse
+from bountydns.core.entities.zone import (
     ZoneRepo,
     ZonesResponse,
     ZoneResponse,
     ZoneData,
     ZoneCreateForm,
-    BaseResponse,
 )
 
 router = APIRouter()
@@ -24,10 +24,14 @@ async def index(
     pagination: PaginationQS = Depends(PaginationQS),
     zone_repo: ZoneRepo = Depends(ZoneRepo),
     token: TokenPayload = Depends(ScopedTo("zone:list")),
+    includes: List[str] = Query(None),
 ):
+
+    includes = only(includes, ["zones"], values=True)
 
     # Support ability to either submit dns_server.name or dns_server.id as dns_server_id
     zone_dns_server_id_label = zone_repo.label("dns_server_id")
+
     try:
         dns_server = int(dns_server)
         label = zone_dns_server_id_label
@@ -36,9 +40,11 @@ async def index(
 
     pg, items = (
         zone_repo.search(search)
+        .loads(includes)
         .filter_or(label == dns_server, zone_dns_server_id_label.is_(None))
         .sort(sort_qs)
         .paginate(pagination)
+        .includes(includes)
         .data()
     )
     return ZonesResponse(pagination=pg, zones=items)

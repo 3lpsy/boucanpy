@@ -6,7 +6,10 @@ from fastapi import HTTPException, Security, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from bountydns.core import logger
-from bountydns.core.entities import TokenPayload, UserRepo, BlackListedTokenRepo
+from bountydns.core.entities.token import TokenPayload
+from bountydns.core.entities.user import UserRepo
+from bountydns.core.entities.black_listed_token import BlackListedTokenRepo
+
 from bountydns.db.models.user import User
 
 DEFAULT_TOKEN_URL = "/api/v1/auth/token"

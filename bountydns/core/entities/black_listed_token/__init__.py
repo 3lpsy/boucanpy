@@ -1,2 +1,2 @@
-from .repos import *
-from .data import *
+from .data import BlackListedTokenData
+from .repos import BlackListedTokenRepo

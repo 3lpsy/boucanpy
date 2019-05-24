@@ -149,8 +149,6 @@ TODO:
 - [ ] Add tests to API
 - [ ] Use vuex store for datatable data
 - [ ] Make relationsips sortable in repo
-- [ ] Add confirmation dialog when deactivating an api token
-
 - [ ] Create DNS Payloads Page
 - [ ] Create DNS Payloads Form
 
