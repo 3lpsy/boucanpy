@@ -3,6 +3,7 @@ import * as api from '@/services/api';
 import {
     DnsRecordsResponse,
     DnsRecordResponse,
+    DnsRecordsDigResponse,
     DnsRecordForZoneCreateForm,
     DnsRecordCreateForm,
 } from '@/types';
@@ -30,6 +31,18 @@ class DnsRecordService {
                 .get(`/zone/${zoneId}/dns-record`, { params: query })
                 .then((response: any) => {
                     let data = response.data as DnsRecordsResponse;
+                    resolve(data);
+                })
+                .catch((e) => reject(e));
+        });
+    }
+
+    getDnsRecordsDigForZone(zoneId: number): Promise<DnsRecordsDigResponse> {
+        return new Promise((resolve, reject) => {
+            api.http
+                .get(`/zone/${zoneId}/dns-record/dig`)
+                .then((response: any) => {
+                    let data = response.data as DnsRecordsDigResponse;
                     resolve(data);
                 })
                 .catch((e) => reject(e));

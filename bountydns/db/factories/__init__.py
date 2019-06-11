@@ -17,10 +17,10 @@ for directory_name, sub_directories, files in walk(factories_dir):
             if class_name not in factories.keys():
                 factories[class_name] = model
 
-aliases = [{f.alias: f} for f in factories if f.alias]
+# aliases = [{f.alias: f} for f in factories if f.alias]
 
 
 def factory(key):
-    if key in aliases:
-        return aliases[key]
+    # if key in aliases:
+    #     return aliases[key]
     return factories[key]

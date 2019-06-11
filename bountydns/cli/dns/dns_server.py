@@ -7,7 +7,7 @@ from bountydns.dns.resolver import Resolver
 from bountydns.dns.logger import DNSLogger
 from bountydns.dns.handler import DNSHandler
 
-from bountydns.cli.commands.base import BaseCommand
+from bountydns.cli.base import BaseCommand
 from bountydns.dns.api_client import ApiClient
 
 

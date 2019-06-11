@@ -1,11 +1,11 @@
 from pathlib import Path
 from bountydns.core import logger, load_env
-from bountydns.cli.commands.base import BaseCommand
+from bountydns.cli.base import BaseCommand
 
-from bountydns.cli.commands.alembic import AlembicInit
-from bountydns.cli.commands.alembic import AlembicUpgrade
-from bountydns.cli.commands.alembic import AlembicMigrate
-from bountydns.cli.commands.db_seed import DbSeed
+from bountydns.cli.alembic import AlembicInit
+from bountydns.cli.alembic import AlembicUpgrade
+from bountydns.cli.alembic import AlembicMigrate
+from bountydns.cli.db_seed import DbSeed
 
 
 class DbSetup(BaseCommand):

@@ -50,17 +50,15 @@ async def store(
 ):
 
     dns_server_id = (
-        dns_server_repo.first_or_fail(name=form.dns_server_name.lower(), or_fail=True)
-        .results()
-        .id
+        dns_server_repo.first_or_fail(name=form.dns_server_name.lower()).results().id
     )
 
-    zone_id = (
+    zone = (
         zone_repo.filter(literal(form.name.lower()).contains(zone_repo.label("domain")))
-        .first_or_fail()
+        .first()
         .results()
-        .id
     )
+    zone_id = zone.id if zone else None
 
     data = only(
         dict(form), ["name", "source_address", "source_port", "type", "protocol"]

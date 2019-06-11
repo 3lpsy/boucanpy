@@ -1,5 +1,5 @@
 from bountydns.core.utils import load_env
-from bountydns.cli.commands.base import BaseCommand
+from bountydns.cli.base import BaseCommand
 from bountydns.db.models.api_token import ApiToken
 
 

@@ -49,23 +49,27 @@ class ApiClient:
     def url(self, url):
         return self.api_url + "/api/v1" + url
 
-    def get(self, url, params=None, fail=True):
+    def get(self, url: str, params=None, fail=True):
         params = params or {}
         headers = self.get_default_headers()
         res = requests.get(self.url(url), headers=headers)
         if fail:
             if res.status_code != 200:
-                logger.critical(str(res.json()))
+                logger.critical(
+                    f"Error getting API {self.url(url)}: " + str(res.json())
+                )
             res.raise_for_status()
         return res.json()
 
-    def post(self, url, data=None, fail=True):
+    def post(self, url: str, data=None, fail=True):
         data = data or {}
         headers = self.get_default_headers()
         res = requests.post(self.url(url), json=data, headers=headers)
         if fail:
             if res.status_code != 200:
-                logger.critical(str(res.json()))
+                logger.critical(
+                    f"Error posting API {self.url(url)}: " + str(res.json())
+                )
             res.raise_for_status()
         return res.json()
 

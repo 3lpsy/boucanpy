@@ -162,6 +162,12 @@ export interface DnsRecordResponse {
     messages?: Message[];
 }
 
+export interface DnsRecordsDigResponse {
+    dig: string;
+    messages?: Message[];
+    pagination?: object;
+}
+
 export interface DnsRecordsResponse {
     dns_records: DnsRecord[];
     messages?: Message[];

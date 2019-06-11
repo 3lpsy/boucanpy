@@ -10,7 +10,9 @@ class DnsRequest(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     # TODO: add foreign key and relationship and handl cascades, etc
-    zone_id = Column(ForeignKey("zones.id", ondelete="CASCADE"), index=True)
+    zone_id = Column(
+        ForeignKey("zones.id", ondelete="CASCADE"), index=True, nullable=True
+    )
     zone = relationship(
         "bountydns.db.models.zone.Zone",
         foreign_keys="bountydns.db.models.dns_request.DnsRequest.zone_id",

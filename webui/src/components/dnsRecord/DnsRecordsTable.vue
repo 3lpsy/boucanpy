@@ -12,13 +12,16 @@
             :busy="isLoading || !isLoaded"
         >
             <template slot="actions" slot-scope="row">
-                <b-button size="sm" @click="destroyRecord(row.item)">Delete</b-button>
+                <b-button size="sm" @click="destroyRecord(row.item)"
+                    >Delete</b-button
+                >
                 <b-button-group>
                     <router-link
                         :to="getEditLink(row.item)"
                         tag="button"
                         class="btn btn-info btn-sm"
-                    >Edit</router-link>
+                        >Edit</router-link
+                    >
                 </b-button-group>
             </template>
         </b-table>

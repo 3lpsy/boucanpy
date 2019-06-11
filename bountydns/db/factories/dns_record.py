@@ -17,8 +17,6 @@ def random_sort():
 
 
 class DnsRecordFactory(BaseFactory):
-    alias = "record"
-
     class Meta:
         model = DnsRecord
 

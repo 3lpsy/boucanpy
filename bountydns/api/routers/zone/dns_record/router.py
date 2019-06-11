@@ -1,17 +1,20 @@
 from typing import List
 from textwrap import dedent
-from dnslib import RR
+from dnslib import RR, DNSRecord
 from dnslib.dns import DNSError
 from fastapi import APIRouter, Depends, Query
 from bountydns.core import only
 from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.core import SortQS, PaginationQS
 
+from bountydns.dns.parser import RecordParser
+
 from bountydns.core.dns_record import (
     DnsRecordsResponse,
     DnsRecordResponse,
     DnsRecordRepo,
     DnsRecordForZoneCreateForm,
+    DnsRecordsDigResponse,
 )
 from bountydns.core.zone import ZoneRepo
 
@@ -46,8 +49,27 @@ async def index(
     return DnsRecordsResponse(pagination=pg, dns_records=items)
 
 
+@router.get(
+    "/dns-record/dig",
+    name="zone.dns_record.dig.index",
+    response_model=DnsRecordsDigResponse,
+)
+async def index(
+    zone_id: int,
+    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    token: TokenPayload = Depends(ScopedTo("dns-record:list")),
+):
+    zone = zone_repo.includes("dns_records").first_or_fail(id=zone_id).results()
+    print(zone)
+    print(zone.dns_records)
+    # TODO: fix method
+    rrs = RecordParser.from_zone(zone).get_rrs()
+    dig = DNSRecord(rr=rrs).toZone()
+    return DnsRecordsDigResponse(dig=dig)
+
+
 @router.post(
-    "/dns-record", name="zone.dns_record.store", response_model=DnsRecordResponse
+    "/dns-record", name="zone.dns_record.store", response_model=DnsRecordsDigResponse
 )
 async def store(
     zone_id: int,

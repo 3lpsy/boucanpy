@@ -12,6 +12,12 @@ class Record:
         self.name = DNSLabel(rr.rname)
         self.data = rr.rdata
 
+    @classmethod
+    def make(cls, zone, rr):
+        if not getattr(rr, "rtype", None):
+            logger.critical(f"No rtype found for rr: {str(rr)} - {str(rr.__class__)}")
+        return cls(zone, rr)
+
     # def match(self, q):
     #     matched = False
     #     logger.debug(

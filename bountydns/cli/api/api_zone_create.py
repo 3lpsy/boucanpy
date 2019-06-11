@@ -1,5 +1,5 @@
 import requests
-from bountydns.cli.commands.base import BaseCommand
+from bountydns.cli.base import BaseCommand
 
 
 class ApiZoneCreate(BaseCommand):

@@ -12,7 +12,8 @@ async def call_command(command, args):
 
 
 if __name__ == "__main__":
-    from bountydns.cli import make_parser, commands
+    from bountydns.cli import commands
+    from bountydns.cli.parser import make_parser
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)

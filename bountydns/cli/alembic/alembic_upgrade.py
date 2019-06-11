@@ -3,7 +3,7 @@ from bountydns.core.utils import db_dir, load_env
 from bountydns.db.session import session, db_register
 from bountydns.db.utils import make_db_url
 from bountydns.db.migrate.upgrade import upgrade
-from bountydns.cli.commands.base import BaseCommand
+from bountydns.cli.base import BaseCommand
 
 
 class AlembicUpgrade(BaseCommand):

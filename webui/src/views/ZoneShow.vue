@@ -9,40 +9,68 @@
             <div class="row" v-if="zone && zone.id">
                 <div class="col-md-12 col-xs-12">
                     <strong>Domain:</strong>
-                    {{zone.domain}}
+                    {{ zone.domain }}
                 </div>
                 <div class="col-md-12 col-xs-12">
                     <strong>IP (Resolves To):</strong>
-                    {{zone.ip}}
+                    {{ zone.ip }}
                 </div>
             </div>
-            <br>
-            <br>
+            <br />
+            <br />
 
             <div class="row" style="margin-bottom: 10px;" v-if="isLoaded">
                 <div class="col-md-9 col-xs-12">
-                    <h4>DNS Records</h4>
+                    <h4>
+                        DNS Records
+                        <small style="font-size: .6em">
+                            <a
+                                v-on:click.stop.prevent="showDigModal"
+                                :href="$route.fullPath"
+                                >(View Records in Dig Format)
+                            </a>
+                        </small>
+                    </h4>
                 </div>
                 <div class="col-md-3 col-xs-12">
                     <router-link
                         tag="button"
                         class="btn pull-right btn-outline-primary"
-                        :to="{name: 'zone.dns-record.create', params: {zoneId}}"
-                    >Create DNS Record</router-link>
+                        :to="{
+                            name: 'zone.dns-record.create',
+                            params: { zoneId },
+                        }"
+                        >Create DNS Record</router-link
+                    >
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12 col-xs-12">
-                    <dns-records-table :zone-id="zoneId"></dns-records-table>
+                    <dns-records-table :zone-id="zoneId"> </dns-records-table>
                 </div>
             </div>
         </b-container>
+        <b-modal
+            v-model="digModalShow"
+            id="show-dig-data"
+            title="Dig Records"
+            v-if="dig"
+            size="lg"
+            ok-only
+        >
+            <div class="col-xs-12">
+                <span>
+                    <code style="white-space: pre-line"> {{ dig }} </code>
+                </span>
+            </div>
+        </b-modal>
     </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import zone from '@/services/zone';
+import dnsRecord from '@/services/dnsRecord';
 import DnsRecordsTable from '@/components/dnsRecord/DnsRecordsTable.vue';
 
 @Component({
@@ -56,6 +84,17 @@ export default class ZoneShow extends Vue {
         ip: '',
         is_active: false,
     };
+
+    digModalShow = false;
+    dig = '';
+
+    showDigModal(e: any) {
+        console.log('showingDigModal');
+        dnsRecord.getDnsRecordsDigForZone(this.zoneId).then((res) => {
+            this.dig = res.dig;
+            this.digModalShow = true;
+        });
+    }
 
     get zoneId() {
         if (!this.$route.params || !this.$route.params.zoneId) {

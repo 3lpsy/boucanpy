@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 04c1c884cf2e
+Revision ID: 2e35b1f5a38c
 Revises: 
-Create Date: 2019-05-16 22:52:52.376153
+Create Date: 2019-06-11 03:58:15.526029
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '04c1c884cf2e'
+revision = '2e35b1f5a38c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -70,7 +70,7 @@ def upgrade():
     sa.Column('scopes', sa.String(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('expires_at', sa.DateTime(), nullable=True),
-    sa.Column('dns_server_id', sa.Integer(), nullable=True),
+    sa.Column('dns_server_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['dns_server_id'], ['dns_servers.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -89,6 +89,18 @@ def upgrade():
     op.create_index(op.f('ix_zones_domain'), 'zones', ['domain'], unique=True)
     op.create_index(op.f('ix_zones_id'), 'zones', ['id'], unique=False)
     op.create_index(op.f('ix_zones_ip'), 'zones', ['ip'], unique=False)
+    op.create_table('dns_records',
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('record', sa.String(length=1024), nullable=True),
+    sa.Column('sort', sa.Integer(), nullable=True),
+    sa.Column('zone_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['zone_id'], ['zones.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_dns_records_id'), 'dns_records', ['id'], unique=False)
+    op.create_index(op.f('ix_dns_records_record'), 'dns_records', ['record'], unique=False)
+    op.create_index(op.f('ix_dns_records_zone_id'), 'dns_records', ['zone_id'], unique=False)
     op.create_table('dns_requests',
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
@@ -98,7 +110,7 @@ def upgrade():
     sa.Column('source_port', sa.Integer(), nullable=True),
     sa.Column('type', sa.String(), nullable=True),
     sa.Column('protocol', sa.String(), nullable=True),
-    sa.Column('dns_server_id', sa.Integer(), nullable=True),
+    sa.Column('dns_server_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['dns_server_id'], ['dns_servers.id'], ),
     sa.ForeignKeyConstraint(['zone_id'], ['zones.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
@@ -121,6 +133,10 @@ def downgrade():
     op.drop_index(op.f('ix_dns_requests_name'), table_name='dns_requests')
     op.drop_index(op.f('ix_dns_requests_id'), table_name='dns_requests')
     op.drop_table('dns_requests')
+    op.drop_index(op.f('ix_dns_records_zone_id'), table_name='dns_records')
+    op.drop_index(op.f('ix_dns_records_record'), table_name='dns_records')
+    op.drop_index(op.f('ix_dns_records_id'), table_name='dns_records')
+    op.drop_table('dns_records')
     op.drop_index(op.f('ix_zones_ip'), table_name='zones')
     op.drop_index(op.f('ix_zones_id'), table_name='zones')
     op.drop_index(op.f('ix_zones_domain'), table_name='zones')

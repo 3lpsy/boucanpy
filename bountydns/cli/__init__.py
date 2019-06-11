@@ -1,4 +1,3 @@
-from .parser import make_parser
 from os import walk
 from pathlib import Path
 from os.path import join, basename

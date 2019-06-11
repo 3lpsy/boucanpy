@@ -1,3 +1,3 @@
-# Infrastucture
+# Burp Extension
 
-This directory holds the supporting Infrastucture. Primarily, it holds the Dockerfiles and Docker Compose project necessary for building the application.
+This directory contains the primary code for the API and DNS Server.

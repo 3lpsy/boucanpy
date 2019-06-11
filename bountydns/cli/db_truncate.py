@@ -1,6 +1,6 @@
 from pathlib import Path
 from bountydns.core import logger
-from bountydns.cli.commands.base import BaseCommand
+from bountydns.cli.base import BaseCommand
 from bountydns.db.models import models
 
 

@@ -1,5 +1,5 @@
 import pytest
-from bountydns.cli.commands.base import BaseCommand
+from bountydns.cli.base import BaseCommand
 from bountydns.core.utils import test_dir, storage_dir
 from bountydns.core.utils import setenv
 

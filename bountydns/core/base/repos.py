@@ -159,7 +159,7 @@ class BaseRepo:
         )
         results = self.final().first()
         if or_fail and not results:
-            abort(404, "Item not found")
+            abort(404, f"Item not found: {self.__class__.__name__}")
         self._results = results
         return bool(self._results)
 
@@ -175,11 +175,11 @@ class BaseRepo:
         results = self.final().first()
         if or_fail:
             if not results:
-                abort(404, "Item not found")
+                abort(404, f"Item not found: {self.__class__.__name__}")
         self._results = results
         return self
 
-    def first_or_fail(self, or_fail=False, **kwargs):
+    def first_or_fail(self, **kwargs):
         return self.first(or_fail=True, **kwargs)
 
     def get(self, id, or_fail=False):

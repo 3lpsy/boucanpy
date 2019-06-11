@@ -1,5 +1,5 @@
 from bountydns.core import logger
-from bountydns.cli.commands.base import BaseCommand
+from bountydns.cli.base import BaseCommand
 from bountydns.db.factories import factory
 import uuid
 
