@@ -13,7 +13,6 @@ from bountydns.core.dns_request import (
     DnsRequestData,
     DnsRequestCreateForm,
 )
-from bountydns.broadcast import make_redis
 
 router = APIRouter()
 options = {"prefix": ""}
@@ -58,6 +57,7 @@ async def store(
         .first()
         .results()
     )
+
     zone_id = zone.id if zone else None
 
     data = only(

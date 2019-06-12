@@ -18,9 +18,11 @@ async def login(
     form: OAuth2PasswordRequestForm = Depends(),
 ):
     user = db.query(User).filter_by(email=form.username).first()
+
     if not user or not user.hashed_password:
         logger.warning(f"user exists failed for {form.username}")
         raise HTTPException(status_code=401, detail="Incorrect email or password")
+
     if not verify_password(form.password, user.hashed_password):
         logger.warning(f"hash verification failed for {form.username}")
         raise HTTPException(status_code=401, detail="Incorrect email or password")
@@ -31,9 +33,12 @@ async def login(
         scopes = "profile super zone user dns-request api-token refresh dns-record dns-server"  # grant access to super routes
     else:
         scopes = "profile zone user:list dns-request api-token:list api-token:create api-token:destroy refresh dns-record:list dns-record:show dns-server:list dns-server:show"
+
     logger.warning(f"creating token with scopes {scopes}")
+
     token = create_bearer_token(data={"sub": user.id, "scopes": scopes})
     data = {"token_type": "bearer", "access_token": str(token.decode())}
+
     if ws_access_token:
         data["ws_access_token"] = create_bearer_token(
             data={"sub": user.id, "scopes": "zone:publish dns-request:publish refresh"}

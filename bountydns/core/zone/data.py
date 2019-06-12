@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 from datetime import datetime
 from bountydns.core.dns_server.data import DnsServerData
@@ -13,5 +13,5 @@ class ZoneData(BaseModel):
     is_active: bool
     dns_server_id: Optional[int]
     dns_server: Optional[DnsServerData]
-    dns_records: Optional[DnsRecordData]
+    dns_records: Optional[List[DnsRecordData]]
     created_at: datetime

@@ -1,4 +1,4 @@
-from dnslib import DNSLabel, QTYPE, RR, dns
+from dnslib import DNSLabel, QTYPE, RR, dns, DNSLabel
 from textwrap import wrap
 from .types import TYPES
 from bountydns.core import logger
@@ -16,6 +16,15 @@ class Record:
     def make(cls, zone, rr):
         if not getattr(rr, "rtype", None):
             logger.critical(f"No rtype found for rr: {str(rr)} - {str(rr.__class__)}")
+
+        # RR's don't have knowledge of domiain so replace "." with zone domain
+        if rr.rname == ".":
+            zone_rname = zone.domain + "."
+        else:
+            zone_rname = "." + zone.domain + "."
+        new_label_name = str(rr.rname).replace(".", zone_rname)
+        logger.debug(f"Replacing RR's rname {str(rr.rname)} with {new_label_name}")
+        rr.set_rname(new_label_name)
         return cls(zone, rr)
 
     # def match(self, q):

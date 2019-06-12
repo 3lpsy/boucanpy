@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import APIRouter, Depends, Query
-from bountydns.core import logger, only, abort
+from bountydns.core import logger, only, abort, abort_for_input
 from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.core import PaginationQS, SortQS
 from bountydns.core.dns_server import (
@@ -42,10 +42,12 @@ async def store(
     token: TokenPayload = Depends(ScopedTo("dns-server:create")),
 ):
     if dns_server_repo.exists(name=form.name.lower()):
-        abort(422, "Invalid Name")
+        abort_for_input("name", "Server name already taken")
 
     data = only(dict(form), ["name"])
+
     data["name"] = data["name"].lower()
+
     item = dns_server_repo.create(data).data()
     return DnsServerResponse(dns_server=item)
 
@@ -69,6 +71,7 @@ async def show(
     except ValueError:
         label = dns_server_repo.label("name")
 
+    # TODO: is this vulnerable to sql injection?
     item = (
         dns_server_repo.loads(includes)
         .filter(label == dns_server)
@@ -104,6 +107,7 @@ async def update(
     except ValueError:
         label = dns_server_repo.label("name")
 
+    # TODO: is this vulnerable to sql injection?
     item = (
         dns_server_repo.filter(label == dns_server).first_or_fail().update(data).data()
     )

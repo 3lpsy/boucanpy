@@ -135,17 +135,39 @@ class BaseRepo:
         )
         for name in self._includes.keys():
             if name not in root_data:
-                prop = getattr(item, name)
-                self.debug(f"getting attr {str(name)} on item {str(item)}")
-                if not prop:
+                if not hasattr(item, name):
                     self.debug(f"cannot find attr {str(name)} on item {str(item)}")
                     continue
+                # TODO: what if 0
+                elif not getattr(item, name):
+                    prop_key = self._includes[name]
+                    root_data[prop_key] = None
                 else:
-                    prop_data = (
-                        prop.as_dict() if hasattr(prop, "as_dict") else dict(prop)
-                    )
-                prop_key = self._includes[name]
-                root_data[prop_key] = prop_data
+                    prop = getattr(item, name)
+                    self.debug(f"getting attr {str(name)} on item {str(item)}")
+                    # prop can be list
+                    if isinstance(prop, list):
+                        prop_data = []
+                        for prop_item in prop:
+                            # TODO: what if includabes are primitives or non-dict
+                            prop_item_data = (
+                                prop_item.as_dict()
+                                if hasattr(prop_item, "as_dict")
+                                else dict(prop_item)
+                            )
+                            prop_data.append(prop_item_data)
+                    # prop can be dictable
+                    else:
+                        prop_data = (
+                            prop.as_dict() if hasattr(prop, "as_dict") else dict(prop)
+                        )
+                    prop_key = self._includes[name]
+
+                    # self.debug(
+                    #     f"attaching attr {str(name)} on item {str(item)} with data {str(prop_data)}"
+                    # )
+
+                    root_data[prop_key] = prop_data
         return root_data
 
     ## EXECUTION

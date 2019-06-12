@@ -6,14 +6,13 @@
                     <h2>Zones</h2>
                 </div>
                 <div class="col-md-3 col-xs-12">
-                    <b-button
-                        v-b-modal.create-zone
-                        class="pull-right"
-                        style="width:100%"
-                        variant="outline-primary"
+                    <router-link
+                        tag="button"
+                        class="btn pull-right btn-outline-primary"
+                        :to="{ name: 'zone.create' }"
                     >
                         Create Zone
-                    </b-button>
+                    </router-link>
                 </div>
             </div>
 
@@ -23,15 +22,13 @@
                 </div>
             </div>
         </b-container>
-        <zone-create-modal modal-id="create-zone"> </zone-create-modal>
     </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import ZonesTable from '@/components/zone/ZonesTable.vue';
-import ZoneCreateModal from '@/components/zone/ZoneCreateModal.vue';
 
-@Component({ components: { ZonesTable, ZoneCreateModal } })
+@Component({ components: { ZonesTable } })
 export default class Zone extends Vue {}
 </script>

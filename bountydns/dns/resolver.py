@@ -6,7 +6,7 @@ from bountydns.dns.parser import RecordParser
 
 
 class Resolver(BaseResolver):
-    def __init__(self, api_client, glob=False):
+    def __init__(self, api_client, glob=True):
         # super().__init__(upstream, 53, 5)
         self.api_client = api_client
         self.records = self.make_records()
@@ -28,6 +28,11 @@ class Resolver(BaseResolver):
             if getattr(qname, self.eq)(name) and (
                 qtype == rtype or qtype == "ANY" or rtype == "CNAME"
             ):
+                logger.debug(
+                    "record matched - name: {} | rtype: {} | rr: {} | qname: {}".format(
+                        str(name), str(rtype), str(rr), str(qname)
+                    )
+                )
                 # If we have a glob match fix reply label
                 if self.glob:
                     a = copy.copy(rr)
@@ -41,6 +46,10 @@ class Resolver(BaseResolver):
                     for a_name, a_rtype, a_rr in self.get_split_records():
                         if a_name == rr.rdata.label and a_rtype in ["A", "AAAA"]:
                             reply.add_ar(a_rr)
+            else:
+                logger.debug(
+                    "record not matched: {} for {}".format(str(name), str(qname))
+                )
         if not reply.rr:
             reply.header.rcode = RCODE.NXDOMAIN
         return reply

@@ -137,24 +137,33 @@ TODO:
 - [x] Create DNS Create Record Form
 - [x] Create DNS Edit Record Form
 - [x] Validate DNS Records in create and edit forms
+- [x] Fix WebSockets
 
-- [ ] Change DNS Server to Pull Records from API
-- [ ] Allow user to seed from yaml
+- [x] Change DNS Server to Pull Records from API
+- [x] Move Create Zone from modal to Page
 
-- [ ] Perform Validation on the Front End for other pages
 - [ ] Perform Better Validation on the Backend
-- [ ] Handle Errors on the Front End
-- [ ] Fix WebSockets
+- [ ] Restrict length of inputs
+- [ ] Apply stricter validation to server name
+- [ ] Apply server name validation during sync process
 - [ ] Check for refreshable WebSocket token on page load
+- [ ] Updatable Dns Records
+- [ ] Deletable items (Zones / Users / Dns Records etc)
+- [ ] User management API & Frontend
+- [ ] Add MFA
+
+- [ ] Handle Errors on the Front End
 - [ ] Add tests to API
 - [ ] Use vuex store for datatable data
 - [ ] Make relationsips sortable in repo
 - [ ] Create DNS Payloads Page
 - [ ] Create DNS Payloads Form
+- [ ] Allow user to seed from yaml
+
+- [ ] Perform Validation on the Front End for other pages
 
 * [ ] Create Packer build
 * [ ] Create Terraform build
-* [ ] Transfer record creation to the API
 * [ ] Implement websocket in DNS server to receive updates regarding records
 * [ ] Build ability for webhook's / events
 * [ ] Confirm DNS Server is as Compliant as possible

@@ -9,6 +9,8 @@ import DnsServerShow from '@/views/DnsServerShow.vue';
 
 import Zone from '@/views/Zone.vue';
 import ZoneEdit from '@/views/ZoneEdit.vue';
+import ZoneCreate from '@/views/ZoneCreate.vue';
+
 import ZoneShow from '@/views/ZoneShow.vue';
 import ZoneDnsRecordCreate from '@/views/ZoneDnsRecordCreate.vue';
 import ZoneDnsRecordEdit from '@/views/ZoneDnsRecordEdit.vue';
@@ -82,6 +84,12 @@ export default new Router({
             path: '/webui/zone',
             name: 'zone',
             component: Zone,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/zone/create',
+            name: 'zone.create',
+            component: ZoneCreate,
             beforeEnter: AUTHED_GUARDS,
         },
         {

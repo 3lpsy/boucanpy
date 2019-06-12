@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from bountydns.core import logger, only
+from bountydns.core import logger, only, abort, abort_for_input
 from bountydns.core.security import (
     ScopedTo,
     TokenPayload,
@@ -37,6 +37,8 @@ async def sync(
     if "api-token" in scopes or "api-token:syncable" in scopes:
         api_token = None
         dns_server = None
+
+        # TODO: validate
         if not dns_server_repo.exists(name=token.payload.dns_server_name.lower()):
             dns_server_repo.clear()
             logger.info("saving dns server from api token")
@@ -82,6 +84,8 @@ async def index(
     token: TokenPayload = Depends(ScopedTo("api-token:list")),
     includes: List[str] = Query(None),
 ):
+    includes = only(includes, ["dns_server"], values=True)
+
     pg, items = (
         api_token_repo.loads("dns_server")
         .strict()
@@ -101,7 +105,10 @@ async def store(
     token: TokenPayload = Depends(ScopedTo("api-token:create")),
     user: User = Depends(current_user),
 ):
-    dns_server = dns_server_repo.first_or_fail(id=form.dns_server_id).results()
+    dns_server = dns_server_repo.first(id=form.dns_server_id).results()
+
+    if not dns_server:
+        abort_for_input("dns_server_id", "DnsServer does not exist")
 
     scopes = []
     for requested_scope in form.scopes.split(" "):
@@ -147,13 +154,16 @@ async def show(
     token: TokenPayload = Depends(ScopedTo("api-token:read")),
     includes: List[str] = Query(None),
 ):
+
+    includes = only(includes, ["dns_server"], values=True)
+
     if (
         not api_token_repo.loads("dns_server")
         .strict()
         .includes(includes)
         .exists(api_token_id)
     ):
-        raise HTTPException(404, detail="Not found")
+        abort("API Token Does not exist")
     api_token = api_token_repo.data()
     return ApiTokenResponse(api_token=api_token)
 
@@ -169,9 +179,13 @@ async def sensitive(
     token: TokenPayload = Depends(ScopedTo("api-token:read")),
     includes: List[str] = Query(None),
 ):
+
+    includes = only(includes, ["dns_server"], values=True)
+
     # TODO: require stronger scope
     if not api_token_repo.exists(api_token_id):
-        raise HTTPException(404, detail="Not found")
+        abort("API Token Does not exist")
+
     api_token = (
         api_token_repo.loads("dns_server")
         .set_data_model(SensitiveApiTokenData)

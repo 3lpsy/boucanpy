@@ -28,6 +28,7 @@ ns1              IN      A       {domain_ip}
 ns2              IN      A       {domain_ip}
 @                IN      A       {domain_ip}
 *                IN      CNAME   {domain_name}
+@                IN      MX      10  {domain_name}.
 @                IN      NS       ns1.{domain_name}.
 @                IN      NS       ns2.{domain_name}.
 """

@@ -31,11 +31,16 @@ class RecordParser:
             rrs = RR.fromZone(
                 ZONE_TEMPLATE.format(domain_name=zone.domain, domain_ip=zone.ip)
             )
-            zone_records = [Record(zone, rr) for rr in rrs]
+            zone_records = [Record.make(zone, rr) for rr in rrs]
             for zr in zone_records:
                 # TODO: make this clean on output
                 rrstr = str(dedent(str(zr.rr)))
-                logger.debug(f"loading record: {rrstr}")
+                logger.debug(f"loading record entry: {rrstr}")
+                logger.debug(
+                    "loaded record details - name: {} | rtype: {} | rr: {}".format(
+                        str(zr.rr.rname), str(QTYPE[zr.rr.rtype]), str(zr.rr)
+                    )
+                )
         else:
             # loop over each dns_record of the zone and convert it to RR record
             dns_records = sorted(dns_records, key=lambda x: x.sort)
@@ -46,7 +51,13 @@ class RecordParser:
                     _zone_records = [Record.make(zone, rr) for rr in rrs]
                     for zr in _zone_records:
                         rrstr = str(dedent(str(zr.rr)))
-                        logger.debug(f"loading record: {rrstr}")
+                        logger.debug(f"loading record: {str(dns_record.record)}")
+                        logger.debug(f"loading record entry: {rrstr}")
+                        logger.debug(
+                            "loaded record details - name: {} | rtype: {} | rr: {}".format(
+                                str(zr.rr.rname), str(QTYPE[zr.rr.rtype]), str(zr.rr)
+                            )
+                        )
                     zone_records = zone_records + _zone_records
                 except Exception as e:
                     logger.critical(

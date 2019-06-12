@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from typing import List
 from bountydns.core.security import ScopedTo, TokenPayload
-from bountydns.core import logger, only
+from bountydns.core import logger, only, abort, abort_for_input
 
 from bountydns.core import SortQS, PaginationQS, BaseResponse
 from bountydns.core.dns_server import DnsServerRepo
@@ -50,6 +50,13 @@ async def store(
 
     data["domain"] = data["domain"].lower()
 
+    # Make sure domain is unique
+
+    if zone_repo.exists(domain=data["domain"]):
+        abort_for_input("domain", "A Zone with that domain already exists")
+
+    zone_repo.clear()
+
     if form.dns_server_id:
         if dns_server_repo.exists(id=form.dns_server_id):
             data["dns_server_id"] = dns_server_repo.results().id
@@ -62,7 +69,7 @@ async def store(
 async def show(
     zone_id: int,
     zone_repo: ZoneRepo = Depends(ZoneRepo),
-    token: TokenPayload = Depends(ScopedTo("zone:update")),
+    token: TokenPayload = Depends(ScopedTo("zone:show")),
     includes: List[str] = Query(None),
 ):
     includes = only(includes, ["dns_server", "dns_records"], values=True)
@@ -82,6 +89,14 @@ async def update(
     includes: List[str] = Query(None),
 ):
     data = only(dict(form), ["ip", "domain"])
+
+    if "domain" in data:
+        data["domain"] = data["domain"].lower()
+        existing_domain = zone_repo.first(domain=data["domain"]).results()
+        if existing_domain and existing_domain.id != zone_id:
+            abort_for_input("domain", "A Zone with that domain already exists")
+        zone_repo.clear()
+
     if form.dns_server_id is not None:
         if form.dns_server_id is 0:
             data["dns_server_id"] = None
@@ -107,7 +122,7 @@ async def activate(
     zone_repo: ZoneRepo = Depends(ZoneRepo),
     token: TokenPayload = Depends(ScopedTo("zone:update")),
 ):
-    zone = zone_repo.get(zone_id).update({"is_active": True}).data()
+    zone = zone_repo.get_or_fail(zone_id).update({"is_active": True}).data()
     return ZoneResponse(zone=zone)
 
 

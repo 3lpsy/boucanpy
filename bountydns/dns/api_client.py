@@ -24,9 +24,14 @@ class ApiClient:
 
     def get_zones(self):
         logger.info("getting zones")
-        dm = ZoneData
-        zone_data = self.get(f"/dns-server/{self.dns_server_name}/zone")
-        return [dm(**z) for z in zone_data["zones"]]
+        zone_data = self.get(
+            f"/dns-server/{self.dns_server_name}/zone",
+            params={"includes": ["dns_records"]},
+        )
+        print("LOOK A THIS ")
+        data = [ZoneData(**z) for z in zone_data["zones"]]
+        logger.critical(str(data))
+        return data
 
     def get_status(self):
         return self.get("/status")
@@ -52,7 +57,10 @@ class ApiClient:
     def get(self, url: str, params=None, fail=True):
         params = params or {}
         headers = self.get_default_headers()
-        res = requests.get(self.url(url), headers=headers)
+        res = requests.get(self.url(url), headers=headers, params=params)
+
+        logger.info("Getting URL: " + str(self.url(url)))
+
         if fail:
             if res.status_code != 200:
                 logger.critical(
@@ -65,6 +73,8 @@ class ApiClient:
         data = data or {}
         headers = self.get_default_headers()
         res = requests.post(self.url(url), json=data, headers=headers)
+        logger.info("Posting URL: " + str(self.url(url)))
+
         if fail:
             if res.status_code != 200:
                 logger.critical(

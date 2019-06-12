@@ -15,3 +15,8 @@ def only(data, grab, values=False):
 
 def abort(code=500, msg="Error"):
     raise HTTPException(code, detail=msg)
+
+
+def abort_for_input(field, msg="Error", code=422):
+    detail = [{"loc": ["body", "form", field], "msg": msg, "type": "value_error"}]
+    raise HTTPException(code, detail=detail)

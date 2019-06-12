@@ -83,7 +83,6 @@ async def store(
     data = only(dict(form), ["record", "sort"])
     data["zone_id"] = zone_id
 
-    # TODO: make sure sorts don't clash
     item = dns_record_repo.create(data).data()
     return DnsRecordResponse(dns_record=item)
 
@@ -116,9 +115,6 @@ async def show(
     return DnsRecordResponse(dns_record=item)
 
 
-# TODO: create update form for dns record
-
-
 @router.put(
     "/dns-record/{dns_record_id}",
     name="zone.dns_record.update",
@@ -136,6 +132,5 @@ async def update(
 
     data = only(dict(form), ["record", "sort"])
 
-    # TODO: make sure sorts don't clash
     item = dns_record_repo.first_or_fail(id=dns_record_id).update(data).data()
     return DnsRecordResponse(dns_record=item)

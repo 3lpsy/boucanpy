@@ -27,7 +27,7 @@ async def index(
     includes: List[str] = Query(None),
 ):
 
-    includes = only(includes, ["zones"], values=True)
+    includes = only(includes, ["dns_records"], values=True)
 
     # Support ability to either submit dns_server.name or dns_server.id as dns_server_id
     zone_dns_server_id_label = zone_repo.label("dns_server_id")

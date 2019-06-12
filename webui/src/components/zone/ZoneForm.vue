@@ -17,7 +17,9 @@
                 v-validate="'required|ip_or_fqdn'"
                 :state="getInputState('domain')"
             ></b-form-input>
-            <template v-slot:invalid-feedback>{{ errors.first('domain') }}</template>
+            <template v-slot:invalid-feedback>{{
+                errors.first('domain')
+            }}</template>
         </b-form-group>
         <b-form-group
             label="Resolve IP"
@@ -35,7 +37,9 @@
                 v-validate="'required|ip'"
                 :state="getInputState('ip')"
             ></b-form-input>
-            <template v-slot:invalid-feedback>{{ errors.first('ip') }}</template>
+            <template v-slot:invalid-feedback>{{
+                errors.first('ip')
+            }}</template>
         </b-form-group>
         <b-form-group
             label="DNS Server Name"
@@ -155,60 +159,76 @@ export default class ZoneForm extends mixins(
     }
 
     onSubmit() {
-        this.$validator.validateAll().then((valid) => {
-            if (valid) {
-                this.disabled = true;
-                console.log('submitting data', this.form);
-                this.confirmDataIfRequired().then((answer) => {
-                    if (answer) {
-                        this.collectForm().then((form) => {
-                            if (this.mode === 'edit') {
-                                zone.updateZone(this.zoneId, form)
-                                    .then(() => {
-                                        bus.$emit('APP_ALERT', {
-                                            text: 'Zone Updated',
-                                            type: 'success',
-                                        });
-                                        this.$emit('form-complete');
-                                        this.form = {
-                                            domain: '',
-                                            ip: '',
-                                            dns_server_id: '',
-                                        };
-                                        this.disabled = false;
-                                        this.boot();
-                                    })
-                                    .catch((error) => {
-                                        this.disabled = false;
-                                        throw error;
-                                    });
+        if (!this.disabled) {
+            this.$validator.validateAll().then((valid) => {
+                if (valid) {
+                    this.disabled = true;
+                    console.log('submitting data', this.form);
+                    this.confirmDataIfRequired()
+                        .then((answer) => {
+                            if (answer) {
+                                this.collectForm().then((form) => {
+                                    if (this.mode === 'edit') {
+                                        zone.updateZone(this.zoneId, form)
+                                            .then(() => {
+                                                bus.$emit('APP_ALERT', {
+                                                    text: 'Zone Updated',
+                                                    type: 'success',
+                                                });
+                                                this.$emit('form-complete');
+                                                this.form = {
+                                                    domain: '',
+                                                    ip: '',
+                                                    dns_server_id: '',
+                                                };
+                                                this.disabled = false;
+                                                this.$router.push({
+                                                    name: 'zone',
+                                                });
+                                            })
+                                            .catch((e) => {
+                                                this.disabled = false;
+                                                this.handleApiError(e);
+
+                                                throw e;
+                                            });
+                                    } else {
+                                        zone.createZone(form)
+                                            .then(() => {
+                                                bus.$emit('APP_ALERT', {
+                                                    text: 'Zone Created',
+                                                    type: 'success',
+                                                });
+                                                this.$emit('form-complete');
+                                                this.form = {
+                                                    domain: '',
+                                                    ip: '',
+                                                    dns_server_id: '',
+                                                };
+                                                this.disabled = false;
+                                                this.$router.push({
+                                                    name: 'zone',
+                                                });
+                                            })
+                                            .catch((e) => {
+                                                this.disabled = false;
+                                                this.handleApiError(e);
+
+                                                throw e;
+                                            });
+                                    }
+                                });
                             } else {
-                                zone.createZone(form)
-                                    .then(() => {
-                                        bus.$emit('APP_ALERT', {
-                                            text: 'Zone Created',
-                                            type: 'success',
-                                        });
-                                        this.$emit('form-complete');
-                                        this.form = {
-                                            domain: '',
-                                            ip: '',
-                                            dns_server_id: '',
-                                        };
-                                        this.disabled = false;
-                                    })
-                                    .catch((error) => {
-                                        this.disabled = false;
-                                        throw error;
-                                    });
+                                this.disabled = false;
                             }
+                        })
+                        .catch((error) => {
+                            this.disabled = false;
+                            throw error;
                         });
-                    } else {
-                        this.disabled = false;
-                    }
-                });
-            }
-        });
+                }
+            });
+        }
     }
 
     boot() {
