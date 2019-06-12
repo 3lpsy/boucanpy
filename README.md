@@ -142,7 +142,6 @@ TODO:
 - [x] Change DNS Server to Pull Records from API
 - [x] Move Create Zone from modal to Page
 
-- [ ] Perform Better Validation on the Backend
 - [ ] Restrict length of inputs
 - [ ] Apply stricter validation to server name
 - [ ] Apply server name validation during sync process
@@ -150,24 +149,27 @@ TODO:
 - [ ] Updatable Dns Records
 - [ ] Deletable items (Zones / Users / Dns Records etc)
 - [ ] User management API & Frontend
-- [ ] Add MFA
 
 - [ ] Handle Errors on the Front End
 - [ ] Add tests to API
-- [ ] Use vuex store for datatable data
-- [ ] Make relationsips sortable in repo
 - [ ] Create DNS Payloads Page
 - [ ] Create DNS Payloads Form
 - [ ] Allow user to seed from yaml
+- [ ] Create Packer build
+- [ ] Create Terraform build
+- [ ] Implement websocket in DNS server to receive updates regarding records
 
-- [ ] Perform Validation on the Front End for other pages
+### Icebox
 
-* [ ] Create Packer build
-* [ ] Create Terraform build
-* [ ] Implement websocket in DNS server to receive updates regarding records
-* [ ] Build ability for webhook's / events
-* [ ] Confirm DNS Server is as Compliant as possible
-* [ ] Divide the project into submodules
+- [ ] Perform Better Validation on the Backend
+- [ ] Perform Better Validation on the Frontend
+
+- [ ] Add MFA
+- [ ] Use vuex store for datatable data
+- [ ] Make relationsips sortable in repo
+- [ ] Confirm DNS Server is as Compliant as possible
+- [ ] Build ability for webhook's / events
+
 
 ```
 usage: bdnsctl.py [-h]
