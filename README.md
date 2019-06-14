@@ -142,13 +142,14 @@ TODO:
 - [x] Change DNS Server to Pull Records from API
 - [x] Move Create Zone from modal to Page
 
-- [ ] Restrict length of inputs
-- [ ] Apply stricter validation to server name
-- [ ] Apply server name validation during sync process
+- [x] Restrict length of inputs
+- [x] Apply stricter validation to server name
+- [x] Apply server name validation during sync process
 - [ ] Check for refreshable WebSocket token on page load
 - [ ] Updatable Dns Records
 - [ ] Deletable items (Zones / Users / Dns Records etc)
 - [ ] User management API & Frontend
+- [ ] Treat all emails as lowercase
 
 - [ ] Handle Errors on the Front End
 - [ ] Add tests to API
@@ -163,7 +164,6 @@ TODO:
 
 - [ ] Perform Better Validation on the Backend
 - [ ] Perform Better Validation on the Frontend
-
 - [ ] Add MFA
 - [ ] Use vuex store for datatable data
 - [ ] Make relationsips sortable in repo

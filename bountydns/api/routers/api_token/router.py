@@ -18,6 +18,7 @@ from bountydns.core.api_token import (
     SensitiveApiTokenResponse,
     SensitiveApiTokenData,
 )
+from bountydns.core.dns_server import DnsServerCreateForm
 from bountydns.core.dns_server import DnsServerRepo
 
 from bountydns.core import SortQS, PaginationQS, BaseResponse
@@ -42,9 +43,9 @@ async def sync(
         if not dns_server_repo.exists(name=token.payload.dns_server_name.lower()):
             dns_server_repo.clear()
             logger.info("saving dns server from api token")
-            dns_server = dns_server_repo.create(
-                dict(name=token.payload.dns_server_name.lower())
-            ).results()
+            # TODO: Handle failure of validation
+            data = DnsServerCreateForm(name=token.payload.dns_server_name.lower())
+            dns_server = dns_server_repo.create(dict(data)).results()
         else:
             dns_server = dns_server_repo.results()
 

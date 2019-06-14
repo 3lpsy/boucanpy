@@ -1,11 +1,11 @@
 from typing import Optional
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, constr
 from bountydns.core import is_valid_domain, is_valid_ipv4address
 
 
 class ZoneCreateForm(BaseModel):
-    domain: str
-    ip: str
+    domain: constr(min_length=4, max_length=64)
+    ip: constr(min_length=7, max_length=15)
     dns_server_id: Optional[int]
 
     @validator("ip")

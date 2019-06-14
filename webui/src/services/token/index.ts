@@ -1,6 +1,6 @@
 import Cookie from 'js-cookie';
 import jwtDecode from 'jwt-decode';
-import {Token as TokenData, TokenPayload} from '@/types';
+import { Token as TokenData, TokenPayload } from '@/types';
 
 const COOKIE_NAME = process.env.VUE_APP_COOKIE_NAME || 'auth_token';
 const WS_COOKIE_NAME = process.env.VUE_APP_WS_COOKIE_NAME || 'ws_auth_token';
@@ -27,34 +27,36 @@ class Token {
     }
 
     save(accessToken: string) {
-        return Cookie.set(COOKIE_NAME, accessToken)
+        return Cookie.set(COOKIE_NAME, accessToken);
     }
 
     saveWS(wsAccessToken: string) {
-        return Cookie.set(WS_COOKIE_NAME, wsAccessToken)
+        return Cookie.set(WS_COOKIE_NAME, wsAccessToken);
     }
 
     remove() {
-        return Cookie.remove(COOKIE_NAME)
+        return Cookie.remove(COOKIE_NAME);
     }
 
-    parse(accessToken: string) : TokenData {
-        let payload = (jwtDecode(accessToken) as TokenPayload);
+    parse(accessToken: string): TokenData {
+        let payload = jwtDecode(accessToken) as TokenPayload;
+        let exp = payload.exp;
         let scopes = payload.scopes || '';
 
         return {
             sub: payload.sub,
             scopes: scopes.split(' '),
-            exp: payload.exp
-        }
+            exp: exp,
+            token: accessToken,
+        };
     }
 
     get(): string {
-        return this.cookie()
+        return this.cookie();
     }
 
     getWS(): string {
-        return this.cookieWS()
+        return this.cookieWS();
     }
 }
 

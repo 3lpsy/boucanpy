@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, constr, conint
 
 # TODO: make form custom to dns api client
 class DnsRequestCreateForm(BaseModel):
-    name: str
-    source_address: str
-    source_port: int
-    type: str
-    protocol: str
-    dns_server_name: str
+    name: constr(min_length=4, max_length=2048)
+    source_address: constr(min_length=7, max_length=15)
+    source_port: conint(ge=0, le=65535)
+    type: constr(min_length=1, max_length=32)
+    protocol: constr(min_length=3, max_length=5)
+    dns_server_name: constr(regex="^[a-zA-Z0-9-_]+$", min_length=4, max_length=254)

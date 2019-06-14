@@ -20,7 +20,7 @@ class ApiClient:
 
     def sync(self):
         logger.info("syncing api token")
-        return self.post("/api-token/sync", fail=False)
+        return self.post("/api-token/sync", fail=True)
 
     def get_zones(self):
         logger.info("getting zones")

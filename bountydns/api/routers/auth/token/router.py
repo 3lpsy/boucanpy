@@ -40,6 +40,7 @@ async def login(
     data = {"token_type": "bearer", "access_token": str(token.decode())}
 
     if ws_access_token:
+        # TODO: make it so that you cannot get publish access without base scope
         data["ws_access_token"] = create_bearer_token(
             data={"sub": user.id, "scopes": "zone:publish dns-request:publish refresh"}
         )

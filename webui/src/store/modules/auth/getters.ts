@@ -7,48 +7,59 @@ export interface IAuthGetters {
     getUser(state: IAuthState): User;
     hasToken(state: IAuthState): boolean;
     hasUser(state: IAuthState): boolean;
+
+    hasWSToken(state: IAuthState): boolean;
+    getWSToken(state: IAuthState): Token;
+
     hasWSTokenRaw(state: IAuthState): boolean;
     getWSTokenRaw(state: IAuthState): string;
-
 }
 
 export const AuthGetters: IAuthGetters = {
     isAuthenticated(state: IAuthState): boolean {
-        if (! state.user || state.user.id < 1) {
-            return false
+        if (!state.user || state.user.id < 1) {
+            return false;
+        } else if (state.token.sub.length < 1) {
+            return false;
         }
-        else if (state.token.sub.length < 1) {
-            return false
-        }
-        return true
+        return true;
     },
 
     hasToken(state: IAuthState): boolean {
-        if (! state.token || state.token.sub.length < 1) {
-            return false
+        if (!state.token || state.token.sub.length < 1) {
+            return false;
         }
-        return true
+        return true;
     },
 
     hasUser(state: IAuthState): boolean {
-        if (! state.user || state.user.id < 1) {
-            return false
+        if (!state.user || state.user.id < 1) {
+            return false;
         }
-        return true
+        return true;
     },
 
     getToken(state: IAuthState): Token {
-        return state.token
+        return state.token;
     },
 
     getUser(state: IAuthState): User {
-        return state.user
+        return state.user;
+    },
+
+    getWSToken(state: IAuthState): Token {
+        return state.wsToken;
+    },
+
+    hasWSToken(state: IAuthState): boolean {
+        return state.wsToken.sub.length > 0;
     },
 
     getWSTokenRaw(state: IAuthState): string {
-        return state.wsTokenRaw
+        return state.wsToken.token;
     },
+
     hasWSTokenRaw(state: IAuthState): boolean {
-        return state.wsTokenRaw.length > 0
+        return state.wsToken.token.length > 0;
     },
 };

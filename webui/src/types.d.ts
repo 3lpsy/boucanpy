@@ -114,8 +114,9 @@ export interface UserResponse {
 }
 export interface TokenPayload {
     sub: string;
-    exp: string;
+    exp: number;
     scopes: string;
+    token: string;
 }
 
 export interface DnsServer {
@@ -176,6 +177,7 @@ export interface DnsRecordsResponse {
 
 export interface Token {
     sub: string;
-    exp: string;
+    exp: number;
     scopes: string[];
+    token: string;
 }

@@ -1,29 +1,13 @@
-from pydantic import BaseModel
-from dnslib import RR
-from dnslib.dns import DNSError
-
-
-class DnsRecordStr(str):
-    @classmethod
-    def get_validators(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        try:
-            RR.fromZone(v)
-        except Exception as e:
-            msg = str(e)
-            raise ValueError(f"could not cast record: {msg}")
-        return v
+from pydantic import BaseModel, conint
+from bountydns.core import DnsRecordStr
 
 
 class DnsRecordCreateForm(BaseModel):
     record: DnsRecordStr
-    sort: int
+    sort: conint(ge=0, le=1024)
     zone_id: int
 
 
 class DnsRecordForZoneCreateForm(BaseModel):
     record: DnsRecordStr
-    sort: int
+    sort: conint(ge=0, le=1024)
