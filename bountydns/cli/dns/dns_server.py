@@ -18,6 +18,13 @@ class DnsServer(BaseCommand):
     add_log_level = True
     add_debug = True
 
+    def __init__(self, *args, **kwargs):
+        self.api_client = None
+        self.resolver = None
+        self.udp_server = None
+        self.tcp_server = None
+        super().__init__(*args, **kwargs)
+
     @classmethod
     def parser(cls, parser):
         parser.add_argument(
@@ -37,47 +44,83 @@ class DnsServer(BaseCommand):
         parser.add_argument(
             "--no-sync", action="store_true", help="sync api token back to database"
         )
+
+        parser.add_argument(
+            "-r",
+            "--refresh-ttl",
+            type=int,
+            default=3600,
+            action="store",
+            help="time to wait before polling for new records",
+        )
         return parser
 
     async def run(self):
-        port = self.get_port()
-        listen = self.get_listen()
 
         # TODO: thread issues?
-        api_client = ApiClient(self.get_api_url(), self.get_api_token())
+        self.api_client = ApiClient(self.get_api_url(), self.get_api_token())
 
-        if not api_client.wait_for_up():
+        if not self.api_client.wait_for_up():
             logger.critical("could not connect to api. quitting")
             self.exit(1)
 
         if self.option("no_sync"):
             logger.info("skipping syncing api token")
         else:
-            api_client.sync()
+            self.api_client.sync()
 
-        resolver = Resolver(api_client)
-        udp_server = DNSServer(
-            resolver,
-            address=listen,
-            port=port,
-            handler=DNSHandler,
-            logger=DNSLogger(api_client),
-        )
-        tcp_server = DNSServer(
-            resolver,
-            address=listen,
-            port=port,
-            tcp=True,
-            handler=DNSHandler,
-            logger=DNSLogger(api_client),
-        )
+        self.boot()
 
-        logger.info("starting DNS server on port %d", port)
-        udp_server.start_thread()
-        tcp_server.start_thread()
+        self.start_servers()
 
         try:
-            while udp_server.isAlive():
+            count = 0
+            while self.udp_server.isAlive():
+                if count > 0 and count % self.option("refresh_ttl") == 0:
+                    if self.api_client.refresh_zones_if_needed():
+                        logger.critical(
+                            "API Client found new or changed zones. Stopping servers..."
+                        )
+                        # TODO: figure out why "stop" does not release the address
+                        self.stop_servers()
+
+                        sleep(1)
+
+                        stop_count = 0
+                        logger.critical("Waiting for UDP Server to stop...")
+                        while self.udp_server.thread and self.udp_server.isAlive():
+                            if stop_count > 30:
+                                logger.critical(
+                                    "UDP Server did not stop while reloading zones"
+                                )
+                                raise Exception(
+                                    "UDP Server threads went rogue during zone reload"
+                                )
+                            logger.info(
+                                "Waiting for DNS Server to stop before reloading zones"
+                            )
+                            stop_count = stop_count + 1
+                            sleep(1)
+                        stop_count = 0
+                        logger.critical("Waiting for TCP Server to stop...")
+                        while self.tcp_server.thread and self.tcp_server.isAlive():
+                            if stop_count > 30:
+                                logger.critical(
+                                    "TCP Server did not stop while reloading zones"
+                                )
+                                raise Exception(
+                                    "TCP Server threads went rogue during zone reload"
+                                )
+                            logger.info(
+                                "Waiting for DNS Server to stop before reloading zones"
+                            )
+                            stop_count = stop_count + 1
+                            sleep(1)
+                        logger.critical("Rebooting server with fresh zones...")
+                        self.boot()
+                        self.start_servers()
+
+                count = count + 1
                 sleep(1)
         except KeyboardInterrupt:
             pass
@@ -100,3 +143,39 @@ class DnsServer(BaseCommand):
 
     def get_listen(self):
         return self.option("listen")
+
+    def boot(self):
+        port = self.get_port()
+        listen = self.get_listen()
+
+        self.resolver = Resolver(self.api_client)
+        self.udp_server = DNSServer(
+            self.resolver,
+            address=listen,
+            port=port,
+            handler=DNSHandler,
+            logger=DNSLogger(self.api_client),
+        )
+        self.tcp_server = DNSServer(
+            self.resolver,
+            address=listen,
+            port=port,
+            tcp=True,
+            handler=DNSHandler,
+            logger=DNSLogger(self.api_client),
+        )
+
+        logger.info("starting DNS server on port %d", port)
+
+    def start_servers(self):
+        self.udp_server.start_thread()
+        self.tcp_server.start_thread()
+
+    def stop_servers(self):
+        self.udp_server.stop()
+        self.udp_server.server.socket.close()
+        self.udp_server.server.server_close()
+        self.tcp_server.stop()
+        self.tcp_server.server.socket.close()
+        self.tcp_server.server.server_close()
+

@@ -71,7 +71,7 @@ async def show(
 
 
 # TODO: create update form for dns record
-@router.post("/dns-record/{dns_record_id}", name="dns_record.store")
+@router.put("/dns-record/{dns_record_id}", name="dns_record.update")
 async def update(
     dns_record_id: int, request: Request, form: DnsRecordForZoneCreateForm = Depends()
 ):

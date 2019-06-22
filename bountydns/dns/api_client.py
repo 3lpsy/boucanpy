@@ -12,6 +12,7 @@ class ApiClient:
     def __init__(self, api_url, api_token):
         self.api_url = api_url
         self.api_token = api_token
+        self.zones = []
         payload = jwt.decode(api_token, verify=False)  # do not trust
         if not "dns_server_name" in payload.keys() or not payload["dns_server_name"]:
             logger.critical("no dns_server_name on api token")
@@ -28,10 +29,61 @@ class ApiClient:
             f"/dns-server/{self.dns_server_name}/zone",
             params={"includes": ["dns_records"]},
         )
-        print("LOOK A THIS ")
         data = [ZoneData(**z) for z in zone_data["zones"]]
-        logger.critical(str(data))
         return data
+
+    def load_zones(self):
+        self.zones = self.get_zones()
+        return True
+
+    def refresh_zones_if_needed(self):
+        logger.info("Checking for New Zones and Records...")
+        old_zones = self.zones
+        new_zones = self.get_zones()
+        # TODO: fix this mess
+
+        if len(old_zones) != len(new_zones):
+            logger.warning(
+                f"Zone Length mistmatch. New or Changed Zone Found: {str(old_zones)} != {str(new_zones)}. Reloading zones."
+            )
+            self.load_zones()
+            return True
+
+        for nz in new_zones:
+            # make sure new zones are in old zones
+            is_nz_exists = False
+            for oz in old_zones:
+                if oz.domain == nz.domain and oz.ip == nz.ip:
+                    nz_dns_records = nz.dns_records or []
+                    for nrec in nz_dns_records:
+                        is_rec_satisfied = False
+                        oz_dns_records = oz.dns_records or []
+                        if len(nz_dns_records) != len(oz_dns_records):
+                            logger.warning(
+                                f"Zone Record Length mistmatch {str(len(nz_dns_records))} != {str(len(oz_dns_records))}. New or Changed Zone Record Found: {str(nz_dns_records)} != {str(oz_dns_records)}. Reloading zones."
+                            )
+                            self.load_zones()
+                            return True
+                        for orec in oz_dns_records:
+                            if orec.record == nrec.record and orec.sort == nrec.sort:
+                                is_rec_satisfied = True
+                        if not is_rec_satisfied:
+                            logger.warning(
+                                f"New or Changed Zone Record {str(nz)}: {str(nrec)} found for server. Reloading zones."
+                            )
+                            self.load_zones()
+                            return True
+                    is_nz_exists = True
+            if not is_nz_exists:
+                logger.warning(
+                    f"New or Changed Zone {str(nz)} found for server. Reloading zones."
+                )
+                self.load_zones()
+                return True
+
+        logger.info("No New Zones or Records Found. All is well")
+
+        return False
 
     def get_status(self):
         return self.get("/status")

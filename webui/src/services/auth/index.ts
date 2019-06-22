@@ -64,7 +64,8 @@ class AuthService {
 
     getUser(): Promise<UserResponse> {
         return new Promise((resolve, reject) => {
-            let request = api.http.get('/auth/user');
+            let http = api.makeHttp();
+            let request = http.get('/auth/user');
             return request
                 .then((response) => {
                     resolve(response.data as UserResponse);

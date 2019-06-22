@@ -27,10 +27,12 @@ class Token {
     }
 
     save(accessToken: string) {
+        console.log(`Saving cookie ${COOKIE_NAME}: ${accessToken}`);
         return Cookie.set(COOKIE_NAME, accessToken);
     }
 
     saveWS(wsAccessToken: string) {
+        console.log(`Saving cookie ${WS_COOKIE_NAME}: ${wsAccessToken}`);
         return Cookie.set(WS_COOKIE_NAME, wsAccessToken);
     }
 

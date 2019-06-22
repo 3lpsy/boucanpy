@@ -82,7 +82,7 @@ export const AuthActions: IAuthActions = {
     },
 
     refreshWS({ dispatch }, token: string): Promise<string> {
-        console.log('auth/refresh');
+        console.log('auth/refreshWS');
         return new Promise((resolve, reject) => {
             authService
                 .refresh(token)

@@ -15,8 +15,8 @@ class Resolver(BaseResolver):
 
     # pull the zones + records from the API and convert them to RR records
     def make_records(self):
-        zones = self.api_client.get_zones()
-        parsed = RecordParser.from_zones(zones)
+        self.api_client.load_zones()
+        parsed = RecordParser.from_zones(self.api_client.zones)
         return parsed.records
 
     def resolve(self, request, handler):

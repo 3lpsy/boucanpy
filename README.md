@@ -145,8 +145,8 @@ TODO:
 - [x] Restrict length of inputs
 - [x] Apply stricter validation to server name
 - [x] Apply server name validation during sync process
-- [ ] Check for refreshable WebSocket token on page load
-- [ ] Updatable Dns Records
+- [x] Check for refreshable WebSocket token on page load
+- [x] Updatable Dns Records while running
 - [ ] Deletable items (Zones / Users / Dns Records etc)
 - [ ] User management API & Frontend
 - [ ] Treat all emails as lowercase
@@ -170,20 +170,55 @@ TODO:
 - [ ] Confirm DNS Server is as Compliant as possible
 - [ ] Build ability for webhook's / events
 
-
 ```
 usage: bdnsctl.py [-h]
-                  {db-seed,seed,db-setup,setup,db-truncate,truncate,test,tests,user-create,user,user-list,users,alembic-current,al-current,alembic-downgrade,al-downgrade,alembic-history,al-history,alembic-init,al-init,alembic-migrate,al-migrate,alembic-show,al-show,alembic-stamp,al-stamp,alembic-upgrade,al-upgrade,zone-create,zone,zone-list,zones,api-login,login,api-server,api,api-urls,urls,api-user-create,api-user,api-user-list,api-users,api-zone-create,api-zone,api-zone-list,api-zones,api-token-list,api-tokens,dns-server,dns}
+                  {db-seed,seed,db-setup,setup,db-truncate,truncate,test,tests,api-token-create,api-token,api-token-list,api-tokens,dns-server,dns,user-create,user,user-list,users,api-login,login,api-server,api,api-urls,urls,api-user-create,api-user,api-user-list,api-users,api-zone-create,api-zone,api-zone-list,api-zones,zone-create,zone,zone-list,zones,alembic-current,al-current,alembic-downgrade,al-downgrade,alembic-history,al-history,alembic-init,al-init,alembic-migrate,al-migrate,alembic-show,al-show,alembic-stamp,al-stamp,alembic-upgrade,al-upgrade}
                   ...
 
 positional arguments:
-  {db-seed,seed,db-setup,setup,db-truncate,truncate,test,tests,user-create,user,user-list,users,alembic-current,al-current,alembic-downgrade,al-downgrade,alembic-history,al-history,alembic-init,al-init,alembic-migrate,al-migrate,alembic-show,al-show,alembic-stamp,al-stamp,alembic-upgrade,al-upgrade,zone-create,zone,zone-list,zones,api-login,login,api-server,api,api-urls,urls,api-user-create,api-user,api-user-list,api-users,api-zone-create,api-zone,api-zone-list,api-zones,api-token-list,api-tokens,dns-server,dns}
+  {db-seed,seed,db-setup,setup,db-truncate,truncate,test,tests,api-token-create,api-token,api-token-list,api-tokens,dns-server,dns,user-create,user,user-list,users,api-login,login,api-server,api,api-urls,urls,api-user-create,api-user,api-user-list,api-users,api-zone-create,api-zone,api-zone-list,api-zones,zone-create,zone,zone-list,zones,alembic-current,al-current,alembic-downgrade,al-downgrade,alembic-history,al-history,alembic-init,al-init,alembic-migrate,al-migrate,alembic-show,al-show,alembic-stamp,al-stamp,alembic-upgrade,al-upgrade}
                         command
     db-seed (seed)      seed db
     db-setup (setup)    setup db
     db-truncate (truncate)
                         truncate db
     test (tests)        run tests
+    api-token-create (api-token)
+                        create api-tokens directly
+    api-token-list (api-tokens)
+                        list api-tokens via DB
+    dns-server (dns)    run dns server
+    user-create (user)  create users via DB
+    user-list (users)   list users via DB
+    api-login (login)   login via API
+    api-server (api)    run api server
+    api-urls (urls)     list api urls
+    api-user-create (api-user)
+                        create user via API
+    api-user-list (api-users)
+                        list users via API
+    api-zone-create (api-zone)
+                        create user via API
+    api-zone-list (api-zones)
+                        list zones via API
+    zone-create (zone)  create zones via DB
+    zone-list (zones)   list zones via DB
+    alembic-current (al-current)
+                        run alembic current
+    alembic-downgrade (al-downgrade)
+                        run alembic downgrade
+    alembic-history (al-history)
+                        run alembic history
+    alembic-init (al-init)
+                        run alembic init
+    alembic-migrate (al-migrate)
+                        run alembic migrate
+    alembic-show (al-show)
+                        run alembic show
+    alembic-stamp (al-stamp)
+                        run alembic stamp
+    alembic-upgrade (al-upgrade)
+                        run alembic upgrade
     user-create (user)  create users via DB
     user-list (users)   list users via DB
     alembic-current (al-current)
@@ -215,11 +250,12 @@ positional arguments:
                         create user via API
     api-zone-list (api-zones)
                         list zones via API
+    api-token-create (api-token)
+                        create api-tokens directly
     api-token-list (api-tokens)
                         list api-tokens via DB
     dns-server (dns)    run dns server
 
 optional arguments:
   -h, --help            show this help message and exit
-
 ```

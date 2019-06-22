@@ -128,9 +128,11 @@ async def update(
     zone_repo: ZoneRepo = Depends(ZoneRepo),
     token: TokenPayload = Depends(ScopedTo("dns-record:create")),
 ):
+    # TODO: use abort_for_input instead of or_fail
     zone_repo.exists(id=zone_id, or_fail=True)
 
-    data = only(dict(form), ["record", "sort"])
+    data = only(form, ["record", "sort"])
 
     item = dns_record_repo.first_or_fail(id=dns_record_id).update(data).data()
+
     return DnsRecordResponse(dns_record=item)

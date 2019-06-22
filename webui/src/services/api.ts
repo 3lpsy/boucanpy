@@ -41,74 +41,59 @@ function isTokenRefreshable(token: TokenPayload): boolean {
 
 // TODO: pull from cookie instead of store?
 function refreshToken(config: AxiosRequestConfig): any {
-    console.log('axios interception: triggering refresh action for token');
+    if (store.getters['auth/hasToken']) {
+        let token = store.getters['auth/getToken'];
+        if (isTokenExpired(token)) {
+            console.log('axios interception: deauthenticating');
 
-    store
-        .dispatch('auth/refresh', store.getters['auth/getToken'].token)
-        .then(() => {
-            console.log('test');
-            console.log(config);
-            console.log('t2');
-            return config;
-        })
-        .catch((e) => {
-            throw e;
-        });
-    // if (store.getters['auth/hasToken']) {
-    //     let token = store.getters['auth/getToken'];
-    //     if (isTokenExpired(token)) {
-    //         store.dispatch('auth/deauthenticate').then(() => {
-    //             router.push({ name: 'login' });
-    //             return config;
-    //         });
-    //     } else {
-    //         if (isTokenRefreshable(token)) {
-    //             store.dispatch('auth/refresh', token.token).then(() => {
-    //                 return config;
-    //             });
-    //         } else {
-    //             return config;
-    //         }
-    //     }
-    // } else {
-    //     return config;
-    // }
+            return store.dispatch('auth/deauthenticate').then(() => {
+                router.push({ name: 'login' });
+                return config;
+            });
+        } else {
+            if (isTokenRefreshable(token)) {
+                console.log(
+                    'axios interception: triggering refresh action for token',
+                );
+                return store.dispatch('auth/refresh', token.token).then(() => {
+                    return config;
+                });
+            } else {
+                return config;
+            }
+        }
+    } else {
+        return config;
+    }
 }
 
 // TODO: pull from cookie instead of store?
 function refreshWebSocketToken(config: AxiosRequestConfig): any {
-    console.log('axios interception: triggering action for ws token');
-
-    store
-        .dispatch('auth/refresh', store.getters['auth/getWSToken'].token)
-        .then(() => {
-            console.log('test3');
-            console.log(config);
-            console.log('t3');
-            return config;
-        })
-        .catch((e) => {
-            throw e;
-        });
-    // if (store.getters['auth/hasWSToken']) {
-    //     let wsToken = store.getters['auth/getWSToken'];
-    //     if (isTokenExpired(wsToken)) {
-    //         store.dispatch('auth/deauthenticate').then(() => {
-    //             router.push({ name: 'login' });
-    //             return config;
-    //         });
-    //     } else {
-    //         if (isTokenRefreshable(wsToken)) {
-    //             store.dispatch('auth/refresh', wsToken.token).then(() => {
-    //                 return config;
-    //             });
-    //         } else {
-    //             return config;
-    //         }
-    //     }
-    // } else {
-    //     return config;
-    // }
+    if (store.getters['auth/hasWSToken']) {
+        let wsToken = store.getters['auth/getWSToken'];
+        if (isTokenExpired(wsToken)) {
+            console.log('axios interception: deauthenticating');
+            return store.dispatch('auth/deauthenticate').then(() => {
+                router.push({ name: 'login' });
+                return config;
+            });
+        } else {
+            if (isTokenRefreshable(wsToken)) {
+                console.log(
+                    'axios interception: triggering action for ws token',
+                );
+                return store
+                    .dispatch('auth/refreshWS', wsToken.token)
+                    .then(() => {
+                        return config;
+                    });
+            } else {
+                return config;
+            }
+        }
+    } else {
+        return config;
+    }
 }
 
 function handleError(error: any) {
