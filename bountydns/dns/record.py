@@ -1,6 +1,7 @@
 from dnslib import DNSLabel, QTYPE, RR, dns, DNSLabel
 from textwrap import wrap
-from .types import TYPES
+
+# from .types import TYPES
 from bountydns.core import logger
 
 
