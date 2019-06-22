@@ -94,6 +94,6 @@ async def destroy(
     token: TokenPayload = Depends(ScopedTo("dns-record:destroy")),
 ):
 
-    item = dns_record_repo.first_or_fail(id=dns_record_id).delete()
+    dns_record_repo.first_or_fail(id=dns_record_id).delete()
     messages = [{"text": "Delete Succesful", "type": "success"}]
     return BaseResponse(messages=messages)

@@ -54,7 +54,7 @@ async def index(
     name="zone.dns_record.dig.index",
     response_model=DnsRecordsDigResponse,
 )
-async def index(
+async def dig(
     zone_id: int,
     zone_repo: ZoneRepo = Depends(ZoneRepo),
     token: TokenPayload = Depends(ScopedTo("dns-record:list")),

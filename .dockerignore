@@ -6,4 +6,5 @@ infra
 .pytest_cache
 .mypy_cache
 .git
+test.py
 __pycache__
