@@ -3,10 +3,11 @@ from bountydns.core.utils import getenv
 
 def make_db_url():
     DB_DRIVER = getenv("DB_DRIVER", "postgresql")
-    DB_DATABASE = getenv("DB_DATABASE", "postgres")
     if "sqlite" in DB_DRIVER:
+        DB_DATABASE = getenv("DB_DATABASE", "", optional=True)
         SQLALCHEMY_DATABASE_URI = f"{DB_DRIVER}:///{DB_DATABASE}"
     else:
+        DB_DATABASE = getenv("DB_DATABASE", "postgres")
         DB_SERVER = getenv("DB_HOST", "db")
         DB_USER = getenv("DB_USER", "postgres")
         DB_PASSWORD = getenv("DB_PASSWORD", "postgres")

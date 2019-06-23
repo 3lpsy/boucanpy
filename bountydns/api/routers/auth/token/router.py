@@ -6,6 +6,7 @@ from bountydns.core.auth import PasswordAuthResponse
 from bountydns.core.security import verify_password, create_bearer_token
 from bountydns.db.models.user import User
 from bountydns.db.session import session
+from bountydns.core.enums import SUPER_SCOPES, NORMAL_SCOPES, PUBLISH_SCOPES
 
 router = APIRouter()
 options = {"prefix": "/auth"}
@@ -32,9 +33,9 @@ async def login(
     if user.mfa_secret:  # mfa is enabled
         scopes = "profile mfa_required"
     elif user.is_superuser:
-        scopes = "profile super zone user dns-request api-token refresh dns-record dns-server"  # grant access to super routes
+        scopes = SUPER_SCOPES  # grant access to super routes
     else:
-        scopes = "profile zone user:list dns-request api-token:list api-token:create api-token:destroy refresh dns-record:list dns-record:show dns-server:list dns-server:show"
+        scopes = NORMAL_SCOPES
 
     logger.warning(f"creating token with scopes {scopes}")
 
@@ -44,6 +45,6 @@ async def login(
     if ws_access_token:
         # TODO: make it so that you cannot get publish access without base scope
         data["ws_access_token"] = create_bearer_token(
-            data={"sub": user.id, "scopes": "zone:publish dns-request:publish refresh"}
+            data={"sub": user.id, "scopes": PUBLISH_SCOPES}
         )
     return PasswordAuthResponse(**data)

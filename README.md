@@ -149,15 +149,15 @@ TODO:
 - [x] Updatable Dns Records while running
 - [x] User management API & Frontend
 - [x] Deletable items (Zones / Users / Dns Records etc)
-- [ ] Treat all emails as lowercase
+- [x] Treat all emails as lowercase
 
-- [ ] Handle General Network Errors on the Front End
+- [x] Handle General Network Errors on the Front End
 - [ ] Add tests to API
-- [ ] Create DNS Payloads Page
-- [ ] Create DNS Payloads Form
 - [ ] Create Packer build
 - [ ] Create Terraform build
 - [ ] Allow user to seed from yaml
+- [ ] Create DNS Payloads Page
+- [ ] Create DNS Payloads Form
 - [ ] Gracefully allow actions when super is in token via ScopedTo
 - [ ] Users can manage their own profile / user info
 
@@ -165,6 +165,7 @@ TODO:
 
 - [ ] Perform Better Validation on the Backend
 - [ ] Perform Better Validation on the Frontend
+- [ ] Refactor code to handle General network errors via toast
 - [ ] Add MFA
 - [ ] Use vuex store for datatable data
 - [ ] Make relationsips sortable in repo

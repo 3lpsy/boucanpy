@@ -166,6 +166,7 @@ class ApiServer(BaseCommand):
             superuser_key = f"SEED_USER_{i}_SUPERUSER"
             is_superuser = int(environ.get(superuser_key, 0))
             if email and password:
+                email = email.lower()
                 hashed_password = hash_password(password)
                 repo = UserRepo(db=session)
                 if not repo.exists(email=email):
@@ -187,6 +188,7 @@ class ApiServer(BaseCommand):
                 if not repo.exists(name=name):
                     logger.info(f"seeding domain {name}")
                     domain = factory("DnsServerFactory").create(name=name)
+
         for i in range(9):
             i = str(i)
             ip_key = f"SEED_ZONE_{i}_IP"

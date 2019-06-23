@@ -35,7 +35,7 @@ class UserCreate(BaseCommand):
     async def run(self):
         self.load_env("api")
         self.db_register()
-        email = self.option("email")
+        email = self.option("email").lower()
         password = self.get_password()
         hashed_password = hash_password(password)
         is_superuser = bool(self.option("superuser"))

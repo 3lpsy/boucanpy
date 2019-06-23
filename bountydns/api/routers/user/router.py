@@ -2,7 +2,14 @@ from typing import List
 from fastapi import APIRouter, Depends, Query
 from bountydns.db.models.user import User
 from bountydns.core.security import ScopedTo, hash_password, TokenPayload, current_user
-from bountydns.core import PaginationQS, SortQS, BaseResponse, abort, only
+from bountydns.core import (
+    PaginationQS,
+    SortQS,
+    BaseResponse,
+    abort,
+    only,
+    abort_for_input,
+)
 from bountydns.core.user import (
     UserRepo,
     UsersResponse,
@@ -33,6 +40,11 @@ async def post(
     user_repo: UserRepo = Depends(UserRepo),
     token: TokenPayload = Depends(ScopedTo("user:create", "super", satisfy="one")),
 ):
+    if user_repo.exists(email=form.email):
+        abort_for_input("email", "Email has already been taken.")
+
+    user_repo.clear()
+
     # TODO: data validation against current db & perm checks
     data = {
         "email": form.email,
