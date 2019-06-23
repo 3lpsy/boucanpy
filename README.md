@@ -151,14 +151,13 @@ TODO:
 - [ ] User management API & Frontend
 - [ ] Treat all emails as lowercase
 
-- [ ] Handle Errors on the Front End
+- [ ] Handle General Network Errors on the Front End
 - [ ] Add tests to API
 - [ ] Create DNS Payloads Page
 - [ ] Create DNS Payloads Form
-- [ ] Allow user to seed from yaml
 - [ ] Create Packer build
 - [ ] Create Terraform build
-- [ ] Implement websocket in DNS server to receive updates regarding records
+- [ ] Allow user to seed from yaml
 
 ### Icebox
 
