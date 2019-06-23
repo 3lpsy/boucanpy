@@ -7,6 +7,12 @@ import DnsServerCreate from '@/views/DnsServerCreate.vue';
 import DnsServerEdit from '@/views/DnsServerEdit.vue';
 import DnsServerShow from '@/views/DnsServerShow.vue';
 
+import UserIndex from '@/views/UserIndex.vue';
+import UserCreate from '@/views/UserCreate.vue';
+import UserEdit from '@/views/UserEdit.vue';
+
+import ProfileEdit from '@/views/ProfileEdit.vue';
+
 import Zone from '@/views/Zone.vue';
 import ZoneEdit from '@/views/ZoneEdit.vue';
 import ZoneCreate from '@/views/ZoneCreate.vue';
@@ -24,11 +30,21 @@ import Login from '@/views/Login.vue';
 import NotFound from '@/views/errors/NotFound.vue';
 
 import GuardCollection from '@/router/guards/collection';
-import { HasAuthenticationCookie, IsAuthenticated } from '@/router/guards/auth';
+import {
+    HasAuthenticationCookie,
+    IsAuthenticated,
+    IsSuperuser,
+} from '@/router/guards/auth';
 
 const AUTHED_GUARDS = GuardCollection([
     new HasAuthenticationCookie(),
     new IsAuthenticated(),
+]);
+
+const SUPER_GUARDS = GuardCollection([
+    new HasAuthenticationCookie(),
+    new IsAuthenticated(),
+    new IsSuperuser(),
 ]);
 
 Vue.use(Router);
@@ -40,6 +56,31 @@ export default new Router({
             path: '/webui',
             name: 'home',
             component: Home,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/user',
+            name: 'user.index',
+            component: UserIndex,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/user/create',
+            name: 'user.create',
+            component: UserCreate,
+            beforeEnter: SUPER_GUARDS,
+        },
+        {
+            path: '/webui/user/:userId/edit',
+            name: 'user.edit',
+            component: UserEdit,
+            beforeEnter: AUTHED_GUARDS,
+        },
+
+        {
+            path: '/webui/profile/edit',
+            name: 'profile.edit',
+            component: ProfileEdit,
             beforeEnter: AUTHED_GUARDS,
         },
         {

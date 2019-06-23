@@ -57,8 +57,18 @@ export default class AppAlerts extends Vue {
         }
     }
 
+    registerOnToast() {
+        if (!this.registeredEvents.includes('APP_TOAST')) {
+            bus.$on('APP_TOAST', (toast) => {
+                this.$bvToast.toast(toast.message, toast.options);
+            });
+            this.registeredEvents.push('APP_TOAST');
+        }
+    }
+
     created() {
         this.registerOnAlert();
+        this.registerOnToast();
     }
 }
 </script>

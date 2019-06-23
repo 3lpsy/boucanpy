@@ -8,12 +8,6 @@ export interface Message {
     text: string;
 }
 
-export interface User {
-    id: number;
-    email: string;
-    created_at: number;
-}
-
 export interface ApiToken {
     id: number;
     scopes: string;
@@ -107,11 +101,34 @@ export interface DnsRequestsResponse {
     pagination?: object;
 }
 
+export interface User {
+    id: number;
+    email: string;
+    is_superuser?: boolean;
+    is_active?: boolean;
+
+    created_at: number;
+}
+
+export interface UserCreateForm {
+    email: string;
+    is_superuser?: boolean;
+    password: string;
+    password_confirm: string;
+}
+
 export interface UserResponse {
     user: User;
     messages?: Message[];
     pagination?: object;
 }
+
+export interface UsersResponse {
+    user: User[];
+    messages?: Message[];
+    pagination?: object;
+}
+
 export interface TokenPayload {
     sub: string;
     exp: number;

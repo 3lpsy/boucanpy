@@ -147,8 +147,8 @@ TODO:
 - [x] Apply server name validation during sync process
 - [x] Check for refreshable WebSocket token on page load
 - [x] Updatable Dns Records while running
-- [ ] Deletable items (Zones / Users / Dns Records etc)
-- [ ] User management API & Frontend
+- [x] User management API & Frontend
+- [x] Deletable items (Zones / Users / Dns Records etc)
 - [ ] Treat all emails as lowercase
 
 - [ ] Handle General Network Errors on the Front End
@@ -158,6 +158,8 @@ TODO:
 - [ ] Create Packer build
 - [ ] Create Terraform build
 - [ ] Allow user to seed from yaml
+- [ ] Gracefully allow actions when super is in token via ScopedTo
+- [ ] Users can manage their own profile / user info
 
 ### Icebox
 

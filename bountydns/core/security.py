@@ -91,10 +91,22 @@ def token_has_required_scopes(token_payload: TokenPayload, scopes: List[str]):
     return True
 
 
+def token_has_one_required_scopes(token_payload: TokenPayload, scopes: List[str]):
+    token_scopes = token_payload.scopes
+    required_scopes = scopes or []
+    for required_scope in required_scopes:
+        for token_scope in token_scopes:
+            if token_scope == required_scope:
+                return True
+    logger.critical(f"auth token missing at least one scope: {required_scope}")
+    return False
+
+
 class ScopedTo:
-    def __init__(self, *scopes, leeway=0) -> None:
+    def __init__(self, *scopes, leeway=0, satisfy="all") -> None:
         self._scopes = scopes
         self._leeway = leeway
+        self._satisfy = satisfy
 
     def __call__(
         self,
@@ -105,8 +117,15 @@ class ScopedTo:
         token = verify_jwt_token(
             token, bl_token_repo, self._leeway
         )  # proper validation goes here
-        if not token_has_required_scopes(token, self._scopes):
-            raise HTTPException(403, detail="Forbidden")
+        if self._satisfy not in ["all", "one"]:
+            logger.warning(f"Invalid satisfy value: {self._satisfy}")
+
+        if self._satisfy == "one":
+            if not token_has_one_required_scopes(token, self._scopes):
+                raise HTTPException(403, detail="Forbidden")
+        else:
+            if not token_has_required_scopes(token, self._scopes):
+                raise HTTPException(403, detail="Forbidden")
         return token
 
 

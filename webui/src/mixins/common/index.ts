@@ -3,6 +3,8 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { mixins } from 'vue-class-component';
 import { capitalize } from '@/utils';
+import { User } from '@/types';
+import bus from '@/bus';
 
 @Component({})
 export default class CommonMixin extends Vue {
@@ -23,6 +25,10 @@ export default class CommonMixin extends Vue {
         return this.inputs.find({ name: fieldName });
     }
 
+    get authUser(): User {
+        return this.$store.getters['auth/getUser'];
+    }
+
     get isAuthenticated(): boolean {
         return this.$store.getters['auth/isAuthenticated'];
     }
@@ -41,27 +47,52 @@ export default class CommonMixin extends Vue {
         if (!e || !e.response) return;
 
         let response = e.response;
-        if (response.status == 422 && response.data) {
+        if (response.data) {
             let data = response.data;
 
             if (data.detail) {
                 let detail = data.detail;
+                if (Array.isArray(detail)) {
+                    for (let item of detail) {
+                        if (
+                            item.loc.includes('body') &&
+                            item.loc.includes('form')
+                        ) {
+                            let msg = item.msg;
+                            let fieldName = item.loc[item.loc.length - 1];
 
-                for (let item of detail) {
-                    if (
-                        item.loc.includes('body') &&
-                        item.loc.includes('form')
-                    ) {
-                        let msg = item.msg;
-                        let fieldName = item.loc[item.loc.length - 1];
-
-                        if (this.getField(fieldName)) {
-                            this.addError(fieldName, msg);
+                            if (this.getField(fieldName)) {
+                                this.addError(fieldName, msg);
+                            }
                         }
                     }
+                } else if (
+                    typeof detail === 'string' ||
+                    detail instanceof String
+                ) {
+                    this.handleGlobalError({
+                        status: response.status,
+                        message: detail,
+                    });
                 }
             }
         }
+    }
+
+    handleGlobalError(error: any) {
+        let code = error.status || 500;
+        let status = String(code);
+        let message = error.message || 'Unkown Error';
+        let toastMsg = status + ': ' + message;
+
+        bus.$emit('APP_TOAST', {
+            message: toastMsg,
+            options: {
+                title: 'Application Message',
+                variant: 'danger',
+                toaster: 'b-toaster-bottom-right',
+            },
+        });
     }
 
     addError(fieldName: string, msg: string) {

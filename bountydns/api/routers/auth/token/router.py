@@ -17,14 +17,16 @@ async def login(
     db: Session = Depends(session),
     form: OAuth2PasswordRequestForm = Depends(),
 ):
-    user = db.query(User).filter_by(email=form.username).first()
+    username = form.username.lower() if form.username else ""
+
+    user = db.query(User).filter_by(email=username).first()
 
     if not user or not user.hashed_password:
-        logger.warning(f"user exists failed for {form.username}")
+        logger.warning(f"user exists failed for {username}")
         raise HTTPException(status_code=401, detail="Incorrect email or password")
 
     if not verify_password(form.password, user.hashed_password):
-        logger.warning(f"hash verification failed for {form.username}")
+        logger.warning(f"hash verification failed for {username}")
         raise HTTPException(status_code=401, detail="Incorrect email or password")
 
     if user.mfa_secret:  # mfa is enabled

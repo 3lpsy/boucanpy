@@ -35,6 +35,9 @@ class DbSeed(BaseCommand):
 
             logger.info("creating superuser")
             super = factory("SuperUserFactory").create(email="jim@jim.com")
+            logger.info("creating normal user")
+            norm = factory("UserFactory").create(email="norm@jim.com")
+
             logger.info("creating zones")
             zone = factory("ZoneFactory").create(domain="othersite.com", ip="127.0.1.1")
             dns_server = factory("DnsServerFactory").create()

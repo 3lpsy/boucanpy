@@ -25,7 +25,13 @@ export const AuthMutations: IAuthMutations = {
         state.wsToken = wsToken;
     },
     CLEAR_USER: (state) => {
-        state.user = { id: 0, email: '', created_at: 0 };
+        state.user = {
+            id: 0,
+            email: '',
+            created_at: 0,
+            is_superuser: false,
+            is_active: false,
+        };
     },
     SET_USER: (state, user: User) => {
         state.user = user;
