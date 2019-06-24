@@ -13,6 +13,9 @@ _sessions = {}
 _session = sessionmaker(autocommit=False, autoflush=False, query_cls=PaginationQuery)
 _scoped_session = scoped_session(_session)
 
+import traceback
+import inspect
+
 # TODO: fix this, move back to single database target
 def session():
     if DEFAULT_KEY in _sessions.keys():
@@ -20,6 +23,11 @@ def session():
     session = dbs[DEFAULT_KEY]["Session"]()
     _sessions[DEFAULT_KEY] = session
     return session
+
+
+# Depends(session) resolves on different threadpool. Use Depends(async_session) for same threadpool
+async def async_session():
+    return session()
 
 
 def db_session():

@@ -20,3 +20,5 @@ from .types import (
 )
 
 from .enums import *
+
+from .depends import Depends

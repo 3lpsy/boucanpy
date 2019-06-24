@@ -29,8 +29,8 @@ options = {"prefix": ""}
 
 @router.post("/api-token/sync", name="api_token.sync", response_model=ApiTokenResponse)
 async def sync(
-    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
-    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
+    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo()),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
     token: TokenPayload = Depends(ScopedTo("api-token:syncable")),
 ):
     scopes = token.scopes
@@ -77,7 +77,7 @@ async def sync(
 async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
-    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
+    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo()),
     token: TokenPayload = Depends(ScopedTo("api-token:list")),
     includes: List[str] = Query(None),
 ):
@@ -95,8 +95,8 @@ async def index(
 @router.post("/api-token", name="api_token.store", response_model=ApiTokenResponse)
 async def store(
     form: ApiTokenCreateForm,
-    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
-    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
+    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo()),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
     token: TokenPayload = Depends(ScopedTo("api-token:create")),
     user: User = Depends(current_user),
 ):
@@ -142,7 +142,7 @@ async def store(
 )
 async def show(
     api_token_id: int,
-    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
+    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo()),
     token: TokenPayload = Depends(ScopedTo("api-token:read")),
     includes: List[str] = Query(None),
 ):
@@ -164,7 +164,7 @@ async def show(
 )
 async def sensitive(
     api_token_id: int,
-    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
+    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo()),
     token: TokenPayload = Depends(ScopedTo("api-token:read")),
     includes: List[str] = Query(None),
 ):
@@ -183,7 +183,7 @@ async def sensitive(
 @router.delete("/api-token/{api_token_id}", response_model=BaseResponse)
 async def destroy(
     api_token_id: int,
-    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo),
+    api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo()),
     token: TokenPayload = Depends(ScopedTo("api-token:destroy")),
 ):
     messages = [{"text": "Deactivation Succesful", "type": "success"}]

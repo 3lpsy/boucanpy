@@ -5,7 +5,7 @@ from starlette.requests import Request
 from fastapi import HTTPException, Security, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
-from bountydns.core import logger
+from bountydns.core import logger, abort
 from bountydns.core.token import TokenPayload
 from bountydns.core.user import UserRepo
 from bountydns.core.black_listed_token import BlackListedTokenRepo
@@ -45,7 +45,7 @@ def create_bearer_token(
         to_encode, config.API_SECRET_KEY, algorithm=config.JWT_ALGORITHM
     )
 
-    return encoded_jwt
+    return str(encoded_jwt.decode())
 
 
 def verify_jwt_token(token: str, bl_token_repo=None, leeway=0) -> TokenPayload:
@@ -108,12 +108,13 @@ class ScopedTo:
         self._leeway = leeway
         self._satisfy = satisfy
 
-    def __call__(
+    async def __call__(
         self,
         request: Request,
-        bl_token_repo: BlackListedTokenRepo = Depends(BlackListedTokenRepo),
+        bl_token_repo: BlackListedTokenRepo = Depends(BlackListedTokenRepo()),
         token: str = Security(oauth2),
     ) -> TokenPayload:
+
         token = verify_jwt_token(
             token, bl_token_repo, self._leeway
         )  # proper validation goes here
@@ -122,15 +123,19 @@ class ScopedTo:
 
         if self._satisfy == "one":
             if not token_has_one_required_scopes(token, self._scopes):
-                raise HTTPException(403, detail="Forbidden")
+                vmsg = f"Token does not have one of the required scopes: {str(self._scopes)}"
+                logger.error(vmsg)
+                abort(code=403, msg="Forbidden", debug=vmsg)
         else:
             if not token_has_required_scopes(token, self._scopes):
-                raise HTTPException(403, detail="Forbidden")
+                vmsg = f"Token does not have all required scopes: {str(self._scopes)}"
+                logger.error(vmsg)
+                abort(code=403, msg="Forbidden", debug=vmsg)
         return token
 
 
-def current_user(
-    token: TokenPayload = Depends(ScopedTo()), user_repo: UserRepo = Depends(UserRepo)
+async def current_user(
+    token: TokenPayload = Depends(ScopedTo()), user_repo: UserRepo = Depends(UserRepo())
 ) -> User:
     user = user_repo.get_by_sub(token.sub)
     if not user:

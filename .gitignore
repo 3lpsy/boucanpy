@@ -1,5 +1,11 @@
 .vscode
 
+bountydns/storage/logs/*.log
+bountydns/storage/logs/*.log*
+bountydns/storage/database/*.db
+bountydns/storage/database/*.sqlite
+bountydns/storage/database/*.sqlite*
+
 .env/*.env
 !.env/.gitkeep
 !.env/*.example

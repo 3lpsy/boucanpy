@@ -20,7 +20,10 @@ for directory_name, sub_directories, files in walk(factories_dir):
 # aliases = [{f.alias: f} for f in factories if f.alias]
 
 
-def factory(key):
+def factory(key, session=None):
     # if key in aliases:
     #     return aliases[key]
-    return factories[key]
+    f = factories[key]
+    if session:
+        f._meta.sqlalchemy_session = session
+    return f

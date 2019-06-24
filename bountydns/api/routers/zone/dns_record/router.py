@@ -29,8 +29,8 @@ async def index(
     zone_id: int,
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
-    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo),
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo()),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-record:list")),
     includes: List[str] = Query(None),
 ):
@@ -56,7 +56,7 @@ async def index(
 )
 async def dig(
     zone_id: int,
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-record:list")),
 ):
     zone = zone_repo.includes("dns_records").first_or_fail(id=zone_id).results()
@@ -74,8 +74,8 @@ async def dig(
 async def store(
     zone_id: int,
     form: DnsRecordForZoneCreateForm,
-    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo),
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo()),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-record:create")),
 ):
     zone_repo.exists(id=zone_id, or_fail=True)
@@ -95,8 +95,8 @@ async def store(
 async def show(
     zone_id: int,
     dns_record_id: int,
-    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo),
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo()),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-record:show")),
     includes: List[str] = Query(None),
 ):
@@ -124,8 +124,8 @@ async def update(
     zone_id: int,
     dns_record_id: int,
     form: DnsRecordForZoneCreateForm,
-    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo),
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo()),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-record:create")),
 ):
     # TODO: use abort_for_input instead of or_fail

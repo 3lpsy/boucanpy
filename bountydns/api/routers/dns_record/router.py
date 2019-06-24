@@ -22,7 +22,7 @@ options = {"prefix": ""}
 async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
-    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo),
+    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-record:list")),
     includes: List[str] = Query(None),
 ):
@@ -54,7 +54,7 @@ async def store(request: Request, form: DnsRecordForZoneCreateForm = Depends()):
 )
 async def show(
     dns_record_id: int,
-    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo),
+    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-record:show")),
     includes: List[str] = Query(None),
 ):
@@ -90,7 +90,7 @@ async def update(
 )
 async def destroy(
     dns_record_id: int,
-    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo),
+    dns_record_repo: DnsRecordRepo = Depends(DnsRecordRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-record:destroy")),
 ):
 

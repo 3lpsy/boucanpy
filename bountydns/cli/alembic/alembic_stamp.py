@@ -17,6 +17,7 @@ class AlembicStamp(BaseCommand):
         return parser
 
     async def run(self):
-        load_env("api")
+        env = self.option("env")
+        self.load_env(f"api.{env}")
         db_register(make_db_url())
         stamp(self.migration_dir)

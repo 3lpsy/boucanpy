@@ -5,7 +5,7 @@ from bountydns.core import logger
 from bountydns.core.auth import PasswordAuthResponse
 from bountydns.core.security import verify_password, create_bearer_token
 from bountydns.db.models.user import User
-from bountydns.db.session import session
+from bountydns.db.session import async_session
 from bountydns.core.enums import SUPER_SCOPES, NORMAL_SCOPES, PUBLISH_SCOPES
 
 router = APIRouter()
@@ -15,7 +15,7 @@ options = {"prefix": "/auth"}
 @router.post("/token", name="auth.token", response_model=PasswordAuthResponse)
 async def login(
     ws_access_token: bool = False,
-    db: Session = Depends(session),
+    db: Session = Depends(async_session),
     form: OAuth2PasswordRequestForm = Depends(),
 ):
     username = form.username.lower() if form.username else ""

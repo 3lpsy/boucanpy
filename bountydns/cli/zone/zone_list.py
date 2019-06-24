@@ -13,7 +13,8 @@ class ZoneList(BaseCommand):
         return parser
 
     async def run(self):
-        self.load_env("api")
+        env = self.option("env")
+        self.load_env(f"api.{env}")
         self.db_register()
         for zone in self.session().query(Zone).all():
             print(zone.id, zone.domain, zone.ip, zone.dns_server.name)

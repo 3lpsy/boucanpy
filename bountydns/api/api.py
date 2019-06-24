@@ -1,7 +1,6 @@
 from pathlib import Path
 from os.path import join
 from urllib.parse import urlparse
-from dotenv import load_dotenv
 from bountydns.core.utils import root_dir
 from fastapi import FastAPI, APIRouter
 
@@ -20,11 +19,9 @@ from bountydns.db.session import session, db_register
 from bountydns.db.utils import make_db_url
 
 db_register(make_db_url())
-
 from bountydns.api import (
     config,
 )  # environment must be loaded, dabatabse must be registerd
-
 
 # CORS
 api = FastAPI(title=config.API_PROJECT_NAME, openapi_url="/api/v1/openapi.json")
@@ -110,9 +107,9 @@ async def http_exception(request, exc):
     return JSONResponse({"detail": "Server Error"}, status_code=500)
 
 
-@api.middleware("http")
 async def db_session_middleware(request: Request, call_next):
     request.state.db = session()
     response = await call_next(request)
     request.state.db.close()
     return response
+

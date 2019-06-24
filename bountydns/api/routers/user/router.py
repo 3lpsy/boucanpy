@@ -1,5 +1,6 @@
 from typing import List
-from fastapi import APIRouter, Depends, Query
+from bountydns.core import Depends
+from fastapi import APIRouter, Query
 from bountydns.db.models.user import User
 from bountydns.core.security import ScopedTo, hash_password, TokenPayload, current_user
 from bountydns.core import (
@@ -9,6 +10,7 @@ from bountydns.core import (
     abort,
     only,
     abort_for_input,
+    logger,
 )
 from bountydns.core.user import (
     UserRepo,
@@ -27,7 +29,7 @@ options = {"prefix": ""}
 async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
-    user_repo: UserRepo = Depends(UserRepo),
+    user_repo: UserRepo = Depends(UserRepo()),
     token: TokenPayload = Depends(ScopedTo("user:list")),
 ):
     pg, items = user_repo.sort(sort_qs).paginate(pagination).data()
@@ -37,9 +39,10 @@ async def index(
 @router.post("/user", name="user.store", response_model=UserResponse)
 async def post(
     form: UserCreateForm,
-    user_repo: UserRepo = Depends(UserRepo),
+    user_repo: UserRepo = Depends(UserRepo()),
     token: TokenPayload = Depends(ScopedTo("user:create", "super", satisfy="one")),
 ):
+
     if user_repo.exists(email=form.email):
         abort_for_input("email", "Email has already been taken.")
 
@@ -49,7 +52,7 @@ async def post(
     data = {
         "email": form.email,
         "hashed_password": hash_password(form.password),
-        "is_active": True,
+        "is_active": getattr(form, "is_superuser", True),
         "is_superuser": getattr(form, "is_superuser", False),
     }
     item = user_repo.create(data).data()
@@ -59,7 +62,7 @@ async def post(
 @router.get("/user/{user_id}", name="user.show", response_model=UserResponse)
 async def show(
     user_id: int,
-    user_repo: UserRepo = Depends(UserRepo),
+    user_repo: UserRepo = Depends(UserRepo()),
     token: TokenPayload = Depends(ScopedTo("user:show", "super")),
     includes: List[str] = Query(None),
 ):
@@ -73,7 +76,7 @@ async def show(
 async def post(
     user_id: int,
     form: UserEditForm,
-    user_repo: UserRepo = Depends(UserRepo),
+    user_repo: UserRepo = Depends(UserRepo()),
     token: TokenPayload = Depends(ScopedTo("user:update", "super", satisfy="one")),
 ):
 
@@ -91,7 +94,7 @@ async def post(
 )
 async def activate(
     user_id: int,
-    user_repo: UserRepo = Depends(UserRepo),
+    user_repo: UserRepo = Depends(UserRepo()),
     token: TokenPayload = Depends(ScopedTo("user:create", "super")),
 ):
     user = user_repo.get_or_fail(user_id).update({"is_active": True}).data()
@@ -101,7 +104,7 @@ async def activate(
 @router.delete("/user/{user_id}", response_model=BaseResponse)
 async def destroy(
     user_id: int,
-    user_repo: UserRepo = Depends(UserRepo),
+    user_repo: UserRepo = Depends(UserRepo()),
     token: TokenPayload = Depends(ScopedTo("user:create", "super", satisfy="one")),
     user: User = Depends(current_user),
 ):

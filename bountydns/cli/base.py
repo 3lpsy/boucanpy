@@ -40,6 +40,9 @@ class BaseCommand:
         parser = sub_parser.add_parser(
             cls.name, aliases=cls.aliases, help=cls.description
         )
+        parser.add_argument(
+            "-E", "--env", action="store", default="dev", help="environment"
+        )
         if cls.add_log_level:
             parser.add_argument(
                 "-L", "--log-level", action="store", default="info", help="log level"
@@ -66,6 +69,8 @@ class BaseCommand:
             level = "debug"
         elif self.option("log_level", None):
             level = self.option("log_level")
+        elif self.env("LOG_LEVEL", "info"):
+            level = "info"
         return level
 
     def get_second_log_level(self):

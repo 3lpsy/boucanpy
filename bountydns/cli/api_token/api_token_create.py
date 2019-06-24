@@ -32,7 +32,8 @@ class ApiTokenCreate(BaseCommand):
         return parser
 
     async def run(self):
-        self.load_env("api")
+        env = self.option("env")
+        self.load_env(f"api.{env}")
         self.db_register()
         dns_server_name = self.option("dns_server_name", None) or uuid.uuid4().hex
         scopes = self.get_scopes()

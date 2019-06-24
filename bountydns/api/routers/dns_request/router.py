@@ -24,7 +24,7 @@ options = {"prefix": ""}
 async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
-    dns_request_repo: DnsRequestRepo = Depends(DnsRequestRepo),
+    dns_request_repo: DnsRequestRepo = Depends(DnsRequestRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-request:list")),
 ):
     pg, items = (
@@ -42,9 +42,9 @@ async def index(
 )
 async def store(
     form: DnsRequestCreateForm,
-    dns_request_repo: DnsRequestRepo = Depends(DnsRequestRepo),
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
-    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
+    dns_request_repo: DnsRequestRepo = Depends(DnsRequestRepo()),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
     token: str = Depends(ScopedTo("dns-request:create")),
 ):
 

@@ -6,7 +6,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Session, joinedload, raiseload
 
 from bountydns.core import logger, abort
-from bountydns.db.session import session
+from bountydns.db.session import async_session
 from bountydns.db.pagination import Pagination
 from bountydns.core.pagination.data import PaginationData
 
@@ -17,7 +17,7 @@ class BaseRepo:
     default_loads = []
     default_fitlers = []
 
-    def __init__(self, db: Session = Depends(session)):
+    def __init__(self, db=None):
         self.db = db
         self._query = None
         self._results = None
@@ -27,6 +27,10 @@ class BaseRepo:
         self._is_list = False  # check at runtime instead (?)
         self._options = []
         self._includes = {}
+
+    async def __call__(self, db: Session = Depends(async_session)):
+        self.db = db
+        return self
 
     ## RESULTS
     def results(self):
@@ -380,7 +384,7 @@ class BaseRepo:
 
     def debug(self, msg):
         # pass
-        logger.info(msg)
+        logger.debug(msg)
 
     def clear(self):
         self._query = None

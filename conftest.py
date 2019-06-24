@@ -1,68 +1,76 @@
 # http://alexmic.net/flask-sqlalchemy-pytest/
-#  import os
-# import pytest
+from os import unlink
+import pytest
+from os.path import join, exists
 
-# from project.factory import create_app
-# from project.database import db as _db
+from sqlalchemy.orm import scoped_session
 
+from bountydns.core import load_env
+from bountydns.core.utils import db_dir, project_dir, storage_dir
 
-# TESTDB = 'test_project.db'
-# TESTDB_PATH = "/opt/project/data/{}".format(TESTDB)
-# TEST_DATABASE_URI = 'sqlite:///' + TESTDB_PATH
+load_env("api.test")
 
+from bountydns.api.api import api
+from bountydns.db.session import session as _api_session
+from bountydns.db.session import _session  # sessionmaker
+from bountydns.db import metadata as _metadata
+from bountydns.db import engine as _engine
 
-# @pytest.fixture(scope='session')
-# def app(request):
-#     """Session-wide test `Flask` application."""
-#     settings_override = {
-#         'TESTING': True,
-#         'SQLALCHEMY_DATABASE_URI': TEST_DATABASE_URI
-#     }
-#     app = create_app(__name__, settings_override)
+from bountydns.db.utils import get_resolved_db_path
+from starlette.testclient import TestClient
 
-#     # Establish an application context before running the tests.
-#     ctx = app.app_context()
-#     ctx.push()
-
-#     def teardown():
-#         ctx.pop()
-
-#     request.addfinalizer(teardown)
-#     return app
+from bountydns.db.migrate.upgrade import upgrade
+import logging
 
 
-# @pytest.fixture(scope='session')
-# def db(app, request):
-#     """Session-wide test database."""
-#     if os.path.exists(TESTDB_PATH):
-#         os.unlink(TESTDB_PATH)
-
-#     def teardown():
-#         _db.drop_all()
-#         os.unlink(TESTDB_PATH)
-
-#     _db.app = app
-#     _db.create_all()
-
-#     request.addfinalizer(teardown)
-#     return _db
+@pytest.fixture
+def setlog(caplog):
+    caplog.set_level(logging.INFO)
 
 
-# @pytest.fixture(scope='function')
-# def session(db, request):
-#     """Creates a new database session for a test."""
-#     connection = db.engine.connect()
-#     transaction = connection.begin()
+@pytest.fixture(scope="session")
+def client(request):
 
-#     options = dict(bind=connection, binds={})
-#     session = db.create_scoped_session(options=options)
+    _client = TestClient(api)
+    return _client
 
-#     db.session = session
 
-#     def teardown():
-#         transaction.rollback()
-#         connection.close()
-#         session.remove()
+@pytest.fixture(scope="session")
+def engine(client, request):
+    """Session-wide test database."""
+    DB_PATH = get_resolved_db_path()
 
-#     request.addfinalizer(teardown)
-#     return session
+    if exists(DB_PATH):
+        unlink(DB_PATH)
+
+    migration_dir = join(db_dir("alembic"), "api")
+    e = _engine()
+
+    def teardown():
+        _metadata().drop_all(bind=e)
+        unlink(DB_PATH)
+
+    upgrade(migration_dir)
+
+    request.addfinalizer(teardown)
+
+    return e
+
+
+@pytest.fixture(scope="function")
+def session(engine, request):
+    """Creates a new database session for a test."""
+    connection = engine.connect()
+    transaction = connection.begin()
+
+    options = dict(bind=connection, binds={})
+    s = _session(**options)  # calls session maker
+    scoped = scoped_session(s)
+
+    def teardown():
+        transaction.rollback()
+        connection.close()
+        scoped.remove()
+
+    request.addfinalizer(teardown)
+    return scoped

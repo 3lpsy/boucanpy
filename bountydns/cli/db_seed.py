@@ -19,7 +19,8 @@ class DbSeed(BaseCommand):
         return parser
 
     async def run(self):
-        self.load_env("api")
+        env = self.option("env")
+        self.load_env(f"api.{env}")
         self.db_register()
 
         if self.option("target", False) == False:

@@ -9,7 +9,7 @@ services:
       bountydnspub:
     command: api-server --debug --reload --no-envs --db-setup --db-seed -l 0.0.0.0 --db-seed-env
     env_file:
-      - ./../../.env/api.env
+      - ./../../.env/api.dev.env
     depends_on:
       - db
       - broadcast

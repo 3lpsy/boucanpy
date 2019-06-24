@@ -18,7 +18,7 @@ options = {"prefix": ""}
 async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
-    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-server:list")),
     search: str = Query(None),
     includes: List[str] = Query(None),
@@ -38,7 +38,7 @@ async def index(
 @router.post("/dns-server", name="dns_server.store", response_model=DnsServerResponse)
 async def store(
     form: DnsServerCreateForm,
-    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-server:create")),
 ):
     if dns_server_repo.exists(name=form.name.lower()):
@@ -57,7 +57,7 @@ async def store(
 )
 async def show(
     dns_server: str,
-    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-server:show")),
     includes: List[str] = Query(None),
 ):
@@ -92,7 +92,7 @@ async def show(
 async def update(
     dns_server: str,
     form: DnsServerCreateForm,
-    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
     token: TokenPayload = Depends(ScopedTo("dns-server:update")),
 ):
 

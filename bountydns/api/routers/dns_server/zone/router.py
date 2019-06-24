@@ -22,7 +22,7 @@ async def index(
     sort_qs: SortQS = Depends(SortQS),
     search: str = Query(None),
     pagination: PaginationQS = Depends(PaginationQS),
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
     token: TokenPayload = Depends(ScopedTo("zone:list")),
     includes: List[str] = Query(None),
 ):

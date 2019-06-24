@@ -21,7 +21,7 @@ options = {"prefix": ""}
 async def index(
     sort_qs: SortQS = Depends(SortQS),
     pagination: PaginationQS = Depends(PaginationQS),
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
     token: TokenPayload = Depends(ScopedTo("zone:list")),
     includes: List[str] = Query(None),
 ):
@@ -41,8 +41,8 @@ async def index(
 @router.post("/zone", name="zone.store", response_model=ZoneResponse)
 async def store(
     form: ZoneCreateForm,
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
-    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
     token: TokenPayload = Depends(ScopedTo("zone:create")),
 ):
 
@@ -68,7 +68,7 @@ async def store(
 @router.get("/zone/{zone_id}", name="zone.show", response_model=ZoneResponse)
 async def show(
     zone_id: int,
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
     token: TokenPayload = Depends(ScopedTo("zone:show")),
     includes: List[str] = Query(None),
 ):
@@ -83,8 +83,8 @@ async def show(
 async def update(
     zone_id: int,
     form: ZoneCreateForm,
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
-    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
+    dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
     token: TokenPayload = Depends(ScopedTo("zone:update")),
     includes: List[str] = Query(None),
 ):
@@ -119,7 +119,7 @@ async def update(
 )
 async def activate(
     zone_id: int,
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
     token: TokenPayload = Depends(ScopedTo("zone:update")),
 ):
     zone = zone_repo.get_or_fail(zone_id).update({"is_active": True}).data()
@@ -129,7 +129,7 @@ async def activate(
 @router.delete("/zone/{zone_id}", name="zone.destroy", response_model=BaseResponse)
 async def destroy(
     zone_id: int,
-    zone_repo: ZoneRepo = Depends(ZoneRepo),
+    zone_repo: ZoneRepo = Depends(ZoneRepo()),
     token: TokenPayload = Depends(ScopedTo("zone:destroy")),
 ):
     messages = [{"text": "Deactivation Succesful", "type": "success"}]

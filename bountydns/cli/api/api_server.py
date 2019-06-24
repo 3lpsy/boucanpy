@@ -59,7 +59,8 @@ class ApiServer(BaseCommand):
     async def run(self):
         args = ["bountydns.api.main:api"]
         kwargs = self.get_kwargs()
-        self.load_env("api")
+        env = self.option("env")
+        self.load_env(f"api.{env}")
 
         if self.should_import_check():
             logger.info("performing import check")

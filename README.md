@@ -152,7 +152,7 @@ TODO:
 - [x] Treat all emails as lowercase
 
 - [x] Handle General Network Errors on the Front End
-- [ ] Add tests to API
+- [x] Add basic tests to API
 - [ ] Create Packer build
 - [ ] Create Terraform build
 - [ ] Allow user to seed from yaml
@@ -163,6 +163,7 @@ TODO:
 
 ### Icebox
 
+- [ ] Write more tests and enabling logging in tests
 - [ ] Perform Better Validation on the Backend
 - [ ] Perform Better Validation on the Frontend
 - [ ] Refactor code to handle General network errors via toast
