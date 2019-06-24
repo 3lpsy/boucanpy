@@ -92,7 +92,7 @@ After demonstrating that the project is worth dedicating time to, Phase 2 will i
 Features:
 
 - Manage DNS Records through WebUI / API
-- Ability to update the DNS server's records for running DNS Server (WebSocket)
+- Ability to update the DNS server's records for running DNS Server (Polling)
 - Receive Notifications on DNS Resolution via email or webhook
 - Easily build the application with Docker, Packer, & Terraform
 

@@ -37,7 +37,7 @@ async def index(
 
 
 @router.post("/user", name="user.store", response_model=UserResponse)
-async def post(
+async def store(
     form: UserCreateForm,
     user_repo: UserRepo = Depends(UserRepo()),
     token: TokenPayload = Depends(ScopedTo("user:create", "super", satisfy="one")),
@@ -73,12 +73,24 @@ async def show(
 
 
 @router.put("/user/{user_id}", name="user.update", response_model=UserResponse)
-async def post(
+async def update(
     user_id: int,
     form: UserEditForm,
     user_repo: UserRepo = Depends(UserRepo()),
     token: TokenPayload = Depends(ScopedTo("user:update", "super", satisfy="one")),
 ):
+    email = getattr(form, "email", None)
+    print("hello1")
+    if email:
+        print("hello2")
+
+        existing = user_repo.first(email=email).results()
+        print(existing)
+        if existing and existing.id != user_id:
+            print("hello3")
+
+            abort_for_input(msg="Invalid Email Address", code=422, field="email")
+        user_repo.clear()
 
     data = only(form, ["email", "is_active", "is_superuser"])
 
@@ -97,6 +109,7 @@ async def activate(
     user_repo: UserRepo = Depends(UserRepo()),
     token: TokenPayload = Depends(ScopedTo("user:create", "super")),
 ):
+
     user = user_repo.get_or_fail(user_id).update({"is_active": True}).data()
     return UserResponse(user=user)
 

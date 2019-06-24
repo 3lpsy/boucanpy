@@ -20,7 +20,7 @@ def abort(code=500, msg="Error", debug=""):
     raise HTTPException(code, detail=msg)
 
 
-def abort_for_input(field, msg="Error", code=422, debug=""):
+def abort_for_input(field="", msg="Error", code=422, debug=""):
     if debug and environ.get("API_ENV", "").lower() in ["test", "local", "dev"]:
         msg = msg + "(Debug: " + str(debug) + ")"
     detail = [{"loc": ["body", "form", field], "msg": msg, "type": "value_error"}]

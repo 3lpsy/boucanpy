@@ -22,7 +22,7 @@ class DbTruncate(BaseCommand):
         self.db_register()
         failed = []
         if self.option("confirm"):
-            for model in models:
+            for class_name, model in models.items():
                 for item in self.session().query(model).all():
                     logger.info(f"deleting {item}")
                     try:

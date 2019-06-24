@@ -59,7 +59,7 @@ def db_register(db_uri):
         import_module(f"bountydns.db.models.base", "base"), "metadata"
     )
     models = getattr(import_module(f"bountydns.db.models", "models"), "models")
-    db["models"] = models
+    db["models"] = models.values()
     dbs[DEFAULT_KEY] = db
     # setup events
 

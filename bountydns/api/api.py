@@ -107,9 +107,9 @@ async def http_exception(request, exc):
     return JSONResponse({"detail": "Server Error"}, status_code=500)
 
 
-async def db_session_middleware(request: Request, call_next):
-    request.state.db = session()
-    response = await call_next(request)
-    request.state.db.close()
-    return response
+# async def db_session_middleware(request: Request, call_next):
+#     request.state.db = session()
+#     response = await call_next(request)
+#     request.state.db.close()
+#     return response
 

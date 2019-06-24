@@ -3,7 +3,7 @@ from os.path import join
 from importlib import import_module
 from bountydns.core.utils import db_dir, snake_to_title
 
-models = []
+models = {}
 
 models_dir = db_dir("models")
 for directory_name, sub_directories, files in walk(models_dir):
@@ -15,4 +15,11 @@ for directory_name, sub_directories, files in walk(models_dir):
             module = import_module(module_path, class_name)
             model = getattr(module, class_name)
             if model not in models:
-                models.append(model)
+                models[class_name] = model
+
+
+def model(key):
+    # if key in aliases:
+    #     return aliases[key]
+    f = models[key]
+    return f

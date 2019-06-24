@@ -1,12 +1,13 @@
 from typing import Optional
 from pydantic import BaseModel, ValidationError, validator, constr
+from bountydns.core import ConstrainedEmailStr, ConstrainedSecretStr
 
 
 class UserCreateForm(BaseModel):
-    email: str
+    email: ConstrainedEmailStr
     is_superuser: Optional[bool]
-    password: constr(min_length=8, max_length=1024)
-    password_confirm: constr(min_length=8, max_length=1024)
+    password: ConstrainedSecretStr
+    password_confirm: ConstrainedSecretStr
 
     @validator("password_confirm")
     def passwords_match(cls, v, values, **kwargs):
@@ -22,10 +23,10 @@ class UserCreateForm(BaseModel):
 
 
 class UserEditForm(BaseModel):
-    email: Optional[str]
+    email: Optional[ConstrainedEmailStr]
     is_superuser: Optional[bool]
-    password: Optional[constr(min_length=8, max_length=1024)]
-    password_confirm: Optional[constr(min_length=8, max_length=1024)]
+    password: Optional[ConstrainedSecretStr]
+    password_confirm: Optional[ConstrainedSecretStr]
 
     @validator("password_confirm")
     def passwords_match(cls, v, values, **kwargs):

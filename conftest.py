@@ -30,7 +30,6 @@ def setlog(caplog):
 
 @pytest.fixture(scope="session")
 def client(request):
-
     _client = TestClient(api)
     return _client
 
@@ -60,17 +59,14 @@ def engine(client, request):
 @pytest.fixture(scope="function")
 def session(engine, request):
     """Creates a new database session for a test."""
-    connection = engine.connect()
-    transaction = connection.begin()
 
-    options = dict(bind=connection, binds={})
+    options = dict(bind=engine, binds={})
     s = _session(**options)  # calls session maker
-    scoped = scoped_session(s)
+    # scoped = scoped_session(s)
 
     def teardown():
-        transaction.rollback()
-        connection.close()
-        scoped.remove()
+        s.rollback()
+        # scoped.remove()
 
     request.addfinalizer(teardown)
-    return scoped
+    return s
