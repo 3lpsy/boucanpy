@@ -153,6 +153,7 @@ TODO:
 
 - [x] Handle General Network Errors on the Front End
 - [x] Add basic tests to API
+- [ ] Initialize repos with .new()
 - [ ] Create Packer build
 - [ ] Create Terraform build
 - [ ] Allow user to seed from yaml

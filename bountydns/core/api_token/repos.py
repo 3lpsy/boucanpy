@@ -11,7 +11,7 @@ class ApiTokenRepo(BaseRepo):
     default_model = ApiToken
     default_data_model = ApiTokenData
 
-    def __init__(self, db=None, bl_token_repo=None):
+    def __init__(self, db=None, bl_token_repo=None, **kwargs):
         self.bl_token_repo = bl_token_repo
         super().__init__(db)
 
@@ -25,6 +25,4 @@ class ApiTokenRepo(BaseRepo):
         bl_token_repo: BlackListedTokenRepo = Depends(BlackListedTokenRepo()),
         db: Session = Depends(async_session),
     ):
-        self.bl_token_repo = bl_token_repo
-        self.db = db
-        return self
+        return self.new(db=db, bl_token_repo=bl_token_repo)

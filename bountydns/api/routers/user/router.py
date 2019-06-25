@@ -79,25 +79,21 @@ async def update(
     user_repo: UserRepo = Depends(UserRepo()),
     token: TokenPayload = Depends(ScopedTo("user:update", "super", satisfy="one")),
 ):
+
     email = getattr(form, "email", None)
-    print("hello1")
     if email:
-        print("hello2")
-
-        existing = user_repo.first(email=email).results()
-        print(existing)
+        for u in user_repo.new().all().results():
+            print("USER:", u.id, u.email, u)
+        existing = user_repo.new().first(email=email).results()
         if existing and existing.id != user_id:
-            print("hello3")
-
             abort_for_input(msg="Invalid Email Address", code=422, field="email")
-        user_repo.clear()
 
     data = only(form, ["email", "is_active", "is_superuser"])
 
     if getattr(form, "password", None):
         data["hashed_password"] = hash_password(form.password)
 
-    item = user_repo.get_or_fail(user_id).update(data).data()
+    item = user_repo.new().get_or_fail(user_id).update(data).data()
     return UserResponse(user=item)
 
 

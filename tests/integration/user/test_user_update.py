@@ -27,18 +27,16 @@ def test_superuser_can_update_user(client, session):
 def test_email_must_not_already_exist_or_failure(client, session):
     auth = factory("SuperUserFactory", session=session).create()
     existing = factory("UserFactory", session=session).create(email="existing@test.com")
-    target = factory("UserFactory", session=session).create(email="target@test.com")
+    target = factory("UserFactory", session=session).create(email="target2@test.com")
 
     token = create_bearer_token(data={"sub": auth.id, "scopes": SUPER_SCOPES})
     bearer = "Bearer " + str(token)
 
     data = {"email": existing.email}
 
-    print(f"/api/v1/user/{str(target.id)}")
     response = client.put(
         f"/api/v1/user/{str(target.id)}",
         json=data,
         headers={"Content-Type": "application/json", "Authorization": bearer},
     )
-    print(response.text)
-    assert response.status_code == 200
+    assert response.status_code == 422

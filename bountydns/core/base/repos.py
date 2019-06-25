@@ -17,7 +17,7 @@ class BaseRepo:
     default_loads = []
     default_fitlers = []
 
-    def __init__(self, db=None):
+    def __init__(self, db=None, **kwargs):
         self.db = db
         self._query = None
         self._results = None
@@ -28,9 +28,13 @@ class BaseRepo:
         self._options = []
         self._includes = {}
 
+    # some strange caching thing happens with Depends() so when it's called, we just return a new instance
     async def __call__(self, db: Session = Depends(async_session)):
-        self.db = db
-        return self
+        return self.new(db=db)
+
+    def new(self, db=None, **kwargs):
+        db = db or self.db
+        return self.__class__(db=db, **kwargs)
 
     ## RESULTS
     def results(self):
