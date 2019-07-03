@@ -1,5 +1,6 @@
 from pathlib import Path
 from os.path import join
+from os import environ
 from urllib.parse import urlparse
 from bountydns.core.utils import root_dir
 from fastapi import FastAPI, APIRouter
@@ -54,10 +55,12 @@ api.include_router(main_router, prefix=config.API_V1_STR)
 from starlette.websockets import WebSocket
 
 # public broadcast
-api.add_websocket_route("/broadcast", broadcast_index, name="broadcast.index")
-api.add_websocket_route(
-    "/broadcast/auth", broadcast_authed_index, name="broadcast.authed.index"
-)
+
+if int(environ.get("BROADCAST_ENABLED", 0)) == 1:
+    api.add_websocket_route("/broadcast", broadcast_index, name="broadcast.index")
+    api.add_websocket_route(
+        "/broadcast/auth", broadcast_authed_index, name="broadcast.authed.index"
+    )
 
 
 @api.get("/")

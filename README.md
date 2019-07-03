@@ -10,6 +10,16 @@ For more information on Burp Collaborator, checkout [burp's documentation](https
 
 When answering queries, the DNS server hits the API with information regarding the DNS query. The API will then serve the log of the DNS queries via a RESTful HTTP API as well as front-end (HTML/JS) web GUI.
 
+### Getting Started Quickly
+
+Set the Environment variables
+
+```
+$ cd .env
+$ cp x.env.example x.env
+$ vim x.env #
+```
+
 ## Building and Running
 
 As of now the project can only automatically build for development. The build system uses docker and docker-compose to raise multiple services which the application requires.

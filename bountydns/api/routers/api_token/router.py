@@ -81,6 +81,10 @@ async def index(
     token: TokenPayload = Depends(ScopedTo("api-token:list")),
     includes: List[str] = Query(None),
 ):
+    logger.critical("LOOK AT MEEEEE")
+    print("HELLOOOOOOOOOOO")
+    includes = only(includes, ["dns_server"], values=True)
+
     pg, items = (
         api_token_repo.loads("dns_server")
         .strict()
@@ -128,7 +132,7 @@ async def store(
 
     data = {
         "scopes": " ".join(scopes),
-        "token": str(token.decode()),
+        "token": str(token),
         "expires_at": form.expires_at,
         "dns_server_id": form.dns_server_id,
     }

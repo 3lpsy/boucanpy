@@ -35,6 +35,7 @@ class ApiTokenCreate(BaseCommand):
         env = self.option("env")
         self.load_env(f"api.{env}")
         self.db_register()
+
         dns_server_name = self.option("dns_server_name", None) or uuid.uuid4().hex
         scopes = self.get_scopes()
         expires_delta = timedelta(days=self.option("days"))
@@ -49,7 +50,7 @@ class ApiTokenCreate(BaseCommand):
             expire=expires_at,
         )
 
-        print("API_TOKEN:{}".format(str(token.decode())))
+        print("API_TOKEN:{}".format(str(token)))
 
     def get_scopes(self):
         if self.option("scope"):

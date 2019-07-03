@@ -7,6 +7,10 @@ def only_values(l, grab):
 
 
 def only(data, grab, values=False):
+    if not grab:
+        grab = []
+    if not data:
+        data = {}
     if values:
         return only_values(data, grab)
     if not isinstance(data, dict):

@@ -22,9 +22,11 @@ def random_expires_at():
 
 def bearer_token(dns_server_name, scopes):
     return str(
-        create_bearer_token(
-            data={"sub": 1, "dns_server_name": dns_server_name, "scopes": scopes}
-        ).decode()
+        str(
+            create_bearer_token(
+                data={"sub": 1, "dns_server_name": dns_server_name, "scopes": scopes}
+            )
+        )
     )
 
 

@@ -198,9 +198,10 @@ export default class ApiTokensTable extends mixins(
                 this.isLoaded = true;
                 this.isLoading = false;
             })
-            .catch((error) => {
+            .catch((err) => {
                 this.isLoading = false;
-                throw error;
+                this.handleApiError(err);
+                throw err;
             });
     }
 

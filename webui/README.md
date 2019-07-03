@@ -1,11 +1,20 @@
 # The Web Interface
 
-This directory holds the front end code for the primary web interface. The Web Interface consists of a Single Page Application Written with VueJS
+This directory holds the front end code for the primary web interface.
+
+The Web Interface consists of a Single Page Application Written with VueJS.
 
 ## Project setup
 
 ```
 npm install
+
+```
+
+### Compiles and hot-reloads for development (used when synced as a docker volume)
+
+```
+npm run watch
 ```
 
 ### Compiles and hot-reloads for development

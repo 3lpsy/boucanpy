@@ -119,17 +119,24 @@ export const AuthActions: IAuthActions = {
                     console.log('dispatching auth/setUpAccessToken');
                     dispatch('setUpAccessToken', tokens.accessToken)
                         .then((user) => {
-                            dispatch('setUpWSAccessToken', tokens.wsAccessToken)
-                                .then((token) => {
-                                    resolve(user);
-                                })
-                                .catch((err) => {
-                                    console.log(
-                                        'auth/setUpWSAccessToken error in auth/authenticate:',
-                                        err,
-                                    );
-                                    throw err;
-                                });
+                            if (tokens.wsAccessToken) {
+                                dispatch(
+                                    'setUpWSAccessToken',
+                                    tokens.wsAccessToken,
+                                )
+                                    .then((token) => {
+                                        resolve(user);
+                                    })
+                                    .catch((err) => {
+                                        console.log(
+                                            'auth/setUpWSAccessToken error in auth/authenticate:',
+                                            err,
+                                        );
+                                        throw err;
+                                    });
+                            } else {
+                                resolve(user);
+                            }
                         })
                         .catch((err) => {
                             console.log(
@@ -142,10 +149,8 @@ export const AuthActions: IAuthActions = {
                 .catch((err) => {
                     console.log('authenticate error');
                     console.log('dispatching auth/deauthenticate');
-                    return new Promise((resolve, reject) => {
-                        dispatch('deauthenticate').then(() => {
-                            reject(err);
-                        });
+                    dispatch('deauthenticate').then(() => {
+                        reject(err);
                     });
                 });
         });

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from bountydns.core.security import ScopedTo, current_user, TokenPayload
 from bountydns.db.models.user import User
-from bountydns.core import PaginationQS
+from bountydns.core import PaginationQS, logger
 from bountydns.core.user import UserRepo, UserResponse, UserCreateForm
 
 
@@ -15,5 +15,6 @@ async def show(
     token: TokenPayload = Depends(ScopedTo("profile")),
     user: User = Depends(current_user),
 ):
+    logger.critical("Loading user")
     item = user_repo.set_results(user).data()
     return UserResponse(user=item)

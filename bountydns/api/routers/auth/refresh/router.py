@@ -22,4 +22,4 @@ async def login(
     token = create_bearer_token(
         data={"sub": token.sub, "scopes": " ".join(token.scopes)}
     )
-    return PasswordAuthResponse(token_type="bearer", access_token=str(token.decode()))
+    return PasswordAuthResponse(token_type="bearer", access_token=str(token))

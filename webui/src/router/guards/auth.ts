@@ -24,21 +24,26 @@ export class IsAuthenticated extends Guard {
                 .dispatch('auth/setUpAccessToken', token.cookie())
                 .then((user: User) => {
                     if (!store.getters['auth/hasWSToken']) {
-                        store
-                            .dispatch(
-                                'auth/setUpWSAccessToken',
-                                token.cookieWS(),
-                            )
-                            .then((token) => {
-                                next();
-                            })
-                            .catch((err) => {
-                                console.log(
-                                    'Error during middleware authentication for setUpWsAccessToken',
-                                );
-                                next({ name: 'login' });
-                                throw err;
-                            });
+                        if (token.cookieWS()) {
+                            store
+                                .dispatch(
+                                    'auth/setUpWSAccessToken',
+                                    token.cookieWS(),
+                                )
+                                .then((token) => {
+                                    next();
+                                })
+                                .catch((err) => {
+                                    console.log(
+                                        'Error during middleware authentication for setUpWsAccessToken',
+                                    );
+                                    next({ name: 'login' });
+                                    throw err;
+                                });
+                        } else {
+                            // no ws token to load, probably disabled
+                            next();
+                        }
                     } else {
                         next();
                     }

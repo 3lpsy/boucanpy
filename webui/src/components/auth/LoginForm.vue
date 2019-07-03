@@ -20,37 +20,37 @@
         <ul class="error-messages" v-if="loginError">
             <li>{{ loginError }}</li>
         </ul>
-        <button class="btn btn-lg btn-primary pull-xs-right">
-            Sign in
-        </button>
+        <button class="btn btn-lg btn-primary pull-xs-right">Sign in</button>
     </b-form>
 </template>
 
 <script lang="ts">
-    import { Vue, Component } from 'vue-property-decorator';
-    import { mixins } from 'vue-class-component';
-    import CommonMixin from '@/mixins/common';
-    import {LoginForm as LoginFormData, User} from '@/types';
-    import authService from '@/services/auth';
+import { Vue, Component } from 'vue-property-decorator';
+import { mixins } from 'vue-class-component';
+import CommonMixin from '@/mixins/common';
+import { LoginForm as LoginFormData, User } from '@/types';
+import authService from '@/services/auth';
 
-    @Component
-    export default class LoginForm extends mixins(CommonMixin) {
-        show: boolean = true
-        loginError: string = ''
-        form: LoginFormData = {
-            username: '',
-            password: ''
-        }
-        onSubmit() {
-            console.log("dispatching auth/authenticate")
-            this.$store.dispatch('auth/authenticate', this.form).then((user: User) => {
-                this.$router.push({'name': 'home'})
-            }).catch((err) => {
-                this.loginError = "Authentication failed"
-                console.log("ERROR", err)
-                throw err
+@Component
+export default class LoginForm extends mixins(CommonMixin) {
+    show: boolean = true;
+    loginError: string = '';
+    form: LoginFormData = {
+        username: '',
+        password: '',
+    };
+    onSubmit() {
+        console.log('dispatching auth/authenticate');
+        this.$store
+            .dispatch('auth/authenticate', this.form)
+            .then((user: User) => {
+                this.$router.push({ name: 'home' });
             })
-        }
-
+            .catch((err) => {
+                this.loginError = 'Authentication failed';
+                console.log('ERROR', err);
+                this.handleApiError(err);
+            });
     }
+}
 </script>

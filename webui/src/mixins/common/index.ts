@@ -44,7 +44,10 @@ export default class CommonMixin extends Vue {
     }
 
     handleApiError(e: any) {
-        if (!e || !e.response) return;
+        if (!e || !e.response) {
+            console.log('No response on error');
+            return;
+        }
 
         let response = e.response;
         if (response.data) {
@@ -64,6 +67,12 @@ export default class CommonMixin extends Vue {
                             if (this.getField(fieldName)) {
                                 this.addError(fieldName, msg);
                             }
+                        } else {
+                            let message = item.loc.join('.') + ' - ' + item.msg;
+                            this.handleGlobalError({
+                                status: response.status,
+                                message: message,
+                            });
                         }
                     }
                 } else if (

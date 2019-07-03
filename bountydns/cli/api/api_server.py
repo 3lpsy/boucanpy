@@ -144,11 +144,13 @@ class ApiServer(BaseCommand):
         return False
 
     def should_bcast_check(self):
-        if not self.option("no_bcast_check", False):
-            return True
+        if self.env("BROADCAST_ENABLED", 0, int_=True) == 0:
+            return False
+        elif self.option("no_bcast_check", False):
+            return False
         elif self.env("API_NO_BROADCAST_CHECK", 1, int_=True) == 0:
-            return True
-        return False
+            return False
+        return True
 
     def seed_from_env(self):
         from bountydns.core.user import UserRepo

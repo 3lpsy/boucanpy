@@ -1,3 +1,4 @@
+from os import environ
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
@@ -40,9 +41,9 @@ async def login(
     logger.warning(f"creating token with scopes {scopes}")
 
     token = create_bearer_token(data={"sub": user.id, "scopes": scopes})
-    data = {"token_type": "bearer", "access_token": str(token.decode())}
+    data = {"token_type": "bearer", "access_token": str(token)}
 
-    if ws_access_token:
+    if ws_access_token and int(environ.get("BROADCAST_ENABLED", 0)) == 1:
         # TODO: make it so that you cannot get publish access without base scope
         data["ws_access_token"] = create_bearer_token(
             data={"sub": user.id, "scopes": PUBLISH_SCOPES}

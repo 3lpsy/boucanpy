@@ -33,7 +33,7 @@ async def broadcast_authed_index(websocket: WebSocket):
     if not token_has_required_scopes(token, []):  # TODO: check scopes later
         raise HTTPException(403, detail="Forbidden")
     user_repo = UserRepo(session())
-    user = current_user(token, user_repo)
+    user = await current_user(token, user_repo)
 
     subscriber, channel = await make_subscriber("auth")
 

@@ -1,3 +1,4 @@
+from os import environ
 from importlib import import_module
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -63,7 +64,8 @@ def db_register(db_uri):
     dbs[DEFAULT_KEY] = db
     # setup events
 
-    db_register_model_events(models)
+    if int(environ.get("BROADCAST_ENABLED"), 0) == 1:
+        db_register_model_events(models)
 
     from bountydns.db.search.mixin import SearchableMixin
 
