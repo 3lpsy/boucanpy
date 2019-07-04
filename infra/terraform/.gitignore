@@ -4,6 +4,14 @@
 env
 env.sh
 
+
+data/*.pem
+data/*.pem.pub
+data/*.pub
+
+
+*.pub
+
 *.pem
 *.pem.pub
 

@@ -1,0 +1,69 @@
+{
+  "variables": {
+    "region": "{{ env `PACKER_REGION` }}",
+    "vpc_id": "{{ env `PACKER_VPC_ID` }}",
+    "subnet_id": "{{ env `PACKER_SUBNET_ID` }}",
+    "name": "bountydns",
+    "version": "0.0.1",
+    "ssh_username": "ubuntu",
+    "profile_name": "{{ env `PACKER_AWS_PROFILE_NAME` }}"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "vpc_id": "{{user `vpc_id`}}",
+      "subnet_id": "{{user `subnet_id`}}",
+      "profile": "{{ user `profile_name` }}",
+      "associate_public_ip_address": true,
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477"],
+        "most_recent": true
+      },
+      "instance_type": "t2.micro",
+      "ami_regions": "{{user `destination_regions`}}",
+      "ssh_username": "{{user `ssh_username` }}",
+      "name": "{{ user `name` }}-{{ user `version` }}",
+      "ami_name": "{{ user `name` }}-{{ user `version` }}",
+      "force_deregister": "true",
+      "force_delete_snapshot": "true"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mkdir /tmp/provisioners",
+        "sudo chown {{user `ssh_username`}}:{{user `ssh_username`}} /tmp/provisioners"
+      ]
+    },
+    {
+      "type": "file",
+      "destination": "/tmp/provisioners/",
+      "source": "./provisioners/"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo bash /tmp/provisioners/provision.sh",
+        "sudo bash /tmp/provisioners/provision.docker.sh",
+        "sudo bash /tmp/provisioners/provision.docker-compose.sh",
+        "sudo bash /tmp/provisioners/provision.bdns.sh",
+        "sudo rm -rf /tmp/provisioners",
+        "sudo rm -rf /tmp/*",
+        "sudo apt-get -y autoremove --purge",
+        "sudo apt-get -y clean",
+        "sudo apt-get -y autoclean",
+        "sudo dpkg --get-selections | grep -v deinstall",
+        "sudo rm -f /root/.bash_history",
+        "sudo rm -f /home/{{ user `ssh_username` }}/.bash_history",
+        "sudo find /var/log -type f | while read f; do echo -ne '' | sudo tee \"${f}\"; done;"
+      ]
+    }
+  ]
+}
