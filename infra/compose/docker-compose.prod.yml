@@ -7,9 +7,9 @@ services:
     image: 3lpsy/bountydns:latest
     networks:
       bountydnspub:
-    command: api-server --debug --reload --no-envs --db-setup --db-seed -l 0.0.0.0 --db-seed-env
+    command: api-server --no-envs --db-setup -l 0.0.0.0 --db-seed-env
     env_file:
-      - ${COMPOSE_ENV_DIR}/api.dev.env
+      - ${COMPOSE_ENV_DIR}/api.prod.env
     depends_on:
       - db
       - broadcast
@@ -19,7 +19,7 @@ services:
       bountydnspub:
     command: dns-server -l 0.0.0.0 -p 53
     env_file:
-      - ${COMPOSE_ENV_DIR}/dns.dev.env
+      - ${COMPOSE_ENV_DIR}/dns.prod.env
     restart: on-failure:2
     depends_on:
       - bountydns
@@ -38,7 +38,10 @@ services:
       dockerfile: ./../docker/proxy.dockerfile
     image: 3lpsy/bountydns-proxy:latest
     env_file:
-      - ${COMPOSE_ENV_DIR}/proxy.dev.env
+      - ${COMPOSE_ENV_DIR}/proxy.prod.env
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8443:8443"
     networks:
       bountydnspub:
     depends_on:
@@ -50,27 +53,16 @@ services:
       dockerfile: ./../docker/broadcast.dockerfile
     image: 3lpsy/bountydns-broadcast:latest
     env_file:
-      - ${COMPOSE_ENV_DIR}/broadcast.dev.env
+      - ${COMPOSE_ENV_DIR}/broadcast.prod.env
     networks:
       bountydnspub:
     restart: on-failure:5
   db:
     image: postgres:latest
     env_file:
-      - ${COMPOSE_ENV_DIR}/db.dev.env
+      - ${COMPOSE_ENV_DIR}/db.prod.env
     networks:
       bountydnspub:
-  dbui:
-    image: dpage/pgadmin4
-    env_file:
-      - ${COMPOSE_ENV_DIR}/dbui.dev.env
-    networks:
-      bountydnspub:
-    volumes:
-      - ./../dbui/dev.servers.json:/pgadmin4/servers.json
-      - ./../dbui/dev.pass.txt:/dbpass.txt
-    logging:
-      driver: none
 
 networks:
   bountydnspub:

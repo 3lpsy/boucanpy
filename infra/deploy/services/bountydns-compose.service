@@ -1,0 +1,25 @@
+[Unit]
+Description=BountyDNS All in One Deployment
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+
+WorkingDirectory=/opt/bountydns
+
+# Remove old containers, images and volumes
+ExecStartPre=/opt/bountydns/compose.sh prod down -v
+ExecStartPre=/opt/bountydns/compose.sh prod rm -fv
+ExecStartPre=-/bin/bash -c 'docker volume ls -qf "name=bountydns_" | xargs docker volume rm'
+ExecStartPre=-/bin/bash -c 'docker network ls -qf "name=bountydns_" | xargs docker network rm'
+ExecStartPre=-/bin/bash -c 'docker ps -aqf "name=bountydns_*" | xargs docker rm'
+
+# Compose up
+ExecStart=/opt/bountydns/compose.sh prod up
+
+# Compose down, remove containers and volumes
+ExecStop=/opt/bountydns/compose.sh prod down -v
+
+[Install]
+WantedBy=multi-user.target

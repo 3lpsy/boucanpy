@@ -178,7 +178,7 @@ resource "aws_key_pair" "main" {
 }
 
 resource "aws_instance" "main" {
-  ami                    = "ami-026c8acd92718196b"
+  ami                    = "ami-02a516d715c0fc8a9"
   instance_type          = "t2.micro"
   subnet_id              = "${aws_subnet.main.id}"
   vpc_security_group_ids = ["${aws_security_group.main.id}"]
@@ -231,27 +231,3 @@ resource "aws_route53_record" "ns" {
   ttl     = "5"
   records = ["${var.dns_sub}.${var.dns_root}."]
 }
-
-# resource "aws_route53_record" "ns" {
-#   allow_overwrite = true
-#   name            = "${var.dns_root}"
-#   ttl             = 30
-#   type            = "NS"
-#   zone_id         = "${aws_route53_zone.main.zone_id}"
-
-#   records = ["${aws_instance.main.public_ip}"]
-# }
-
-# resource "null_resource" "ns_configure" {
-
-#     triggers = {
-#         zone_id = "${aws_route53_zone.main.id}"
-#     }
-
-
-#     provisioner "local-exec" {
-#         command = "echo 'Changing Registration Name Servers for ${var.dns_root'"
-#     }
-
-# }
-

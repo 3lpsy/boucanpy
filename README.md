@@ -16,7 +16,7 @@ Set the Environment variables
 
 ```
 $ cd .env
-$ cp x.env.example x.env
+$ cp x.env.example x.dev.env # alternatively x.prod.env
 $ vim x.env #
 ```
 
