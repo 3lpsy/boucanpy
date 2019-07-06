@@ -178,7 +178,7 @@ resource "aws_key_pair" "main" {
 }
 
 resource "aws_instance" "main" {
-  ami                    = "ami-02a516d715c0fc8a9"
+  ami                    = "ami-0f951f1a641b201ef"
   instance_type          = "t2.micro"
   subnet_id              = "${aws_subnet.main.id}"
   vpc_security_group_ids = ["${aws_security_group.main.id}"]
@@ -190,22 +190,86 @@ resource "aws_instance" "main" {
   }
 }
 
+
+### Environment + Secrets 
+
+#### Database 
+
+resource "random_pet" "db_database" {
+  length    = 2
+  separator = "_"
+}
+resource "random_pet" "db_username" {
+  length    = 2
+  separator = "_"
+}
+resource "random_string" "db_password" {
+  length  = 32
+  special = false
+}
+
+#### do not use single quotes
+data "template_file" "db_env" {
+  template = <<-EOT
+POSTGRES_DB="${random_pet.db_database.id}"
+POSTGRES_USER="${random_pet.db_username.id}"
+POSTGRES_PASSWORD="${random_string.db_password.result}"
+EOT
+}
+
+
+#### Proxy 
+
+#### do not use single quotes
+data "template_file" "proxy_env" {
+  template = <<-EOT
+SSL_ENABLED="0"
+INSECURE_LISTEN_PORT="8080"
+API_BACKEND_PROTO="http"
+API_BACKEND_HOST="bountydns"
+API_BACKEND_PORT="8080"
+DEBUG_CONF="1"
+EOT
+}
+
+#### Broadcast 
+
+resource "random_string" "broadcast_password" {
+  length  = 24
+  special = false
+}
+
+#### do not use single quotes
+data "template_file" "broadcast_env" {
+  template = <<-EOT
+REDIS_PASSWORD="${random_string.broadcast_password.result}"
+REDIS_MASTER_HOST="redis"
+EOT
+}
+
+
+### Configuration
 resource "null_resource" "server_configure" {
   triggers = {
     server_id = "${aws_instance.main.id}"
+    db_env = "${data.template_file.db_env.rendered}"
+    proxy_env = "${data.template_file.proxy_env.rendered}"
+    broadcast_env = "${data.template_file.broadcast_env.rendered}"
   }
 
   connection {
-    host        = "${aws_instance.main.public_ip}"
-    type        = "ssh"
-    user        = "ubuntu"
+    host = "${aws_instance.main.public_ip}"
+    type = "ssh"
+    user = "ubuntu"
     private_key = "${file("${path.root}/data/key.pem")}"
-    agent       = false # change to true if agent is required
+    agent = false # change to true if agent is required
   }
 
   provisioner "remote-exec" {
     inline = [
-      "whoami"
+      "echo '${data.template_file.db_env.rendered}' | sudo tee /etc/bountydns/env/db.prod.env",
+      "echo '${data.template_file.proxy_env.rendered}' | sudo tee /etc/bountydns/env/proxy.prod.env",
+      "echo '${data.template_file.broadcast_env.rendered}' | sudo tee /etc/bountydns/env/broadcast.prod.env",
     ]
   }
 }
@@ -218,16 +282,16 @@ resource "aws_route53_zone" "main" {
 
 resource "aws_route53_record" "a" {
   zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = "${var.dns_sub}.${var.dns_root}"
-  type    = "A"
-  ttl     = "5"
+  name = "${var.dns_sub}.${var.dns_root}"
+  type = "A"
+  ttl = "5"
   records = ["${aws_instance.main.public_ip}"]
 }
 
 resource "aws_route53_record" "ns" {
   zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = "${var.dns_sub}.${var.dns_root}"
-  type    = "NS"
-  ttl     = "5"
+  name = "${var.dns_sub}.${var.dns_root}"
+  type = "NS"
+  ttl = "5"
   records = ["${var.dns_sub}.${var.dns_root}."]
 }
