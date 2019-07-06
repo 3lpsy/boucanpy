@@ -4,7 +4,6 @@ FROM python:3.7-alpine3.9
 ENV API_ENV=dev
 ENV API_SECRET_KEY=helloworld
 ENV API_SERVER_NAME=boutydns
-ENV API_SERVER_HOST=127.0.0.1:8080
 ENV API_CORS_ORIGINS=http://127.0.0.1:8080,http://localhost:8080
 ENV DB_DRIVER=postgresql
 ENV DB_HOST=db

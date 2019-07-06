@@ -25,7 +25,7 @@
         "owners": ["099720109477"],
         "most_recent": true
       },
-      "instance_type": "t2.micro",
+      "instance_type": "t2.medium",
       "ami_regions": "{{user `destination_regions`}}",
       "ssh_username": "{{user `ssh_username` }}",
       "name": "{{ user `name` }}-{{ user `version` }}",
@@ -51,11 +51,11 @@
       "type": "shell",
       "inline": [
         "sudo bash /tmp/provisioners/provision.sh",
+        "sudo bash /tmp/provisioners/provision.jwtbin.sh",
         "sudo bash /tmp/provisioners/provision.docker.sh",
         "sudo bash /tmp/provisioners/provision.docker-compose.sh",
         "sudo bash /tmp/provisioners/provision.bdns-dl.sh",
         "sudo bash /tmp/provisioners/provision.bdns-build.sh",
-        "sudo bash /tmp/provisioners/provision.bdns-configure.sh",
         "sudo rm -rf /tmp/provisioners",
         "sudo rm -rf /tmp/*",
         "sudo apt-get -y autoremove --purge",

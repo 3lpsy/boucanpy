@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e;
-
+export DEBIAN_FRONTEND=noninteractive;
 
 echo "Provisioning: BDNS Download - Start"
 echo "Provisioning: BDNS Download - Cloning BountyDNS to /opt/bountydns"

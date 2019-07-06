@@ -8,6 +8,7 @@ compose="docker-compose"
 env="${1}"
 
 shift ;
+
 if [[ ${#env} -lt 3 ]]; then
     echo "please pass the environment type: compose.sh [env] [args]"
 elif [[ "${env}" == "dev" ]]; then

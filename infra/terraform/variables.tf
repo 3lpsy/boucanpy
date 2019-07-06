@@ -1,6 +1,12 @@
+variable "admin_email" {}
+variable "admin_password" {}
+
 variable "dns_root" {}
 
 variable "dns_sub" { default = "bdns" }
+
+variable "dns_dashboard_sub" { default = "dashbdns" }
+
 variable "trusted_external_cidr_block" {}
 
 variable "internet_cidr_block" {}

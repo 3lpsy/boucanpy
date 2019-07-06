@@ -42,82 +42,27 @@ resource "aws_network_acl" "main" {
   }
 }
 
-resource "aws_network_acl_rule" "dashboard_ingress" {
-  network_acl_id = "${aws_network_acl.main.id}"
+# TODO: make restrictive
+resource "aws_network_acl_rule" "allow_all_in" {
   rule_number    = 100
+  rule_action    = "allow"
   egress         = false
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "${var.trusted_external_cidr_block}"
-  from_port      = 8080
-  to_port        = 8080
-}
-
-resource "aws_network_acl_rule" "ssh_ingress" {
-  network_acl_id = "${aws_network_acl.main.id}"
-  rule_number    = 200
-  egress         = false
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "${var.trusted_external_cidr_block}"
-  from_port      = 22
-  to_port        = 22
-}
-
-resource "aws_network_acl_rule" "http_ingress" {
-  network_acl_id = "${aws_network_acl.main.id}"
-  rule_number    = 300
-  egress         = false
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "${var.internet_cidr_block}"
-  from_port      = 80
-  to_port        = 80
-}
-
-resource "aws_network_acl_rule" "https_ingress" {
-  network_acl_id = "${aws_network_acl.main.id}"
-  rule_number    = 400
-  egress         = false
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "${var.internet_cidr_block}"
-  from_port      = 443
-  to_port        = 443
-}
-
-
-resource "aws_network_acl_rule" "dns_tcp_ingress" {
-  network_acl_id = "${aws_network_acl.main.id}"
-  rule_number    = 500
-  egress         = false
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "${var.internet_cidr_block}"
-  from_port      = 53
-  to_port        = 53
-}
-
-resource "aws_network_acl_rule" "dns_udp_ingress" {
-  network_acl_id = "${aws_network_acl.main.id}"
-  rule_number    = 600
-  egress         = false
-  protocol       = "udp"
-  rule_action    = "allow"
-  cidr_block     = "${var.internet_cidr_block}"
-  from_port      = 53
-  to_port        = 53
-}
-
-resource "aws_network_acl_rule" "all_outbound" {
-  network_acl_id = "${aws_network_acl.main.id}"
-  rule_number    = 700
-  egress         = true
-  protocol       = "-1"
-  rule_action    = "allow"
-  cidr_block     = "${var.internet_cidr_block}"
   from_port      = 0
   to_port        = 65535
+  protocol       = -1
+  cidr_block     = "${var.internet_cidr_block}"
+  network_acl_id = "${aws_network_acl.main.id}"
+}
+
+resource "aws_network_acl_rule" "allow_all_out" {
+  rule_number    = 100
+  rule_action    = "allow"
+  egress         = true
+  from_port      = 0
+  to_port        = 65535
+  protocol       = -1
+  cidr_block     = "${var.internet_cidr_block}"
+  network_acl_id = "${aws_network_acl.main.id}"
 }
 
 resource "aws_route_table" "main" {
@@ -148,23 +93,69 @@ resource "aws_security_group" "main" {
   vpc_id      = "${aws_vpc.main.id}"
 }
 
-# TODO: make restrictive
-resource "aws_security_group_rule" "allow_all_in" {
-  type              = "ingress"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = -1
-  cidr_blocks       = ["${var.internet_cidr_block}"]
+
+resource "aws_security_group_rule" "dashboard_ingress" {
   security_group_id = "${aws_security_group.main.id}"
+  type              = "ingress"
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.trusted_external_cidr_block}"]
+  from_port         = 8080
+  to_port           = 8080
 }
 
-resource "aws_security_group_rule" "allow_all_out" {
+resource "aws_security_group_rule" "ssh_ingress" {
+  security_group_id = "${aws_security_group.main.id}"
+  type              = "ingress"
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.trusted_external_cidr_block}"]
+  from_port         = 22
+  to_port           = 22
+}
+
+resource "aws_security_group_rule" "http_ingress" {
+  security_group_id = "${aws_security_group.main.id}"
+  type              = "ingress"
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.internet_cidr_block}"]
+  from_port         = 80
+  to_port           = 80
+}
+
+resource "aws_security_group_rule" "https_ingress" {
+  security_group_id = "${aws_security_group.main.id}"
+  type              = "ingress"
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.internet_cidr_block}"]
+  from_port         = 443
+  to_port           = 443
+}
+
+
+resource "aws_security_group_rule" "dns_tcp_ingress" {
+  security_group_id = "${aws_security_group.main.id}"
+  type              = "ingress"
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.internet_cidr_block}"]
+  from_port         = 53
+  to_port           = 53
+}
+
+resource "aws_security_group_rule" "dns_udp_ingress" {
+  security_group_id = "${aws_security_group.main.id}"
+  type              = "ingress"
+  protocol          = "udp"
+  cidr_blocks       = ["${var.internet_cidr_block}"]
+  from_port         = 53
+  to_port           = 53
+}
+
+resource "aws_security_group_rule" "all_outbound" {
+  security_group_id = "${aws_security_group.main.id}"
   type              = "egress"
+  protocol          = "-1"
+  cidr_blocks       = ["${var.internet_cidr_block}"]
   from_port         = 0
   to_port           = 65535
-  protocol          = -1
-  cidr_blocks       = ["${var.internet_cidr_block}"]
-  security_group_id = "${aws_security_group.main.id}"
 }
 
 
@@ -193,27 +184,36 @@ resource "aws_instance" "main" {
 
 ### Environment + Secrets 
 
+# jwt secret is generated on the server via API_SECRET
+data "template_file" "dns_env" {
+  template = <<-EOT
+API_URL=http://proxy:8080
+API_TOKEN=
+EOT
+}
+
+
 #### Database 
 
 resource "random_pet" "db_database" {
-  length    = 2
+  length = 2
   separator = "_"
 }
 resource "random_pet" "db_username" {
-  length    = 2
-  separator = "_"
+  length = 2
+  separator = "-"
 }
 resource "random_string" "db_password" {
-  length  = 32
+  length = 32
   special = false
 }
 
 #### do not use single quotes
 data "template_file" "db_env" {
   template = <<-EOT
-POSTGRES_DB="${random_pet.db_database.id}"
-POSTGRES_USER="${random_pet.db_username.id}"
-POSTGRES_PASSWORD="${random_string.db_password.result}"
+POSTGRES_DB=${random_pet.db_database.id}
+POSTGRES_USER=${random_pet.db_username.id}
+POSTGRES_PASSWORD=${random_string.db_password.result}
 EOT
 }
 
@@ -223,27 +223,59 @@ EOT
 #### do not use single quotes
 data "template_file" "proxy_env" {
   template = <<-EOT
-SSL_ENABLED="0"
-INSECURE_LISTEN_PORT="8080"
-API_BACKEND_PROTO="http"
-API_BACKEND_HOST="bountydns"
-API_BACKEND_PORT="8080"
-DEBUG_CONF="1"
+SSL_ENABLED=0
+INSECURE_LISTEN_PORT=8080
+API_BACKEND_PROTO=http
+API_BACKEND_HOST=bountydns
+API_BACKEND_PORT=8080
+DEBUG_CONF=1
 EOT
 }
 
 #### Broadcast 
 
 resource "random_string" "broadcast_password" {
-  length  = 24
+  length = 24
   special = false
 }
 
 #### do not use single quotes
 data "template_file" "broadcast_env" {
   template = <<-EOT
-REDIS_PASSWORD="${random_string.broadcast_password.result}"
-REDIS_MASTER_HOST="redis"
+REDIS_PASSWORD=${random_string.broadcast_password.result}
+REDIS_MASTER_HOST=redis
+EOT
+}
+
+#### Api 
+
+resource "random_string" "api_secret_key" {
+  length  = 32
+  special = false
+}
+
+data "template_file" "api_env" {
+  template = <<-EOT
+API_ENV=prod
+API_SECRET_KEY=${random_string.api_secret_key.result}
+API_SERVER_NAME=boutydns
+API_CORS_ORIGINS=http://${var.dns_dashboard_sub}.${var.dns_root}:8080,http://${var.dns_sub}.${var.dns_root}:8080,http://${aws_instance.main.public_ip}:8080
+DB_DRIVER=postgresql
+DB_HOST=db
+DB_PORT=5432
+DB_USER=${random_pet.db_username.id}
+DB_PASSWORD=${random_string.db_password.result}
+DB_DATABASE=${random_pet.db_database.id}
+BROADCAST_ENABLED=1
+BROADCAST_DRIVER=redis
+BROADCAST_HOST=broadcast
+BROADCAST_PORT=6379
+BROADCAST_PASSWORD=${random_string.broadcast_password.result}
+BROADCAST_PATH=0
+SEED_USER_0_EMAIL=${var.admin_email}
+SEED_USER_0_PASSWORD=${var.admin_password}
+SEED_USER_0_SUPERUSER=1
+
 EOT
 }
 
@@ -252,6 +284,7 @@ EOT
 resource "null_resource" "server_configure" {
   triggers = {
     server_id = "${aws_instance.main.id}"
+    api_env = "${data.template_file.api_env.rendered}"
     db_env = "${data.template_file.db_env.rendered}"
     proxy_env = "${data.template_file.proxy_env.rendered}"
     broadcast_env = "${data.template_file.broadcast_env.rendered}"
@@ -267,9 +300,19 @@ resource "null_resource" "server_configure" {
 
   provisioner "remote-exec" {
     inline = [
+      "echo '${data.template_file.api_env.rendered}' | sudo tee /etc/bountydns/env/api.prod.env",
       "echo '${data.template_file.db_env.rendered}' | sudo tee /etc/bountydns/env/db.prod.env",
       "echo '${data.template_file.proxy_env.rendered}' | sudo tee /etc/bountydns/env/proxy.prod.env",
       "echo '${data.template_file.broadcast_env.rendered}' | sudo tee /etc/bountydns/env/broadcast.prod.env",
+      "echo '${data.template_file.dns_env.rendered}' | sudo tee /etc/bountydns/env/dns.prod.env",
+      "sudo /opt/bountydns/infra/deploy/utils/configure_dns_jwt.sh"
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo systemctl enable bountydns-compose",
+      "sudo systemctl restart bountydns-compose"
     ]
   }
 }
@@ -294,4 +337,12 @@ resource "aws_route53_record" "ns" {
   type = "NS"
   ttl = "5"
   records = ["${var.dns_sub}.${var.dns_root}."]
+}
+
+resource "aws_route53_record" "a_dash" {
+  zone_id = "${aws_route53_zone.main.zone_id}"
+  name = "${var.dns_dashboard_sub}.${var.dns_root}"
+  type = "A"
+  ttl = "5"
+  records = ["${aws_instance.main.public_ip}"]
 }

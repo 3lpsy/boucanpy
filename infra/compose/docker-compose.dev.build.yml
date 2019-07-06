@@ -36,6 +36,11 @@ services:
     build:
       context: ./../proxy
       dockerfile: ./../docker/proxy.dockerfile
+      args:
+        VUE_APP_API_BASE: http://localhost:8080
+        VUE_APP_API_URL: http://localhost:8080/api/v1
+        VUE_APP_BROADCAST_BASE: http://localhost:8080
+        VUE_APP_BROADCAST_URL: http://localhost:8080/broadcast
     image: 3lpsy/bountydns-proxy:latest
     env_file:
       - ${COMPOSE_ENV_DIR}/proxy.dev.env

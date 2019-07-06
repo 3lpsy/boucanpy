@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -e;
+export DEBIAN_FRONTEND=noninteractive;
+
 DOCKER_COMPOSE_VERSION="1.24.1"
 echo "Provisioning: Docker Compose - Start"
 

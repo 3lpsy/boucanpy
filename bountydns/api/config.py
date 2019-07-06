@@ -5,7 +5,6 @@ from bountydns.db.session import db_url
 
 API_V1_STR = "/api/v1"
 
-API_SERVER_HOST = getenv("API_SERVER_HOST")
 
 API_SECRET_KEY = getenv("API_SECRET_KEY")
 JWT_ALGORITHM = "HS256"
