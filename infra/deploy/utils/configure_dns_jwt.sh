@@ -59,7 +59,7 @@ cat $TMP_FILE | grep -v API_TOKEN > $COPY_FILE;
 rm $TMP_FILE
 
 echo "Setting TOKEN in Copied Config";
-echo "API_TOKEN=$TOKEN >> $COPY_FILE";
+echo "API_TOKEN=$TOKEN" >> $COPY_FILE;
 
 echo "Replacing Config with Modified Copy";
 cat "$COPY_FILE" > $TARGET_FILE;
