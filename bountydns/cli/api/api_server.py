@@ -159,6 +159,7 @@ class ApiServer(BaseCommand):
         from bountydns.db.session import _scoped_session
 
         session = _scoped_session
+
         for i in range(9):
             i = str(i)
             user_data = {}
@@ -174,7 +175,7 @@ class ApiServer(BaseCommand):
                 repo = UserRepo(db=session)
                 if not repo.exists(email=email):
                     logger.info(f"seeding user {email}")
-                    user = factory("UserFactory").create(
+                    user = factory("UserFactory", session=session).create(
                         email=email,
                         hashed_password=hashed_password,
                         is_superuser=is_superuser,
@@ -190,7 +191,9 @@ class ApiServer(BaseCommand):
                 repo = DnsServerRepo(db=session)
                 if not repo.exists(name=name):
                     logger.info(f"seeding domain {name}")
-                    domain = factory("DnsServerFactory").create(name=name)
+                    domain = factory("DnsServerFactory", session=session).create(
+                        name=name
+                    )
 
         for i in range(9):
             i = str(i)
@@ -209,14 +212,17 @@ class ApiServer(BaseCommand):
                         dns_server = dns_server_repo.results()
                     else:
                         logger.info(f"seeding dns server as zone dependency: {name}")
-                        dns_server = factory("DnsServerFactory").create(
-                            name=dns_server_name
-                        )
-                    factory("ZoneFactory").create(
+                        dns_server = factory(
+                            "DnsServerFactory", session=session
+                        ).create(name=dns_server_name)
+                    factory("ZoneFactory", session=session).create(
                         ip=ip, domain=domain, dns_server=dns_server
                     )
                 else:
                     repo = ZoneRepo(db=session)
                     if not repo.exists(ip=ip, domain=domain):
                         logger.info(f"seeding zone without dns server: {ip}, {domain}")
-                        factory("GlobalZoneFactory").create(ip=ip, domain=domain)
+                        factory("GlobalZoneFactory", session=session).create(
+                            ip=ip, domain=domain
+                        )
+
