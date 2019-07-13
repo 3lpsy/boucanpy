@@ -112,13 +112,18 @@ class ApiServer(BaseCommand):
         if isinstance(app, str) and (config.debug or config.reload):
             sock = config.bind_socket()
             supervisor = StatReload(config)
+            logger.warning(f"running bountydns api in dev mode...")
+
             return supervisor.run(server.run, sockets=[sock])
         elif config.workers > 1:
             sock = config.bind_socket()
             supervisor = Multiprocess(config)
+
+            logger.warning(f"running bountydns api in worker mode...")
             return supervisor.run(server.run, sockets=[sock])
         else:
             sockets = None
+            logger.warning(f"running bountydns api in standard mode...")
             return await server.serve(sockets=sockets)
 
     def get_kwargs(self):
