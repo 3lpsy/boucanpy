@@ -1,6 +1,15 @@
 variable "admin_email" {}
 variable "admin_password" {}
 
+variable "ami" {
+  default = "ami-0c4c8b37c6bef5b0c" # change me
+}
+
+
+variable "instance_type" {
+  default = "t2.medium" # change me
+}
+
 variable "dns_root" {}
 
 variable "dns_sub" { default = "bdns" }

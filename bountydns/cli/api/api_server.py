@@ -1,4 +1,9 @@
 import uvicorn
+
+from uvicorn import Config as UvicornConfig, Server as UvicornServer
+from uvicorn.supervisors import Multiprocess, StatReload
+
+
 from os import environ
 from bountydns.core import logger, set_log_level
 from bountydns.core.utils import project_dir
@@ -57,7 +62,7 @@ class ApiServer(BaseCommand):
         return parser
 
     async def run(self):
-        args = ["bountydns.api.main:api"]
+        app = "bountydns.api.main:api"
         kwargs = self.get_kwargs()
         env = self.option("env")
         self.load_env(f"api.{env}")
@@ -100,7 +105,21 @@ class ApiServer(BaseCommand):
         if self.option("db_seed_env", False):
             self.seed_from_env()
 
-        return uvicorn.run(*args, **kwargs)
+        # taken from uvicorn/main.py:run
+        config = UvicornConfig(app, **kwargs)
+        server = UvicornServer(config=config)
+
+        if isinstance(app, str) and (config.debug or config.reload):
+            sock = config.bind_socket()
+            supervisor = StatReload(config)
+            return supervisor.run(server.run, sockets=[sock])
+        elif config.workers > 1:
+            sock = config.bind_socket()
+            supervisor = Multiprocess(config)
+            return supervisor.run(server.run, sockets=[sock])
+        else:
+            sockets = None
+            return await server.serve(sockets=sockets)
 
     def get_kwargs(self):
         kwargs = {
@@ -113,7 +132,7 @@ class ApiServer(BaseCommand):
             kwargs["reload_dirs"] = [project_dir()]
 
         elif self.get_workers():
-            kwargs["workers"] = self.get_workers()
+            kwargs["workers"] = int(self.get_workers())
 
         if self.option("debug", None):
             kwargs["debug"] = True
