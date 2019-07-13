@@ -23,7 +23,7 @@ else
 fi
 
 # We need a source file containing API_SECRET_KEY to generate the jwt
-SOURCE_FILE=${2:-/etc/bountydns/env/api.prod.env}
+SOURCE_FILE=${1:-/etc/bountydns/env/api.prod.env}
 if [[ ! -f "$SOURCE_FILE" ]]; then
     echo "No source file found for $SOURCE_FILE. Failing."
     exit 1;
@@ -37,7 +37,7 @@ if [[ ${#JWT_SECRET} -lt 10 ]]; then
 fi
 
 # Generate the jwt token
-TOKEN="$($JWTBIN -c 'sub:1' -exp-diff '+72000' -iat-diff '-1000' | tr -d '\n' | tr -d '\r' | tr -d ' ')"
+TOKEN="$($JWTBIN -c 'sub:1' -c 'scopes:profile dns-request:create dns-request:list zone:list zone:read refresh api-token:syncable' -exp-diff '+72000' -iat-diff '-1000' | tr -d '\n' | tr -d '\r' | tr -d ' ')"
 unset JWT_SECRET
 
 # Add the JWT token to the target file using API_TOKEN as the key

@@ -305,7 +305,7 @@ resource "null_resource" "server_configure" {
       "echo '${data.template_file.proxy_env.rendered}' | sudo tee /etc/bountydns/env/proxy.prod.env",
       "echo '${data.template_file.broadcast_env.rendered}' | sudo tee /etc/bountydns/env/broadcast.prod.env",
       "echo '${data.template_file.dns_env.rendered}' | sudo tee /etc/bountydns/env/dns.prod.env",
-      "sudo /opt/bountydns/infra/deploy/utils/configure_dns_jwt.sh"
+      "sudo bash /opt/bountydns/infra/deploy/utils/configure_dns_jwt.sh /etc/bountydns/env/api.prod.env /etc/bountydns/env/dns.prod.env"
     ]
   }
 
