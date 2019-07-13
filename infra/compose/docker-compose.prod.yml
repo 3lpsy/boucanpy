@@ -25,6 +25,9 @@ services:
       - bountydns
       - broadcast
       - proxy
+    ports:
+      - "0.0.0.0:53:53/udp"
+      - "0.0.0.0:53:53/tcp"
   webui:
     build:
       context: ./../../
