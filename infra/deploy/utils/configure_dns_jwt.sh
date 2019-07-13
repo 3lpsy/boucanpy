@@ -37,7 +37,7 @@ if [[ ${#JWT_SECRET} -lt 10 ]]; then
 fi
 
 # Generate the jwt token
-TOKEN="$($JWTBIN -c 'sub:1' -c 'scopes:profile dns-request:create dns-request:list zone:list zone:read refresh api-token:syncable' -exp-diff '+72000' -iat-diff '-1000' | tr -d '\n' | tr -d '\r' | tr -d ' ')"
+TOKEN="$($JWTBIN -c 'dns_server_name:default' -c 'sub:1' -c 'scopes:profile dns-request:create dns-request:list zone:list zone:read refresh api-token:syncable' -exp-diff '+72000' -iat-diff '-1000' | tr -d '\n' | tr -d '\r' | tr -d ' ')"
 unset JWT_SECRET;
 
 # Add the JWT token to the target file using API_TOKEN as the key
