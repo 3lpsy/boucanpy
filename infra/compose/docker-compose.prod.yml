@@ -17,7 +17,7 @@ services:
     image: 3lpsy/bountydns:latest
     networks:
       bountydnspub:
-    command: dns-server -l 0.0.0.0 -p 53
+    command: dns-server -l 0.0.0.0 -p 53 --refresh-ttl 60
     env_file:
       - ${COMPOSE_ENV_DIR}/dns.prod.env
     restart: on-failure:2

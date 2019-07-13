@@ -163,14 +163,20 @@ TODO:
 
 - [x] Handle General Network Errors on the Front End
 - [x] Add basic tests to API
-- [ ] Initialize repos with .new()
-- [ ] Create Packer build
-- [ ] Create Terraform build
-- [ ] Allow user to seed from yaml
-- [ ] Create DNS Payloads Page
-- [ ] Create DNS Payloads Form
-- [ ] Gracefully allow actions when super is in token via ScopedTo
-- [ ] Users can manage their own profile / user info
+- [x] Initialize repos with .new()
+- [x] Create Packer build
+- [x] Create Terraform build
+
+- [ ] Fix logging / better logging
+- [ ] Get websockets working in production
+- [ ] setup ssl via terraform
+- [ ] setup default zone via terraform
+
+* [ ] Allow user to seed from yaml
+* [ ] Create DNS Payloads Page
+* [ ] Create DNS Payloads Form
+* [ ] Gracefully allow actions when super is in token via ScopedTo
+* [ ] Users can manage their own profile / user info
 
 ### Icebox
 
