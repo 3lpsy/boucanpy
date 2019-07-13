@@ -1,5 +1,7 @@
 #!/bin/bash
 
+## TODO: delete dis
+
 set -eu -o pipefail;
 
 # Try to find the jwtbin binary to generate the jwt token
@@ -31,13 +33,13 @@ if [[ ! -f "$SOURCE_FILE" ]]; then
 fi
 
 # Extract the API_SECRET and rename JWT_SECRET for the jwtbin binary
-export JWT_SECRET="$(cat $SOURCE_FILE | grep API_SECRET_KEY | tr -d '\n' | tr -d '\r' | tr -d ' ')"
+export JWT_SECRET="$(cat $SOURCE_FILE | grep API_SECRET_KEY | tr -d '\n' | tr -d '\r' | tr -d ' ' | cut -d '=' -f 2-)"
 if [[ ${#JWT_SECRET} -lt 10 ]]; then 
     echo "No 'JWT_SECRET' environment variable set. Failing.";
 fi
 
 # Generate the jwt token
-TOKEN="$($JWTBIN -c 'dns_server_name:default' -c 'sub:1' -c 'scopes:profile dns-request:create dns-request:list zone:list zone:read refresh api-token:syncable' -exp-diff '+72000' -iat-diff '-1000' | tr -d '\n' | tr -d '\r' | tr -d ' ')"
+TOKEN=$($JWTBIN -c 'dns_server_name:default' -c 'sub:1' -c 'scopes:profile dns-request:create dns-request:list zone:list zone:read refresh api-token:syncable' -exp-diff '+72000' -iat-diff '-1000' | tr -d '\n' | tr -d '\r' | tr -d ' ')
 unset JWT_SECRET;
 
 # Add the JWT token to the target file using API_TOKEN as the key
