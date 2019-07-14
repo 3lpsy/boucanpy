@@ -1,10 +1,17 @@
+
+variable "aws_access_key_id" {}
+variable "aws_secret_access_key" {}
+
 variable "admin_email" {}
 variable "admin_password" {}
 
 variable "ami" {
-  default = "ami-0c4c8b37c6bef5b0c" # change me
+  default = "ami-02c92cda39b9bd14c" # change me / built via packer
 }
 
+variable "acme_server_url" {
+  default = "https://acme-staging-v02.api.letsencrypt.org/directory"
+}
 
 variable "instance_type" {
   default = "t2.medium" # change me

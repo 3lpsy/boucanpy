@@ -171,6 +171,7 @@ TODO:
 - [ ] Get websockets working in production
 - [ ] setup ssl via terraform
 - [ ] setup default zone via terraform
+- [ ] figure out how to grab public IPs (source ips) inside docker network
 
 * [ ] Allow user to seed from yaml
 * [ ] Create DNS Payloads Page

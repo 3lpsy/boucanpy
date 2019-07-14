@@ -113,12 +113,10 @@ class ApiServer(BaseCommand):
             sock = config.bind_socket()
             supervisor = StatReload(config)
             logger.warning(f"running bountydns api in dev mode...")
-
             return supervisor.run(server.run, sockets=[sock])
         elif config.workers > 1:
             sock = config.bind_socket()
             supervisor = Multiprocess(config)
-
             logger.warning(f"running bountydns api in worker mode...")
             return supervisor.run(server.run, sockets=[sock])
         else:

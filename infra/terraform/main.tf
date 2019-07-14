@@ -1,9 +1,14 @@
 
 provider "aws" {
-  version = "~> 2.0"
-  region  = "${var.aws_default_region}"
+  version    = "~> 2.0"
+  region     = "${var.aws_default_region}"
+  access_key = "${var.aws_access_key_id}"
+  secret_key = "${var.aws_secret_access_key}"
 }
 
+provider "acme" {
+  server_url = "${var.acme_server_url}"
+}
 
 ### NETWORKING
 resource "aws_vpc" "main" {
@@ -275,7 +280,9 @@ BROADCAST_PATH=0
 SEED_USER_0_EMAIL=${var.admin_email}
 SEED_USER_0_PASSWORD=${var.admin_password}
 SEED_USER_0_SUPERUSER=1
-
+SEED_DNS_SERVER_0_NAME=default
+SEED_ZONE_0_IP=${aws_instance.main.public_ip}
+SEED_ZONE_0_DOMAIN=${var.dns_sub}.${var.dns_root}
 EOT
 }
 
@@ -308,16 +315,9 @@ resource "null_resource" "server_configure" {
       "sudo bash /opt/bountydns/infra/deploy/utils/configure_dns_jwt.sh /etc/bountydns/env/api.prod.env /etc/bountydns/env/dns.prod.env"
     ]
   }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo systemctl enable bountydns-compose",
-      "sudo systemctl restart bountydns-compose"
-    ]
-  }
 }
 
-### Route53
+### Route53 + TLS
 
 resource "aws_route53_zone" "main" {
   name = "${var.dns_root}"
@@ -331,13 +331,6 @@ resource "aws_route53_record" "a" {
   records = ["${aws_instance.main.public_ip}"]
 }
 
-resource "aws_route53_record" "ns" {
-  zone_id = "${aws_route53_zone.main.zone_id}"
-  name = "${var.dns_sub}.${var.dns_root}"
-  type = "NS"
-  ttl = "5"
-  records = ["${var.dns_sub}.${var.dns_root}."]
-}
 
 resource "aws_route53_record" "a_dash" {
   zone_id = "${aws_route53_zone.main.zone_id}"
@@ -345,4 +338,111 @@ resource "aws_route53_record" "a_dash" {
   type = "A"
   ttl = "5"
   records = ["${aws_instance.main.public_ip}"]
+}
+
+
+resource "tls_private_key" "private_key" {
+  algorithm = "RSA"
+}
+
+resource "acme_registration" "reg" {
+  account_key_pem = "${tls_private_key.private_key.private_key_pem}"
+  email_address = "acme@${var.dns_sub}.${var.dns_root}"
+}
+
+resource "acme_certificate" "base_certificate" {
+  account_key_pem = "${acme_registration.reg.account_key_pem}"
+  common_name = "${var.dns_sub}.${var.dns_root}"
+
+
+  dns_challenge {
+    provider = "route53"
+
+    config = {
+      AWS_ACCESS_KEY_ID = "${var.aws_access_key_id}"
+      AWS_SECRET_ACCESS_KEY = "${var.aws_secret_access_key}"
+      AWS_DEFAULT_REGION = "${var.aws_default_region}"
+      AWS_HOSTED_ZONE_ID = "${aws_route53_zone.main.zone_id}"
+    }
+  }
+}
+
+
+resource "aws_route53_record" "ns" {
+  zone_id = "${aws_route53_zone.main.zone_id}"
+  name = "${var.dns_sub}.${var.dns_root}"
+  type = "NS"
+  ttl = "5"
+  records = ["${var.dns_sub}.${var.dns_root}."]
+  depends_on = ["acme_certificate.base_certificate", "acme_certificate.dashboard_certificate"]
+}
+
+# used by nginx proxy (dashboard)
+resource "acme_certificate" "dashboard_certificate" {
+  account_key_pem = "${acme_registration.reg.account_key_pem}"
+  common_name = "${var.dns_dashboard_sub}.${var.dns_root}"
+
+
+  dns_challenge {
+    provider = "route53"
+
+    config = {
+      AWS_ACCESS_KEY_ID = "${var.aws_access_key_id}"
+      AWS_SECRET_ACCESS_KEY = "${var.aws_secret_access_key}"
+      AWS_DEFAULT_REGION = "${var.aws_default_region}"
+      AWS_HOSTED_ZONE_ID = "${aws_route53_zone.main.zone_id}"
+    }
+  }
+}
+
+# resource "null_resource" "setup_tls" {
+#   triggers = {
+#     server_id = "${aws_instance.main.id}"
+#     api_env = "${data.template_file.api_env.rendered}"
+#     db_env = "${data.template_file.db_env.rendered}"
+#     proxy_env = "${data.template_file.proxy_env.rendered}"
+#     broadcast_env = "${data.template_file.broadcast_env.rendered}"
+#   }
+
+#   connection {
+#     host = "${aws_instance.main.public_ip}"
+#     type = "ssh"
+#     user = "ubuntu"
+#     private_key = "${file("${path.root}/data/key.pem")}"
+#     agent = false # change to true if agent is required
+#   }
+
+#   provisioner "remote-exec" {
+#     inline = [
+#     ]
+#   }
+# }
+
+
+
+
+
+resource "null_resource" "restart_service" {
+  triggers = {
+    server_id = "${aws_instance.main.id}"
+    api_env = "${data.template_file.api_env.rendered}"
+    db_env = "${data.template_file.db_env.rendered}"
+    proxy_env = "${data.template_file.proxy_env.rendered}"
+    broadcast_env = "${data.template_file.broadcast_env.rendered}"
+  }
+
+  connection {
+    host = "${aws_instance.main.public_ip}"
+    type = "ssh"
+    user = "ubuntu"
+    private_key = "${file("${path.root}/data/key.pem")}"
+    agent = false # change to true if agent is required
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo systemctl enable bountydns-compose",
+      "sudo systemctl restart bountydns-compose"
+    ]
+  }
 }

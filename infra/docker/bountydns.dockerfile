@@ -42,6 +42,7 @@ ENV SEED_USER_0_SUPERUSER=1
 COPY . /bountydns
 WORKDIR /bountydns
 
-EXPOSE 8080
+# EXPOSE 8080
+# EXPOSE 53
 
 ENTRYPOINT ["/usr/bin/docker-run.sh"]
