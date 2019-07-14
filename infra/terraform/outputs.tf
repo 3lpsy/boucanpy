@@ -7,3 +7,4 @@ output "bountydns_server_url" {
   value = "http://${var.dns_dashboard_sub}.${var.dns_root}:8080"
 }
 
+

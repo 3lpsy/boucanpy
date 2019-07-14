@@ -39,6 +39,8 @@ COPY --from=build-stage /landing/ /var/www/app/landing
 
 RUN chown -R nginx:nginx /var/www
 
+RUN mkdir /etc/letsencrypt/live/bountydns.proxy.docker
+
 # dynamically configure configs or user defaults to avoid mounts
 COPY ./docker-run.sh /usr/bin/docker-run.sh
 RUN chmod +x /usr/bin/docker-run.sh

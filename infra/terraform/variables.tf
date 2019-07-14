@@ -5,6 +5,11 @@ variable "aws_secret_access_key" {}
 variable "admin_email" {}
 variable "admin_password" {}
 
+variable "registered_domain_name_servers" { # the "Name Servers" under "Registered Domains > {your domain}"
+  type = "list"
+}
+
+
 variable "ami" {
   default = "ami-02c92cda39b9bd14c" # change me / built via packer
 }
@@ -33,4 +38,8 @@ variable "aws_default_region" {
 
 variable "vpc_cidr" {
   default = "10.20.0.0/16"
+}
+
+variable "upstream_dns_server" {
+  default = "149.112.112.112"
 }

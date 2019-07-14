@@ -1,5 +1,5 @@
 .vscode
-
+.tls
 bountydns/storage/logs/*.log
 bountydns/storage/logs/*.log*
 bountydns/storage/database/*.db

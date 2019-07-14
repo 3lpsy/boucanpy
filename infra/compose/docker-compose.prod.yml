@@ -47,6 +47,8 @@ services:
       - "0.0.0.0:8443:8443"
     networks:
       bountydnspub:
+    volumes:
+      - ${TLS_HOST_DIR}/bountydns.proxy.docker:/etc/letsencrypt/live/bountydns.proxy.docker
     depends_on:
       - webui
       - bountydns

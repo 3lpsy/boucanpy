@@ -1,4 +1,6 @@
 trusted_external_cidr_block = ""
 internet_cidr_block = ""
 dns_root = ""
-
+admin_email = ""
+admin_password = ""
+registered_domain_name_servers = []

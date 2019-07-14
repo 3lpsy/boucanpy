@@ -13,6 +13,10 @@ echo "Provisioning: BDNS Build - Making /etc/bountydns/env"
 sudo mkdir -p /etc/bountydns/env;
 sudo touch /etc/bountydns/env/{api,broadcast,db,dns,proxy}.prod.env
 
+echo "Provisioning: BDNS Build - Making /etc/letsencrypt/live/bountydns.proxy.docker"
+
+sudo mkdir -p /etc/letsencrypt/live/bountydns.proxy.docker;
+
 echo "Provisioning: BDNS Build - Building Compose Project"
 sudo /opt/bountydns/compose.sh prod build;
 

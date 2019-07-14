@@ -1,4 +1,3 @@
-
 provider "aws" {
   version    = "~> 2.0"
   region     = "${var.aws_default_region}"
@@ -319,12 +318,15 @@ resource "null_resource" "server_configure" {
 
 ### Route53 + TLS
 
-resource "aws_route53_zone" "main" {
-  name = "${var.dns_root}"
+# TODO: remove this and use default zone created by aws and change to data
+
+data "aws_route53_zone" "main" {
+  name = "${var.dns_root}."
 }
 
+
 resource "aws_route53_record" "a" {
-  zone_id = "${aws_route53_zone.main.zone_id}"
+  zone_id = "${data.aws_route53_zone.main.zone_id}"
   name = "${var.dns_sub}.${var.dns_root}"
   type = "A"
   ttl = "5"
@@ -333,7 +335,7 @@ resource "aws_route53_record" "a" {
 
 
 resource "aws_route53_record" "a_dash" {
-  zone_id = "${aws_route53_zone.main.zone_id}"
+  zone_id = "${data.aws_route53_zone.main.zone_id}"
   name = "${var.dns_dashboard_sub}.${var.dns_root}"
   type = "A"
   ttl = "5"
@@ -354,6 +356,7 @@ resource "acme_certificate" "base_certificate" {
   account_key_pem = "${acme_registration.reg.account_key_pem}"
   common_name = "${var.dns_sub}.${var.dns_root}"
 
+  recursive_nameservers = ["${var.upstream_dns_server}:53"]
 
   dns_challenge {
     provider = "route53"
@@ -362,19 +365,11 @@ resource "acme_certificate" "base_certificate" {
       AWS_ACCESS_KEY_ID = "${var.aws_access_key_id}"
       AWS_SECRET_ACCESS_KEY = "${var.aws_secret_access_key}"
       AWS_DEFAULT_REGION = "${var.aws_default_region}"
-      AWS_HOSTED_ZONE_ID = "${aws_route53_zone.main.zone_id}"
+      AWS_HOSTED_ZONE_ID = "${data.aws_route53_zone.main.zone_id}"
+      AWS_PROPAGATION_TIMEOUT = 300
+
     }
   }
-}
-
-
-resource "aws_route53_record" "ns" {
-  zone_id = "${aws_route53_zone.main.zone_id}"
-  name = "${var.dns_sub}.${var.dns_root}"
-  type = "NS"
-  ttl = "5"
-  records = ["${var.dns_sub}.${var.dns_root}."]
-  depends_on = ["acme_certificate.base_certificate", "acme_certificate.dashboard_certificate"]
 }
 
 # used by nginx proxy (dashboard)
@@ -382,6 +377,7 @@ resource "acme_certificate" "dashboard_certificate" {
   account_key_pem = "${acme_registration.reg.account_key_pem}"
   common_name = "${var.dns_dashboard_sub}.${var.dns_root}"
 
+  recursive_nameservers = ["${var.upstream_dns_server}:53"]
 
   dns_challenge {
     provider = "route53"
@@ -390,12 +386,51 @@ resource "acme_certificate" "dashboard_certificate" {
       AWS_ACCESS_KEY_ID = "${var.aws_access_key_id}"
       AWS_SECRET_ACCESS_KEY = "${var.aws_secret_access_key}"
       AWS_DEFAULT_REGION = "${var.aws_default_region}"
-      AWS_HOSTED_ZONE_ID = "${aws_route53_zone.main.zone_id}"
+      AWS_HOSTED_ZONE_ID = "${data.aws_route53_zone.main.zone_id}"
+      AWS_PROPAGATION_TIMEOUT = 300
     }
   }
 }
 
-# resource "null_resource" "setup_tls" {
+resource "aws_route53_record" "bdns_ns" {
+  zone_id = "${data.aws_route53_zone.main.zone_id}"
+  name = "${var.dns_sub}.${var.dns_root}"
+  type = "NS"
+  ttl = "5"
+  records = ["${var.dns_sub}.${var.dns_root}."]
+  depends_on = ["acme_certificate.base_certificate", "acme_certificate.dashboard_certificate"]
+}
+
+
+resource "null_resource" "setup_tls" {
+  triggers = {
+    server_id = "${aws_instance.main.id}"
+    api_env = "${data.template_file.api_env.rendered}"
+    db_env = "${data.template_file.db_env.rendered}"
+    proxy_env = "${data.template_file.proxy_env.rendered}"
+    broadcast_env = "${data.template_file.broadcast_env.rendered}"
+  }
+
+
+  connection {
+    host = "${aws_instance.main.public_ip}"
+    type = "ssh"
+    user = "ubuntu"
+    private_key = "${file("${path.root}/data/key.pem")}"
+    agent = false # change to true if agent is required
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo mkdir -p /etc/letsencrypt/live/bountydns.proxy.docker",
+      "echo '${replace(tls_private_key.private_key.private_key_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/bountydns.proxy.docker/privkey.pem",
+      "echo '${replace(acme_certificate.dashboard_certificate.certificate_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/bountydns.proxy.docker/fullchain.pem",
+      "echo '${replace(acme_certificate.dashboard_certificate.issuer_pem, "\n", "\\n")}' | sudo tee -a /etc/letsencrypt/live/bountydns.proxy.docker/fullchain.pem"
+    ]
+  }
+}
+
+# resource "null_resource" "restart_service" {
 #   triggers = {
 #     server_id = "${aws_instance.main.id}"
 #     api_env = "${data.template_file.api_env.rendered}"
@@ -414,35 +449,8 @@ resource "acme_certificate" "dashboard_certificate" {
 
 #   provisioner "remote-exec" {
 #     inline = [
+#       "sudo systemctl enable bountydns-compose",
+#       "sudo systemctl restart bountydns-compose"
 #     ]
 #   }
 # }
-
-
-
-
-
-resource "null_resource" "restart_service" {
-  triggers = {
-    server_id = "${aws_instance.main.id}"
-    api_env = "${data.template_file.api_env.rendered}"
-    db_env = "${data.template_file.db_env.rendered}"
-    proxy_env = "${data.template_file.proxy_env.rendered}"
-    broadcast_env = "${data.template_file.broadcast_env.rendered}"
-  }
-
-  connection {
-    host = "${aws_instance.main.public_ip}"
-    type = "ssh"
-    user = "ubuntu"
-    private_key = "${file("${path.root}/data/key.pem")}"
-    agent = false # change to true if agent is required
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo systemctl enable bountydns-compose",
-      "sudo systemctl restart bountydns-compose"
-    ]
-  }
-}

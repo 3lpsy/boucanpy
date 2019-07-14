@@ -21,6 +21,15 @@ elif [[ "${env}" == "prod" ]]; then
     else
         export COMPOSE_ENV_DIR="$PWD/.env"
     fi
+
+    if [[ -d "/etc/letsencrypt/live" ]]; then
+        export TLS_HOST_DIR="/etc/letsencrypt/live";
+    else
+        export TLS_HOST_DIR="$PWD/.tls";
+    fi 
+    if [[ ! -d ${TLS_HOST_DIR}/bountydns.proxy.docker ]]; then 
+        mkdir ${TLS_HOST_DIR}/bountydns.proxy.docker;
+    fi
     compose="$compose -f docker-compose.prod.yml"
 else
     echo "please pass a valid environment type: compose.sh [env] [args]"
