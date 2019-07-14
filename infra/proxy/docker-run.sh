@@ -33,6 +33,8 @@ sed -i "s/INSECURE_LISTEN_PORT/$INSECURE_LISTEN_PORT/g" /etc/nginx/nginx.conf
 
 sed -i "s/SSL_LISTEN_PORT/$SSL_LISTEN_PORT/g" /etc/nginx/nginx.conf
 
+sed -i "s/TLS_DIR/$TLS_DIR/g" /etc/nginx/nginx.conf
+
 if [[ "$DEBUG_CONF" == "1" ]]; then
     cat /etc/nginx/nginx.conf;
 fi

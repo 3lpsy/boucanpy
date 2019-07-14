@@ -23,7 +23,7 @@ ENV API_BACKEND_PROTO="https"
 ENV API_BACKEND_HOST="api"
 ENV API_BACKEND_PORT="8080"
 ENV DEBUG_CONF="0"
-
+ENV TLS_DIR="/etc/letsencrypt/live/bountydns.proxy.docker"
 # for development, make /var/www/nginx/webui a volume
 RUN mkdir /nginxconfs
 COPY insecure.nginx.conf /nginxconfs

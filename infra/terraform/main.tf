@@ -227,8 +227,9 @@ EOT
 #### do not use single quotes
 data "template_file" "proxy_env" {
   template = <<-EOT
-SSL_ENABLED=0
+SSL_ENABLED=1
 INSECURE_LISTEN_PORT=8080
+SECURE_LISTEN_PORT=8443
 API_BACKEND_PROTO=http
 API_BACKEND_HOST=bountydns
 API_BACKEND_PORT=8080
