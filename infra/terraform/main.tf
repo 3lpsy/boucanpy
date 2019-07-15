@@ -406,10 +406,8 @@ resource "aws_route53_record" "bdns_ns" {
 resource "null_resource" "setup_tls" {
   triggers = {
     server_id = "${aws_instance.main.id}"
-    api_env = "${data.template_file.api_env.rendered}"
-    db_env = "${data.template_file.db_env.rendered}"
-    proxy_env = "${data.template_file.proxy_env.rendered}"
-    broadcast_env = "${data.template_file.broadcast_env.rendered}"
+    private_key_pem = "${tls_private_key.private_key.private_key_pem}"
+    certificate_pem = "${acme_certificate.dashboard_certificate.certificate_pem}"
   }
 
 
@@ -431,27 +429,29 @@ resource "null_resource" "setup_tls" {
   }
 }
 
-# resource "null_resource" "restart_service" {
-#   triggers = {
-#     server_id = "${aws_instance.main.id}"
-#     api_env = "${data.template_file.api_env.rendered}"
-#     db_env = "${data.template_file.db_env.rendered}"
-#     proxy_env = "${data.template_file.proxy_env.rendered}"
-#     broadcast_env = "${data.template_file.broadcast_env.rendered}"
-#   }
+resource "null_resource" "restart_service" {
+  triggers = {
+    server_id = "${aws_instance.main.id}"
+    api_env = "${data.template_file.api_env.rendered}"
+    db_env = "${data.template_file.db_env.rendered}"
+    proxy_env = "${data.template_file.proxy_env.rendered}"
+    broadcast_env = "${data.template_file.broadcast_env.rendered}"
+    private_key_pem = "${tls_private_key.private_key.private_key_pem}"
+    certificate_pem = "${acme_certificate.dashboard_certificate.certificate_pem}"
+  }
 
-#   connection {
-#     host = "${aws_instance.main.public_ip}"
-#     type = "ssh"
-#     user = "ubuntu"
-#     private_key = "${file("${path.root}/data/key.pem")}"
-#     agent = false # change to true if agent is required
-#   }
+  connection {
+    host = "${aws_instance.main.public_ip}"
+    type = "ssh"
+    user = "ubuntu"
+    private_key = "${file("${path.root}/data/key.pem")}"
+    agent = false # change to true if agent is required
+  }
 
-#   provisioner "remote-exec" {
-#     inline = [
-#       "sudo systemctl enable bountydns-compose",
-#       "sudo systemctl restart bountydns-compose"
-#     ]
-#   }
-# }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo systemctl enable bountydns-compose",
+      "sudo systemctl restart bountydns-compose"
+    ]
+  }
+}

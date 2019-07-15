@@ -7,6 +7,7 @@ ARG VUE_APP_API_URL
 ARG VUE_APP_BROADCAST_BASE
 ARG VUE_APP_BROADCAST_URL
 
+# TODO: this should be prod, use build arg to include devtools but default to prod
 RUN npm run build
 
 # Main Container
