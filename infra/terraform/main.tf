@@ -353,9 +353,24 @@ resource "acme_registration" "reg" {
   email_address = "acme@${var.dns_sub}.${var.dns_root}"
 }
 
+resource "tls_private_key" "base_cert_private_key" {
+  algorithm = "RSA"
+}
+
+resource "tls_cert_request" "base_req" {
+  key_algorithm = "RSA"
+  private_key_pem = "${tls_private_key.base_cert_private_key.private_key_pem}"
+  dns_names = ["${var.dns_sub}.${var.dns_root}"]
+
+  subject {
+    common_name = "${var.dns_sub}.${var.dns_root}"
+  }
+}
+
+
 resource "acme_certificate" "base_certificate" {
   account_key_pem = "${acme_registration.reg.account_key_pem}"
-  common_name = "${var.dns_sub}.${var.dns_root}"
+  certificate_request_pem = "${tls_cert_request.base_req.cert_request_pem}"
 
   recursive_nameservers = ["${var.upstream_dns_server}:53"]
 
@@ -370,13 +385,27 @@ resource "acme_certificate" "base_certificate" {
       AWS_PROPAGATION_TIMEOUT = 300
 
     }
+  }
+}
+
+resource "tls_private_key" "dashboard_cert_private_key" {
+  algorithm = "RSA"
+}
+
+resource "tls_cert_request" "dashboard_req" {
+  key_algorithm = "RSA"
+  private_key_pem = "${tls_private_key.dashboard_cert_private_key.private_key_pem}"
+  dns_names = ["${var.dns_dashboard_sub}.${var.dns_root}"]
+
+  subject {
+    common_name = "${var.dns_dashboard_sub}.${var.dns_root}"
   }
 }
 
 # used by nginx proxy (dashboard)
 resource "acme_certificate" "dashboard_certificate" {
   account_key_pem = "${acme_registration.reg.account_key_pem}"
-  common_name = "${var.dns_dashboard_sub}.${var.dns_root}"
+  certificate_request_pem = "${tls_cert_request.dashboard_req.cert_request_pem}"
 
   recursive_nameservers = ["${var.upstream_dns_server}:53"]
 
@@ -393,6 +422,7 @@ resource "acme_certificate" "dashboard_certificate" {
   }
 }
 
+# A root tls cert cannot be generated (base_certificate) while this exists
 resource "aws_route53_record" "bdns_ns" {
   zone_id = "${data.aws_route53_zone.main.zone_id}"
   name = "${var.dns_sub}.${var.dns_root}"
@@ -406,7 +436,7 @@ resource "aws_route53_record" "bdns_ns" {
 resource "null_resource" "setup_tls" {
   triggers = {
     server_id = "${aws_instance.main.id}"
-    private_key_pem = "${tls_private_key.private_key.private_key_pem}"
+    private_key_pem = "${tls_private_key.dashboard_cert_private_key.private_key_pem}"
     certificate_pem = "${acme_certificate.dashboard_certificate.certificate_pem}"
   }
 
@@ -422,7 +452,7 @@ resource "null_resource" "setup_tls" {
   provisioner "remote-exec" {
     inline = [
       "sudo mkdir -p /etc/letsencrypt/live/bountydns.proxy.docker",
-      "echo '${replace(tls_private_key.private_key.private_key_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/bountydns.proxy.docker/privkey.pem",
+      "echo '${replace(tls_private_key.dashboard_cert_private_key.private_key_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/bountydns.proxy.docker/privkey.pem",
       "echo '${replace(acme_certificate.dashboard_certificate.certificate_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/bountydns.proxy.docker/fullchain.pem",
       "echo '${replace(acme_certificate.dashboard_certificate.issuer_pem, "\n", "\\n")}' | sudo tee -a /etc/letsencrypt/live/bountydns.proxy.docker/fullchain.pem"
     ]
