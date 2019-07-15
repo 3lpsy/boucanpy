@@ -24,6 +24,7 @@ ENV API_BACKEND_HOST="api"
 ENV API_BACKEND_PORT="8080"
 ENV DEBUG_CONF="0"
 ENV TLS_DIR="/etc/letsencrypt/live/bountydns.proxy.docker"
+
 # for development, make /var/www/nginx/webui a volume
 RUN mkdir /nginxconfs
 COPY insecure.nginx.conf /nginxconfs
@@ -39,7 +40,7 @@ COPY --from=build-stage /landing/ /var/www/app/landing
 
 RUN chown -R nginx:nginx /var/www
 
-RUN mkdir /etc/letsencrypt/live/bountydns.proxy.docker
+RUN mkdir -p /etc/letsencrypt/live/bountydns.proxy.docker
 
 # dynamically configure configs or user defaults to avoid mounts
 COPY ./docker-run.sh /usr/bin/docker-run.sh
