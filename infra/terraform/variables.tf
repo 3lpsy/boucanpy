@@ -11,10 +11,11 @@ variable "registered_domain_name_servers" { # the "Name Servers" under "Register
 
 
 variable "ami" {
-  default = "ami-02c92cda39b9bd14c" # change me / built via packer
+  default = "ami-05d82dddf2a92ab0d" # change me / built via packer
 }
 
 variable "acme_server_url" {
+  # default = "https://acme-v02.api.letsencrypt.org/directory"
   default = "https://acme-staging-v02.api.letsencrypt.org/directory"
 }
 

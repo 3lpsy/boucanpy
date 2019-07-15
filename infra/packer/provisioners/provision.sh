@@ -13,6 +13,7 @@ echo "Provisioning: Base - Installing Base Packages"
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y git apt-transport-https ca-certificates curl software-properties-common
 
 sudo hostnamectl set-hostname bdns
+echo -n "bdns" | sudo tee /etc/hostname;
 echo "127.0.0.1 bdns" | sudo tee -a /etc/hosts
 sudo systemctl stop systemd-resolved
 sudo systemctl disable systemd-resolved
