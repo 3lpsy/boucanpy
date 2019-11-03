@@ -38,7 +38,7 @@ class ApiTokenCreate(BaseCommand):
 
         dns_server_name = self.option("dns_server_name", None) or uuid.uuid4().hex
         scopes = self.get_scopes()
-        expires_delta = timedelta(days=self.option("days"))
+        expires_delta = timedelta(days=int(self.option("days")))
         expires_at = datetime.utcnow() + expires_delta
 
         token = create_bearer_token(

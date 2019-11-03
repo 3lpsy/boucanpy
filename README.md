@@ -173,11 +173,11 @@ TODO:
 - [ ] setup default zone via terraform
 - [ ] figure out how to grab public IPs (source ips) inside docker network
 
-* [ ] Allow user to seed from yaml
-* [ ] Create DNS Payloads Page
-* [ ] Create DNS Payloads Form
-* [ ] Gracefully allow actions when super is in token via ScopedTo
-* [ ] Users can manage their own profile / user info
+- [ ] Allow user to seed from yaml
+- [ ] Create DNS Payloads Page
+- [ ] Create DNS Payloads Form
+- [ ] Gracefully allow actions when super is in token via ScopedTo
+- [ ] Users can manage their own profile / user info
 
 ### Icebox
 

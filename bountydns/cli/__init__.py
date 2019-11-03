@@ -25,7 +25,8 @@ def extact_commands(parent_dir, parent_mod):
                     if _command:
                         _commands.append(_command)
                     else:
-                        print(f"failed to find command in {module_path}")
+                        if module_path != "bountydns.cli.parser":
+                            print(f"failed to find command in {module_path}")
 
     for directory_name, sub_directories, files in walk(parent_dir):
         # loop over each sub directory in parent_dir and import those files
