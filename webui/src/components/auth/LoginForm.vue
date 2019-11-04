@@ -25,13 +25,14 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
 import { LoginForm as LoginFormData, User } from '@/types';
 import authService from '@/services/auth';
 
-@Component
+@Component({})
 export default class LoginForm extends mixins(CommonMixin) {
     show: boolean = true;
     loginError: string = '';

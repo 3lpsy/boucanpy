@@ -8,7 +8,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import AppFooter from '@/components/AppFooter.vue';
 import AppNavbar from '@/components/AppNavbar.vue';
 import AppAlerts from '@/components/AppAlerts.vue';
@@ -29,12 +30,15 @@ export default class App extends Vue {
                 type: 'info',
             });
         });
-        bus.$on("ZONE_CREATED", (event: any) => {
+        bus.$on('ZONE_CREATED', (event: any) => {
             bus.$emit('APP_ALERT', { text: 'New Zone Added!', type: 'info' });
-        })
-        bus.$on("API_TOKEN_CREATED", (event: any) => {
-            bus.$emit('API_TOKEN_CREATED', { text: 'New Api Token Created!', type: 'info' });
-        })
+        });
+        bus.$on('API_TOKEN_CREATED', (event: any) => {
+            bus.$emit('API_TOKEN_CREATED', {
+                text: 'New Api Token Created!',
+                type: 'info',
+            });
+        });
     }
 }
 </script>

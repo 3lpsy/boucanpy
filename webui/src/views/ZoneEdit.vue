@@ -17,8 +17,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
 import ZoneForm from '@/components/zone/ZoneForm.vue';
+
+import Vue from 'vue';
+import Component from 'vue-class-component';
 
 @Component({ components: { ZoneForm } })
 export default class ZoneEdit extends Vue {

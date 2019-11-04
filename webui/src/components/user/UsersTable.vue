@@ -64,7 +64,8 @@
 </template>
 
 <script>
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
 import DataTableMixin from '@/mixins/dataTable';
@@ -73,7 +74,7 @@ import { GeneralQS } from '@/queries';
 import user from '@/services/user';
 
 // TODO: move to vuex / persistent data
-@Component
+@Component({})
 export default class UsersTable extends mixins(CommonMixin, DataTableMixin) {
     query = new GeneralQS();
     isLoading = true;

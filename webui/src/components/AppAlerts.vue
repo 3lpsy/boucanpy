@@ -19,10 +19,11 @@
 </template>
 
 <script>
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import bus from '@/bus';
 
-@Component
+@Component({})
 export default class AppAlerts extends Vue {
     alerts = [];
     registeredEvents = [];

@@ -21,10 +21,11 @@
 </template>
 
 <script>
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
 
-@Component
+@Component({})
 export default class AppNavbar extends mixins(CommonMixin) {}
 </script>

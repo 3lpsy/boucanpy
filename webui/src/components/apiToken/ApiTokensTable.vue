@@ -85,7 +85,8 @@
 </template>
 
 <script>
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
 import ApiTokenMixin from '@/mixins/apiToken';
@@ -95,7 +96,7 @@ import bus from '@/bus';
 import { GeneralQS } from '@/queries';
 
 // TODO: move to vuex / persistent data
-@Component
+@Component({ name: 'ApiTokensTable' })
 export default class ApiTokensTable extends mixins(
     CommonMixin,
     ApiTokenMixin,

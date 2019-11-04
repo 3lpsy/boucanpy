@@ -23,9 +23,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import ApiTokensTable from '@/components/apiToken/ApiTokensTable.vue';
 
 @Component({ components: { ApiTokensTable } })
-export default class Home extends Vue {}
+export default class ApiToken extends Vue {}
 </script>

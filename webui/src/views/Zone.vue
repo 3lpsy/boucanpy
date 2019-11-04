@@ -10,9 +10,7 @@
                         tag="button"
                         class="btn pull-right btn-outline-primary"
                         :to="{ name: 'zone.create' }"
-                    >
-                        Create Zone
-                    </router-link>
+                    >Create Zone</router-link>
                 </div>
             </div>
 
@@ -26,7 +24,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import ZonesTable from '@/components/zone/ZonesTable.vue';
 
 @Component({ components: { ZonesTable } })

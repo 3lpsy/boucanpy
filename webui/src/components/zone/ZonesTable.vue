@@ -64,7 +64,8 @@
 </template>
 
 <script>
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
 import ZoneMixin from '@/mixins/zone';
@@ -74,7 +75,7 @@ import { GeneralQS } from '@/queries';
 import zone from '@/services/zone';
 
 // TODO: move to vuex / persistent data
-@Component
+@Component({})
 export default class ZonesTable extends mixins(
     CommonMixin,
     ZoneMixin,

@@ -4,7 +4,7 @@ import Component from 'vue-class-component';
 import moment from 'moment';
 
 // You can declare a mixin as the same style as components.
-@Component
+@Component({})
 export default class ApiTokenMixin extends Vue {
     isLoaded = false;
     currentPage = 0;
@@ -15,26 +15,23 @@ export default class ApiTokenMixin extends Vue {
     items = [];
 
     changeSort(sort: any) {
-        this.sortBy = sort.sortBy
-        this.sortDesc = sort.sortDesc
-        this.loadData()
+        this.sortBy = sort.sortBy;
+        this.sortDesc = sort.sortDesc;
+        this.loadData();
     }
 
     changePage(page: any) {
         this.currentPage = page;
-        this.loadData()
+        this.loadData();
     }
 
-    loadData() {
-
-    }
-
+    loadData() {}
 
     formatDate(dt: number) {
         return moment(dt).format('YYYY-MM-DD HH:mm:ss');
     }
 
     mounted() {
-        this.loadData()
+        this.loadData();
     }
 }

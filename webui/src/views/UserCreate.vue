@@ -16,7 +16,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import UserForm from '@/components/user/UserForm.vue';
 
 @Component({ components: { UserForm } })

@@ -1,5 +1,5 @@
 <template id="">
-    <div class="" v-if="isAuthenticated">
+    <div class v-if="isAuthenticated">
         <b-table
             v-if="items.length > 0"
             no-local-sorting
@@ -10,8 +10,7 @@
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             v-on:sort-changed="changeSort"
-        >
-        </b-table>
+        ></b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">
             <span class="text-center">No Data Found :(</span>
         </div>
@@ -27,13 +26,13 @@
             :per-page="perPage"
             aria-controls="my-table"
             @change="changePage"
-
         ></b-pagination>
     </div>
 </template>
 
 <script>
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
 import DnsRequestMixin from '@/mixins/dnsRequest';
@@ -41,7 +40,7 @@ import dnsRequest from '@/services/dnsRequest';
 import DataTableMixin from '@/mixins/dataTable';
 
 // TODO: move to vuex / persistent data
-@Component
+@Component({})
 export default class DnsRequestsTable extends mixins(
     CommonMixin,
     DnsRequestMixin,
@@ -82,7 +81,12 @@ export default class DnsRequestsTable extends mixins(
     };
     loadData() {
         dnsRequest
-            .getDnsRequests(this.currentPage || 1, this.perPage, this.sortBy, this.sortDesc ? 'desc' : 'asc')
+            .getDnsRequests(
+                this.currentPage || 1,
+                this.perPage,
+                this.sortBy,
+                this.sortDesc ? 'desc' : 'asc',
+            )
             .then((res) => {
                 this.currentPage = res.pagination.page;
                 this.perPage = res.pagination.per_page;
@@ -92,11 +96,10 @@ export default class DnsRequestsTable extends mixins(
             });
     }
     created() {
-        this.registerOnBroadcastDnsRequestCreated()
+        this.registerOnBroadcastDnsRequestCreated();
     }
     mounted() {
-      this.loadData()
+        this.loadData();
     }
-
 }
 </script>
