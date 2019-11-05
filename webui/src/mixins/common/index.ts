@@ -6,7 +6,7 @@ import { capitalize } from '@/utils';
 import { User } from '@/types';
 import bus from '@/bus';
 
-@Component({})
+@Component
 export default class CommonMixin extends Vue {
     getInputState(fieldName: string) {
         if (this.errors.has(fieldName)) {

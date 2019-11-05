@@ -12,16 +12,13 @@
             :busy="isLoading || !isLoaded"
         >
             <template slot="actions" slot-scope="row">
-                <b-button size="sm" @click="destroyRecord(row.item)"
-                    >Delete</b-button
-                >
+                <b-button size="sm" @click="destroyRecord(row.item)">Delete</b-button>
                 <b-button-group>
                     <router-link
                         :to="getEditLink(row.item)"
                         tag="button"
                         class="btn btn-info btn-sm"
-                        >Edit</router-link
-                    >
+                    >Edit</router-link>
                 </b-button-group>
             </template>
         </b-table>
@@ -49,7 +46,6 @@
 import Component from 'vue-class-component';
 import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
-import DnsServerMixin from '@/mixins/dnsServer';
 import DataTableMixin from '@/mixins/dataTable';
 import dnsRecord from '@/services/dnsRecord';
 import bus from '@/bus';
@@ -66,7 +62,6 @@ import { GeneralQS } from '@/queries';
 })
 export default class DnsRecordsTable extends mixins(
     CommonMixin,
-    DnsServerMixin,
     DataTableMixin,
 ) {
     items = [];

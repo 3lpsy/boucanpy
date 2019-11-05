@@ -51,7 +51,6 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
-import DnsServerMixin from '@/mixins/dnsServer';
 import DataTableMixin from '@/mixins/dataTable';
 import dnsServer from '@/services/dnsServer';
 import bus from '@/bus';
@@ -61,7 +60,6 @@ import { GeneralQS } from '@/queries';
 @Component({})
 export default class DnsServersTable extends mixins(
     CommonMixin,
-    DnsServerMixin,
     DataTableMixin,
 ) {
     items = [];

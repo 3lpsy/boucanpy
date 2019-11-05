@@ -81,8 +81,6 @@ import Component from 'vue-class-component';
 import { mixins } from 'vue-class-component';
 
 import CommonMixin from '@/mixins/common';
-import ApiTokenMixin from '@/mixins/apiToken';
-import DnsServersMixin from '@/mixins/dnsServer';
 
 import apiToken from '@/services/apiToken';
 import dnsServer from '@/services/dnsServer';
@@ -114,11 +112,7 @@ import { GeneralQS } from '@/queries';
         },
     },
 })
-export default class ApiTokenForm extends mixins(
-    CommonMixin,
-    ApiTokenMixin,
-    DnsServersMixin,
-) {
+export default class ApiTokenForm extends mixins(CommonMixin) {
     formError = '';
     dnsServers = [];
     dnsServersSearch = '';

@@ -4,7 +4,7 @@ import Component from 'vue-class-component';
 import moment from 'moment';
 
 // You can declare a mixin as the same style as components.
-@Component({})
+@Component
 export default class ApiTokenMixin extends Vue {
     isLoaded = false;
     currentPage = 0;

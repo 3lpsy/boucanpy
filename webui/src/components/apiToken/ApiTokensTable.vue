@@ -89,7 +89,6 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
-import ApiTokenMixin from '@/mixins/apiToken';
 import DataTableMixin from '@/mixins/dataTable';
 import apiToken from '@/services/apiToken';
 import bus from '@/bus';
@@ -99,7 +98,6 @@ import { GeneralQS } from '@/queries';
 @Component({ name: 'ApiTokensTable' })
 export default class ApiTokensTable extends mixins(
     CommonMixin,
-    ApiTokenMixin,
     DataTableMixin,
 ) {
     query = new GeneralQS();

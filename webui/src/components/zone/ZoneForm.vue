@@ -17,9 +17,11 @@
                 v-validate="'required|ip_or_fqdn'"
                 :state="getInputState('domain')"
             ></b-form-input>
-            <template v-slot:invalid-feedback>{{
+            <template v-slot:invalid-feedback>
+                {{
                 errors.first('domain')
-            }}</template>
+                }}
+            </template>
         </b-form-group>
         <b-form-group
             label="Resolve IP"
@@ -37,9 +39,11 @@
                 v-validate="'required|ip'"
                 :state="getInputState('ip')"
             ></b-form-input>
-            <template v-slot:invalid-feedback>{{
+            <template v-slot:invalid-feedback>
+                {{
                 errors.first('ip')
-            }}</template>
+                }}
+            </template>
         </b-form-group>
         <b-form-group
             label="DNS Server Name"
@@ -75,7 +79,6 @@ import { mixins } from 'vue-class-component';
 import CommonMixin from '@/mixins/common';
 import ZoneMixin from '@/mixins/zone';
 import DataTableMixin from '@/mixins/dataTable';
-import DnsServersMixin from '@/mixins/dnsServer';
 import zone from '@/services/zone';
 import dnsServer from '@/services/dnsServer';
 import { GeneralQS } from '@/queries';
@@ -111,7 +114,6 @@ import _ from 'underscore';
 export default class ZoneForm extends mixins(
     CommonMixin,
     ZoneMixin,
-    DnsServersMixin,
     DataTableMixin,
 ) {
     formError = '';

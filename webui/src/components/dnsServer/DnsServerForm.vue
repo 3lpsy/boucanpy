@@ -31,7 +31,6 @@ import { mixins } from 'vue-class-component';
 import uuid4 from 'uuid4';
 
 import CommonMixin from '@/mixins/common';
-import DnsServerMixin from '@/mixins/dnsServer';
 
 import dnsServer from '@/services/dnsServer';
 import moment from 'moment';
@@ -49,10 +48,7 @@ import bus from '@/bus';
         },
     },
 })
-export default class DnsServerCreateForm extends mixins(
-    CommonMixin,
-    DnsServerMixin,
-) {
+export default class DnsServerCreateForm extends mixins(CommonMixin) {
     formError = '';
     form = {
         name: '',
