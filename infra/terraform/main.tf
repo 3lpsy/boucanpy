@@ -200,7 +200,7 @@ resource "aws_instance" "main" {
 # jwt secret is generated on the server via API_SECRET
 data "template_file" "dns_env" {
   template = <<-EOT
-API_URL=http://proxy:8080
+API_URL=https://${var.dns_dashboard_sub}.${var.dns_root}:8443
 API_TOKEN=
 EOT
 }
@@ -273,7 +273,7 @@ data "template_file" "api_env" {
 API_ENV=prod
 API_SECRET_KEY=${random_string.api_secret_key.result}
 API_SERVER_NAME=boutydns
-API_CORS_ORIGINS=http://${var.dns_dashboard_sub}.${var.dns_root}:8080,http://${var.dns_sub}.${var.dns_root}:8080,http://${aws_instance.main.public_ip}:8080
+API_CORS_ORIGINS=http://${var.dns_dashboard_sub}.${var.dns_root}:8080,http://${var.dns_sub}.${var.dns_root}:8080,http://${aws_instance.main.public_ip}:8080,https://${var.dns_dashboard_sub}.${var.dns_root}:8443,http://${var.dns_sub}.${var.dns_root}:8443,http://${aws_instance.main.public_ip}:8443
 DB_DRIVER=postgresql
 DB_HOST=db
 DB_PORT=5432
@@ -489,6 +489,9 @@ resource "null_resource" "restart_service" {
 
   provisioner "remote-exec" {
     inline = [
+      "echo '127.0.0.1 ${var.dns_dashboard_sub}.${var.dns_root}' | sudo tee -a /etc/hosts",
+      "echo '127.0.0.1 ${var.dns_sub}.${var.dns_root}' | sudo tee -a /etc/hosts",
+      "sudo hostnamectl set-hostname ${var.dns_dashboard_sub}.${var.dns_root}",
       "sudo systemctl enable bountydns-compose",
       "sudo systemctl restart bountydns-compose"
     ]

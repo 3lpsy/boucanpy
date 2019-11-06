@@ -61,11 +61,11 @@ class DnsServer(BaseCommand):
         self.api_client = ApiClient(self.get_api_url(), self.get_api_token())
 
         if not self.api_client.wait_for_up():
-            logger.critical("could not connect to api. quitting")
+            logger.critical("run@dns_server.py - Could not connect to api. quitting")
             self.exit(1)
 
         if self.option("no_sync"):
-            logger.info("skipping syncing api token")
+            logger.info("run@dns_server.py - Skipping syncing api token")
         else:
             self.api_client.sync()
 
@@ -79,7 +79,7 @@ class DnsServer(BaseCommand):
                 if count > 0 and count % self.option("refresh_ttl") == 0:
                     if self.api_client.refresh_zones_if_needed():
                         logger.critical(
-                            "API Client found new or changed zones. Stopping servers..."
+                            "run@dns_server.py - API Client found new or changed zones. Stopping servers..."
                         )
                         # TODO: figure out why "stop" does not release the address
                         self.stop_servers()
@@ -87,36 +87,42 @@ class DnsServer(BaseCommand):
                         sleep(1)
 
                         stop_count = 0
-                        logger.critical("Waiting for UDP Server to stop...")
+                        logger.critical(
+                            "run@dns_server.py - Waiting for UDP Server to stop..."
+                        )
                         while self.udp_server.thread and self.udp_server.isAlive():
                             if stop_count > 30:
                                 logger.critical(
-                                    "UDP Server did not stop while reloading zones"
+                                    "run@dns_server.py - UDP Server did not stop while reloading zones"
                                 )
                                 raise Exception(
-                                    "UDP Server threads went rogue during zone reload"
+                                    "run@dns_server.py - UDP Server threads went rogue during zone reload"
                                 )
                             logger.info(
-                                "Waiting for DNS Server to stop before reloading zones"
+                                "run@dns_server.py - Waiting for DNS Server to stop before reloading zones"
                             )
                             stop_count = stop_count + 1
                             sleep(1)
                         stop_count = 0
-                        logger.critical("Waiting for TCP Server to stop...")
+                        logger.critical(
+                            "run@dns_server.py - Waiting for TCP Server to stop..."
+                        )
                         while self.tcp_server.thread and self.tcp_server.isAlive():
                             if stop_count > 30:
                                 logger.critical(
-                                    "TCP Server did not stop while reloading zones"
+                                    "run@dns_server.py - TCP Server did not stop while reloading zones"
                                 )
                                 raise Exception(
-                                    "TCP Server threads went rogue during zone reload"
+                                    "run@dns_server.py - TCP Server threads went rogue during zone reload"
                                 )
                             logger.info(
-                                "Waiting for DNS Server to stop before reloading zones"
+                                "run@dns_server.py - Waiting for DNS Server to stop before reloading zones"
                             )
                             stop_count = stop_count + 1
                             sleep(1)
-                        logger.critical("Rebooting server with fresh zones...")
+                        logger.critical(
+                            "run@dns_server.py - Rebooting server with fresh zones..."
+                        )
                         self.boot()
                         self.start_servers()
 

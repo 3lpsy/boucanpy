@@ -15,7 +15,9 @@ class ApiClient:
         self.zones = []
         payload = jwt.decode(api_token, verify=False)  # do not trust
         if not "dns_server_name" in payload.keys() or not payload["dns_server_name"]:
-            logger.critical("__init__@api_client.py - No dns_server_name on api token")
+            logger.critical(
+                f"__init__@api_client.py - No dns_server_name on api token payload: {str(payload)}"
+            )
             raise Exception("no dns_server_name on api token")
         self.dns_server_name = payload["dns_server_name"]
 
@@ -152,7 +154,9 @@ class ApiClient:
             if seconds > 60:
                 logger.warning("could not connect to api. api not up")
                 return False
-            logger.info("wait_for_up@api_client.py - checking for api status")
+            logger.info(
+                f"wait_for_up@api_client.py - checking for api status : {self.url('/status')}"
+            )
             try:
                 sleep(1)
                 self.get_status()
