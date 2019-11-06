@@ -46,6 +46,12 @@ class DnsServer(BaseCommand):
         )
 
         parser.add_argument(
+            "--no-ssl-verify",
+            action="store_true",
+            help="skip ssl verify in the dns server's api client",
+        )
+
+        parser.add_argument(
             "-r",
             "--refresh-ttl",
             type=int,
@@ -58,7 +64,13 @@ class DnsServer(BaseCommand):
     async def run(self):
 
         # TODO: thread issues?
-        self.api_client = ApiClient(self.get_api_url(), self.get_api_token())
+        verify_ssl = True
+        if bool(self.option("no_verify_ssl")):
+            verify_ssl = False
+
+        self.api_client = ApiClient(
+            self.get_api_url(), self.get_api_token(), verify_ssl=verify_ssl
+        )
 
         if not self.api_client.wait_for_up():
             logger.critical("run@dns_server.py - Could not connect to api. quitting")

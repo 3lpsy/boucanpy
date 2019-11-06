@@ -1,7 +1,9 @@
 import jwt
+
 from time import sleep
 import requests
 from dnslib import QTYPE, RCODE, RR
+from urllib3.exceptions import InsecureRequestWarning
 
 from bountydns.core import logger
 
@@ -9,10 +11,17 @@ from bountydns.core.zone.data import ZoneData
 
 
 class ApiClient:
-    def __init__(self, api_url, api_token):
+    def __init__(self, api_url, api_token, verify_ssl=True):
         self.api_url = api_url
         self.api_token = api_token
         self.zones = []
+        self.verify_ssl = verify_ssl
+        if not self.verify_ssl:
+            logger.warning(
+                "__init__@dns_server.py - Disabling SSL Warnings. I hope this was intentional"
+            )
+            requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
         payload = jwt.decode(api_token, verify=False)  # do not trust
         if not "dns_server_name" in payload.keys() or not payload["dns_server_name"]:
             logger.critical(
@@ -117,7 +126,9 @@ class ApiClient:
         headers = self.get_default_headers()
         logger.info("get@api_client.py - Getting URL: " + str(self.url(url)))
 
-        res = requests.get(self.url(url), headers=headers, params=params)
+        res = requests.get(
+            self.url(url), headers=headers, params=params, verify=self.verify_ssl
+        )
 
         if fail:
             if res.status_code != 200:
@@ -131,8 +142,11 @@ class ApiClient:
     def post(self, url: str, data=None, fail=True):
         data = data or {}
         headers = self.get_default_headers()
-        res = requests.post(self.url(url), json=data, headers=headers)
         logger.info("post@api_client.py - Posting URL: " + str(self.url(url)))
+
+        res = requests.post(
+            self.url(url), json=data, headers=headers, verify=self.verify_ssl
+        )
 
         if fail:
             if res.status_code != 200:
@@ -149,9 +163,9 @@ class ApiClient:
         }
 
     def wait_for_up(self):
-        seconds = 0
+        attempts = 0
         while True:
-            if seconds > 60:
+            if attempts > 60:
                 logger.warning("could not connect to api. api not up")
                 return False
             logger.info(
@@ -164,9 +178,9 @@ class ApiClient:
                 return True
             except Exception as e:
                 logger.info(
-                    "wait_for_up@api_client.py - api check not ready after {} seconds: {}".format(
-                        str(seconds), str(e.__class__.__name__)
+                    "wait_for_up@api_client.py - api check not ready after {} attempts: {}".format(
+                        str(attempts), str(e.__class__.__name__)
                     )
                 )
-            seconds = seconds + 1
+            attempts = attempts + 1
             sleep(1)
