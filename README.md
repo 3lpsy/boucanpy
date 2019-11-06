@@ -1,10 +1,8 @@
 # Bounty DNS: A DNS Catcher
 
-Status: WIP / PoC
-
 ![Screenshot](screenshots/screenshot-dns-requests.png)
 
-This project is an attempt to implement a lightweight burp collaborator-esc application and consists of two main components: a DNS Server (Custom Python Implemention with dnslib) and an API.
+This project is an attempt to implement a lightweight burp collaborator-esc application and consists of two main components: a DNS Server (Custom Python Implemention with dnslib) and an API. It is still very much in the early days of development
 
 For more information on Burp Collaborator, checkout [burp's documentation](https://portswigger.net/burp/documentation/collaborator)
 
@@ -22,7 +20,7 @@ $ vim x.env #
 
 ## Building and Running
 
-As of now the project can only automatically build for development. The build system uses docker and docker-compose to raise multiple services which the application requires.
+Make sure the environment is set appropriate for building. As of now the project can only automatically build for development. The build system uses docker and docker-compose to raise multiple services which the application requires.
 
 ### Building the Containers
 
@@ -95,7 +93,7 @@ Features:
 - Create Zones for Specific DNS Servers
 - Log DNS Resolution
 
-## Phase 2: Polish The Code (Current)
+## Phase 2: Polish The Code
 
 After demonstrating that the project is worth dedicating time to, Phase 2 will involve making the project feature complete with all clients (WebUI / CLI) and features (webhooks / email / queue) completed. At this point, the project should not be considered stable nor secure.
 
@@ -106,7 +104,7 @@ Features:
 - Receive Notifications on DNS Resolution via email or webhook
 - Easily build the application with Docker, Packer, & Terraform
 
-## Phase 3: Stability
+## Phase 3: Stability (Current)
 
 Next, sanity checks and proper handlers will be put in place so that API calls fail gracefully. At this point the project should not be considered secure.
 
@@ -190,6 +188,10 @@ TODO:
 - [ ] Make relationsips sortable in repo
 - [ ] Confirm DNS Server is as Compliant as possible
 - [ ] Build ability for webhook's / events
+
+### Contributing
+
+If you're interested in contributing or collaborating, you can reach out to me on twitter @3lpsy or open a github issue.
 
 ```
 usage: bdnsctl.py [-h]

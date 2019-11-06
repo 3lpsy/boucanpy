@@ -1,5 +1,7 @@
 from sqlalchemy import literal
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
+from typing import List
+
 from bountydns.core import logger, abort, only
 from bountydns.core.security import ScopedTo, TokenPayload
 from bountydns.core import SortQS, PaginationQS
@@ -61,7 +63,8 @@ async def store(
     zone_id = zone.id if zone else None
 
     data = only(
-        dict(form), ["name", "source_address", "source_port", "type", "protocol"]
+        dict(form),
+        ["name", "source_address", "source_port", "type", "protocol", "raw_request"],
     )
 
     data["name"] = data["name"].lower()
@@ -72,4 +75,28 @@ async def store(
     logger.info("store@router.py - Creating DNS Request")
     dns_request = dns_request_repo.create(data).data()
 
+    return DnsRequestResponse(dns_request=dns_request)
+
+
+@router.get(
+    "/dns-request/{dns_request_id}",
+    name="dns_request.show",
+    response_model=DnsRequestResponse,
+)
+async def show(
+    dns_request_id: int,
+    dns_request_repo: DnsRequestRepo = Depends(DnsRequestRepo()),
+    token: TokenPayload = Depends(ScopedTo("dns-request:show")),
+    includes: List[str] = Query(None),
+):
+    # probably a bunch of access bypasses with scopes via includes
+    # need easy way to scope for includes
+    includes = only(includes, ["dns_server", "zone"], values=True)
+
+    dns_request = (
+        dns_request_repo.loads(includes)
+        .get_or_fail(dns_request_id)
+        .includes(includes)
+        .data()
+    )
     return DnsRequestResponse(dns_request=dns_request)

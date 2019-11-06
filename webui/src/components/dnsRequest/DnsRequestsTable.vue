@@ -10,7 +10,22 @@
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             v-on:sort-changed="changeSort"
-        ></b-table>
+        >
+            <template v-slot:cell(actions)="row">
+                <router-link
+                    style="margin: 5px"
+                    :to="{ name: 'dns-request.show', params: { dnsRequestId: row.item.id } }"
+                    tag="button"
+                    class="btn btn-info btn-sm"
+                >View</router-link>
+            </template>
+            <template v-slot:cell(created_at)="row">{{ diffForHumans(moment(row.item.created_at))}}</template>
+            <template v-slot:cell(dns_server_name)="row">
+                <span
+                    v-if="row.item.dns_server"
+                >{{ truncateWithTrail(row.item.dns_server.name, 10, '...') }}</span>
+            </template>
+        </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">
             <span class="text-center">No Data Found :(</span>
         </div>
@@ -69,7 +84,7 @@ export default class DnsRequestsTable extends mixins(
         {
             key: 'dns_server_name',
             label: 'Server',
-            sortable: true,
+            sortable: false,
         },
         {
             key: 'zone_id',
@@ -80,7 +95,10 @@ export default class DnsRequestsTable extends mixins(
             key: 'created_at',
             label: 'Created',
             sortable: true,
-            formatter: 'formatDate',
+        },
+        {
+            key: 'actions',
+            label: 'Actions',
         },
     ];
     loadData() {
@@ -90,6 +108,7 @@ export default class DnsRequestsTable extends mixins(
                 this.perPage,
                 this.sortBy,
                 this.sortDesc ? 'desc' : 'asc',
+                ['dns_server'],
             )
             .then((res) => {
                 this.currentPage = res.pagination.page;

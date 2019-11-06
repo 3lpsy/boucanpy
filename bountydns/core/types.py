@@ -1,8 +1,9 @@
-from typing import Optional
-from pydantic import ConstrainedStr, SecretStr
+from typing import Optional, List, ForwardRef
+from pydantic import ConstrainedStr, SecretStr, BaseModel
 from pydantic.utils import validate_email
 from dnslib import RR
 from dnslib.dns import DNSError
+from datetime import datetime
 
 
 class ConstrainedSecretStr(ConstrainedStr):
@@ -56,3 +57,60 @@ class DnsRecordStr(ConstrainedStr):
             msg = str(e)
             raise ValueError(f"could not cast record: {msg}")
         return v
+
+
+class DnsServerData(BaseModel):
+    id: int
+    name: str
+    zones: Optional[List[ForwardRef("ZoneData")]]
+    created_at: datetime
+
+
+class DnsRecordData(BaseModel):
+    id: int
+    record: str
+    sort: int
+    zone_id: int
+    # zone: Optional[ZoneData]
+
+
+class ZoneData(BaseModel):
+    id: int
+    ip: str
+    domain: str
+    is_active: bool
+    dns_server_id: Optional[int]
+    dns_server: Optional[DnsServerData]
+    dns_records: Optional[List[DnsRecordData]]
+    created_at: datetime
+
+
+class DnsRequestData(BaseModel):
+    id: int
+    name: str
+    zone_id: int = None
+    source_address: str
+    source_port: int
+    type: str
+    protocol: str
+    dns_server_id: int
+    created_at: datetime
+    raw_request: str
+    dns_server: Optional[DnsServerData]
+
+
+class ApiTokenData(BaseModel):
+    id: int
+    scopes: str
+    is_active: bool
+    expires_at: datetime
+    dns_server_id: int
+    dns_server: Optional[DnsServerData]
+    created_at: datetime
+
+
+class SensitiveApiTokenData(ApiTokenData):
+    token: str
+
+
+DnsServerData.update_forward_refs()

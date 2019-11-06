@@ -5,17 +5,18 @@ import { mixins } from 'vue-class-component';
 import { capitalize } from '@/utils';
 import { User } from '@/types';
 import bus from '@/bus';
+import moment from 'moment';
 
 @Component
 export default class CommonMixin extends Vue {
     getInputState(fieldName: string) {
         if (this.errors.has(fieldName)) {
-            return 'invalid';
+            return false;
         }
         let field = this.getField(fieldName);
         if (typeof field !== 'undefined' && field) {
             if (field!.flags.valid) {
-                return 'valid';
+                return true;
             }
         }
         return null;
@@ -123,5 +124,23 @@ export default class CommonMixin extends Vue {
 
     get inputs() {
         return this.$validator.fields; // @ts-ignore
+    }
+
+    diffForHumans(target: moment.Moment) {
+        return target.fromNow();
+    }
+
+    moment(val: any) {
+        return moment(val);
+    }
+
+    truncate(target: string, limit: number) {
+        return target.length > limit ? target.substr(0, limit - 1) : target;
+    }
+
+    truncateWithTrail(target: string, limit: number, trail: string) {
+        return target.length > limit
+            ? target.substr(0, limit - 1) + trail
+            : target;
     }
 }

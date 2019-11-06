@@ -86,6 +86,7 @@ export interface DnsRequest {
     id: number;
     name: string;
     zone_id: number | null;
+    zone?: Zone;
     source_address: string;
     source_port: number;
     type: string;
@@ -93,10 +94,17 @@ export interface DnsRequest {
     dns_server_id: number;
     dns_server?: DnsServer;
     created_at: number;
+    raw_request: string;
+}
+
+export interface DnsRequestResponse {
+    dns_request: DnsRequest;
+    messages?: Message[];
+    pagination?: object;
 }
 
 export interface DnsRequestsResponse {
-    dns_requests: DnsRequest;
+    dns_requests: DnsRequest[];
     messages?: Message[];
     pagination?: object;
 }
@@ -139,6 +147,8 @@ export interface TokenPayload {
 export interface DnsServer {
     id: number;
     name: string;
+    zones: Zone[];
+    created_at: number;
 }
 
 export interface DnsServerCreateForm {

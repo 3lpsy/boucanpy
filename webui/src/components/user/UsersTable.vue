@@ -11,14 +11,15 @@
             :responsive="true"
             :busy="isLoading || !isLoaded"
         >
-            <div slot="table-busy" class="text-center text-danger my-2">
+            <tempalte v-slot:table-busy class="text-center text-danger my-2">
                 <b-spinner class="align-middle"></b-spinner>
                 <strong>Loading...</strong>
-            </div>
+            </tempalte>
             <!-- TODO: don't use expires_at, use expires delta -->
-            <template slot="actions" slot-scope="row">
-                <b-button-group>
+            <template v-slot:cell(actions)="row">
+                <div>
                     <b-button
+                        style="margin: 5px"
                         size="sm"
                         @click="
                         deactivateAction(row.item, row.index, $event.target)
@@ -26,11 +27,13 @@
                         v-if="row.item.is_active"
                     >Deactivate</b-button>
                     <b-button
+                        style="margin: 5px"
                         size="sm"
                         @click="activateAction(row.item, row.index, $event.target)"
                         v-if="!row.item.is_active"
                     >Activate</b-button>
                     <router-link
+                        style="margin: 5px"
                         :to="{ name: 'user.edit', params: { userId: row.item.id } }"
                         tag="button"
                         class="btn btn-warning btn-sm"
@@ -40,7 +43,7 @@
                         tag="button"
                         class="btn btn-info btn-sm"
                     >View</router-link>-->
-                </b-button-group>
+                </div>
             </template>
         </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">

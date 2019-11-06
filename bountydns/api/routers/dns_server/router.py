@@ -27,9 +27,9 @@ async def index(
 
     pg, items = (
         dns_server_repo.loads(includes)
+        .includes(includes)
         .search(search, searchable=["name", "id"])
         .paginate(pagination)
-        .includes(includes)
         .data()
     )
     return DnsServersResponse(pagination=pg, dns_servers=items)

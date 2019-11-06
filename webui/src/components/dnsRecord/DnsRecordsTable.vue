@@ -11,7 +11,7 @@
             v-on:sort-changed="changeSort"
             :busy="isLoading || !isLoaded"
         >
-            <template slot="actions" slot-scope="row">
+            <template v-slot:cell(actions)="row">
                 <b-button size="sm" @click="destroyRecord(row.item)">Delete</b-button>
                 <b-button-group>
                     <router-link

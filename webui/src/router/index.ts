@@ -25,6 +25,7 @@ import ApiToken from '@/views/ApiToken.vue';
 import ApiTokenCreate from '@/views/ApiTokenCreate.vue';
 import ApiTokenEdit from '@/views/ApiTokenEdit.vue';
 
+import DnsRequestShow from '@/views/DnsRequestShow.vue';
 import Login from '@/views/Login.vue';
 
 import NotFound from '@/views/errors/NotFound.vue';
@@ -161,6 +162,12 @@ export default new Router({
             path: '/webui/api-token',
             name: 'api-token',
             component: ApiToken,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/dns-request/:dnsRequestId',
+            name: 'dns-request.show',
+            component: DnsRequestShow,
             beforeEnter: AUTHED_GUARDS,
         },
         {

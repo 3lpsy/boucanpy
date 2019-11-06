@@ -1,4 +1,6 @@
+# make this YOUR_IP/32 or YOUR_CIDR, it manages access to 8080 and 8443 where the dashboard is
 trusted_external_cidr_block = ""
+# make this either 0.0.0.0/0 if you want to use it for real services or YOUR_IP/32 for development
 internet_cidr_block = ""
 dns_root = ""
 admin_email = ""

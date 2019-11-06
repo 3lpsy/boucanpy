@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from bountydns.core import logger
 from bountydns.broadcast import make_redis, make_broadcast_url
@@ -22,6 +22,7 @@ class DnsRequest(Base):
     source_port = Column(Integer)
     type = Column(String, index=True)
     protocol = Column(String, index=True)
+    raw_request = Column(Text)
 
     dns_server_id = Column(ForeignKey("dns_servers.id"), nullable=False)
     dns_server = relationship(

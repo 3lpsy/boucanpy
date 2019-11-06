@@ -11,19 +11,28 @@
             v-on:sort-changed="changeSort"
             :busy="isLoading || !isLoaded"
         >
-            <template slot="actions" slot-scope="row">
-                <b-button-group>
+            <template v-slot:cell(actions)="row">
+                <div>
                     <router-link
+                        style="margin: 5px"
                         :to="{ name: 'dns-server.edit', params: { dnsServerId: row.item.id } }"
                         tag="button"
-                        class="btn btn-info btn-sm"
+                        class="btn btn-warning btn-sm"
                     >Edit</router-link>
                     <router-link
+                        style="margin: 5px"
                         :to="{ name: 'dns-server.show', params: { dnsServerId: row.item.id } }"
                         tag="button"
                         class="btn btn-info btn-sm"
                     >View</router-link>
-                </b-button-group>
+                </div>
+            </template>
+            <template v-slot:cell(created_at)="row">{{ diffForHumans(moment(row.item.created_at))}}</template>
+            <template v-slot:cell(zones)="row">
+                <span v-for="(zone, index) in row.item.zones" :key="index">
+                    {{zone.domain}}
+                    <span v-if="index+1 != row.item.zones.length">,</span>
+                </span>
             </template>
         </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">
@@ -78,6 +87,16 @@ export default class DnsServersTable extends mixins(
             sortable: true,
         },
         {
+            key: 'zones',
+            label: 'Zones',
+            sortable: false,
+        },
+        {
+            key: 'created_at',
+            label: 'Created At',
+            sortable: true,
+        },
+        {
             key: 'actions',
             label: 'Actions',
         },
@@ -95,6 +114,7 @@ export default class DnsServersTable extends mixins(
 
     loadData() {
         this.isLoading = true;
+        this.query.includes = ['zones'];
         return dnsServer.getDnsServers(this.query).then((res) => {
             let query = new GeneralQS();
             query.page = res.pagination.page;

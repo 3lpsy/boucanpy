@@ -1,7 +1,2 @@
-from datetime import datetime
-from pydantic import BaseModel
+from bountydns.core.types import DnsServerData
 
-
-class DnsServerData(BaseModel):
-    id: int
-    name: str

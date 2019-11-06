@@ -28,3 +28,4 @@ class DnsRequestFactory(BaseFactory):
     protocol = "udp"
     dns_server = SubFactory(DnsServerFactory)
     zone = SubFactory(ZoneFactory)
+    raw_request = "some fake data"

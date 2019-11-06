@@ -8,3 +8,4 @@ class DnsRequestCreateForm(BaseModel):
     type: constr(min_length=1, max_length=32)
     protocol: constr(min_length=3, max_length=5)
     dns_server_name: constr(regex="^[a-zA-Z0-9-_]+$", min_length=4, max_length=254)
+    raw_request: constr(min_length=1, max_length=16384)

@@ -115,6 +115,7 @@ class ApiClient:
             "type": str(QTYPE[request.q.qtype]),
             "protocol": str(handler.protocol),
             "dns_server_name": str(self.dns_server_name),
+            "raw_request": str(request),
         }
         self.post("/dns-request", data=data)
 

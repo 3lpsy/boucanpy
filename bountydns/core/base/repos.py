@@ -137,10 +137,15 @@ class BaseRepo:
         return self.data_model()(**attrs)
 
     def to_dict(self, item):
+        type_str = str(type(item))
         root_data = item.as_dict() if hasattr(item, "as_dict") else dict(item)
-        # self.debug(
-        #     f"to_dict@repos.py: attaching includables {str(self._includes)} in {self.__class__.__name__}"
-        # )
+
+        self.debug(
+            f"to_dict@repos.py: Collected root data for dict of type {type_str}: {str(root_data)}"
+        )
+        self.debug(
+            f"to_dict@repos.py: Attaching includables: {str(self._includes.keys())}"
+        )
         for name in self._includes.keys():
             if name not in root_data:
                 if not hasattr(item, name):
@@ -226,7 +231,7 @@ class BaseRepo:
         if kwargs:
             self.filter_by(**kwargs)
         self.debug(
-            f"executing all query {self.compiled()} in {self.__class__.__name__}"
+            f"all@repos.py - executing all query {self.compiled()} in {self.__class__.__name__}"
         )
 
         self._results = self.final().all()
@@ -235,7 +240,7 @@ class BaseRepo:
 
     def paginate(self, pagination):
         self.debug(
-            f"executing page query {self.compiled()} in {self.__class__.__name__}"
+            f"paginate@repos.py - executing page query {self.compiled()} in {self.__class__.__name__}"
         )
         self._results = self.final().paginate(
             page=pagination.page, per_page=pagination.per_page, count=True

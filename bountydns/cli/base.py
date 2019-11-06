@@ -1,11 +1,14 @@
 from sys import exit
 from os import environ
+from typing import List
+
 from bountydns.core import (
     load_env,
     set_log_level,
     make_logger,
     set_log_format,
     get_uvicorn_logging,
+    logger,
 )
 from bountydns.core.security import create_bearer_token
 from bountydns.db.session import db_register, session

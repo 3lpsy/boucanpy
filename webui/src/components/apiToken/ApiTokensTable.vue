@@ -12,7 +12,7 @@
             :busy="isLoading || !isLoaded"
         >
             <!-- TODO: don't use expires_at, use expires delta -->
-            <template slot="actions" slot-scope="row">
+            <template v-slot:cell(actions)="row">
                 <b-button
                     size="sm"
                     @click="
@@ -22,20 +22,21 @@
                 >Deactivate</b-button>
                 <span v-else>Dead</span>
             </template>
-            <template slot="reveal" slot-scope="row">
+            <template v-slot:cell(reveal)="row">
                 <b-button
                     size="sm"
                     @click="revealAction(row.item, row.index, $event.target)"
                     v-if="row.item.is_active"
+                    class="btn btn-info btn-sm"
                 >Reveal</b-button>
 
                 <span v-else>Dead</span>
             </template>
-            <template slot="edit" slot-scope="row">
+            <template v-slot:cell(edit)="row">
                 <router-link
                     :to="{ name: 'api-token.edit', params: { apiTokenId: row.item.id } }"
                     tag="button"
-                    class="btn btn-info btn-sm"
+                    class="btn btn-warning btn-sm"
                 >Edit</router-link>
             </template>
         </b-table>
@@ -134,12 +135,12 @@ export default class ApiTokensTable extends mixins(
             label: 'Status',
         },
         {
-            key: 'reveal',
-            label: 'Reveal',
-        },
-        {
             key: 'edit',
             label: 'Edit',
+        },
+        {
+            key: 'reveal',
+            label: 'Reveal',
         },
     ];
 
