@@ -54,16 +54,6 @@ export default class DnsRequestsTable extends mixins(
             label: 'ID',
             sortable: true,
         },
-        {
-            key: 'dns_server_name',
-            label: 'Server',
-            sortable: true,
-        },
-        {
-            key: 'zone_id',
-            label: 'Zone',
-            sortable: true,
-        },
         { key: 'name', label: 'Name', sortable: true },
         {
             key: 'source_address',
@@ -74,6 +64,16 @@ export default class DnsRequestsTable extends mixins(
             key: 'type',
 
             label: 'Type',
+            sortable: true,
+        },
+        {
+            key: 'dns_server_name',
+            label: 'Server',
+            sortable: true,
+        },
+        {
+            key: 'zone_id',
+            label: 'Zone',
             sortable: true,
         },
         {
