@@ -209,15 +209,15 @@ EOT
 #### Database 
 
 resource "random_pet" "db_database" {
-  length = 2
+  length    = 2
   separator = "_"
 }
 resource "random_pet" "db_username" {
-  length = 2
+  length    = 2
   separator = "-"
 }
 resource "random_string" "db_password" {
-  length = 32
+  length  = 32
   special = false
 }
 
@@ -249,7 +249,7 @@ EOT
 #### Broadcast 
 
 resource "random_string" "broadcast_password" {
-  length = 24
+  length  = 24
   special = false
 }
 
@@ -299,29 +299,29 @@ EOT
 ### Configuration
 resource "null_resource" "server_configure" {
   triggers = {
-    server_id = "${aws_instance.main.id}"
-    api_env = "${data.template_file.api_env.rendered}"
-    db_env = "${data.template_file.db_env.rendered}"
-    proxy_env = "${data.template_file.proxy_env.rendered}"
+    server_id     = "${aws_instance.main.id}"
+    api_env       = "${data.template_file.api_env.rendered}"
+    db_env        = "${data.template_file.db_env.rendered}"
+    proxy_env     = "${data.template_file.proxy_env.rendered}"
     broadcast_env = "${data.template_file.broadcast_env.rendered}"
   }
 
   connection {
-    host = "${aws_instance.main.public_ip}"
-    type = "ssh"
-    user = "ubuntu"
+    host        = "${aws_instance.main.public_ip}"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = "${file("${path.root}/data/key.pem")}"
-    agent = false # change to true if agent is required
+    agent       = false # change to true if agent is required
   }
 
   provisioner "remote-exec" {
     inline = [
-      "echo '${data.template_file.api_env.rendered}' | sudo tee /etc/bountydns/env/api.prod.env",
-      "echo '${data.template_file.db_env.rendered}' | sudo tee /etc/bountydns/env/db.prod.env",
-      "echo '${data.template_file.proxy_env.rendered}' | sudo tee /etc/bountydns/env/proxy.prod.env",
-      "echo '${data.template_file.broadcast_env.rendered}' | sudo tee /etc/bountydns/env/broadcast.prod.env",
-      "echo '${data.template_file.dns_env.rendered}' | sudo tee /etc/bountydns/env/dns.prod.env",
-      "sudo bash /opt/bountydns/infra/deploy/utils/configure_dns_jwt.sh /etc/bountydns/env/api.prod.env /etc/bountydns/env/dns.prod.env"
+      "echo '${data.template_file.api_env.rendered}' | sudo tee /etc/bountydns/env/api.prod.env > /dev/null",
+      "echo '${data.template_file.db_env.rendered}' | sudo tee /etc/bountydns/env/db.prod.env > /dev/null",
+      "echo '${data.template_file.proxy_env.rendered}' | sudo tee /etc/bountydns/env/proxy.prod.env > /dev/null",
+      "echo '${data.template_file.broadcast_env.rendered}' | sudo tee /etc/bountydns/env/broadcast.prod.env > /dev/null",
+      "echo '${data.template_file.dns_env.rendered}' | sudo tee /etc/bountydns/env/dns.prod.env > /dev/null",
+      "sudo bash /opt/bountydns/infra/deploy/utils/configure_dns_jwt.sh /etc/bountydns/env/api.prod.env /etc/bountydns/env/dns.prod.env > /dev/null"
     ]
   }
 }
@@ -337,18 +337,18 @@ data "aws_route53_zone" "main" {
 
 resource "aws_route53_record" "a" {
   zone_id = "${data.aws_route53_zone.main.zone_id}"
-  name = "${var.dns_sub}.${var.dns_root}"
-  type = "A"
-  ttl = "5"
+  name    = "${var.dns_sub}.${var.dns_root}"
+  type    = "A"
+  ttl     = "5"
   records = ["${aws_instance.main.public_ip}"]
 }
 
 
 resource "aws_route53_record" "a_dash" {
   zone_id = "${data.aws_route53_zone.main.zone_id}"
-  name = "${var.dns_dashboard_sub}.${var.dns_root}"
-  type = "A"
-  ttl = "5"
+  name    = "${var.dns_dashboard_sub}.${var.dns_root}"
+  type    = "A"
+  ttl     = "5"
   records = ["${aws_instance.main.public_ip}"]
 }
 
@@ -359,7 +359,7 @@ resource "tls_private_key" "private_key" {
 
 resource "acme_registration" "reg" {
   account_key_pem = "${tls_private_key.private_key.private_key_pem}"
-  email_address = "acme@${var.dns_sub}.${var.dns_root}"
+  email_address   = "acme@${var.dns_sub}.${var.dns_root}"
 }
 
 resource "tls_private_key" "base_cert_private_key" {
@@ -367,9 +367,9 @@ resource "tls_private_key" "base_cert_private_key" {
 }
 
 resource "tls_cert_request" "base_req" {
-  key_algorithm = "RSA"
+  key_algorithm   = "RSA"
   private_key_pem = "${tls_private_key.base_cert_private_key.private_key_pem}"
-  dns_names = ["${var.dns_sub}.${var.dns_root}"]
+  dns_names       = ["${var.dns_sub}.${var.dns_root}"]
 
   subject {
     common_name = "${var.dns_sub}.${var.dns_root}"
@@ -378,7 +378,7 @@ resource "tls_cert_request" "base_req" {
 
 
 resource "acme_certificate" "base_certificate" {
-  account_key_pem = "${acme_registration.reg.account_key_pem}"
+  account_key_pem         = "${acme_registration.reg.account_key_pem}"
   certificate_request_pem = "${tls_cert_request.base_req.cert_request_pem}"
 
   recursive_nameservers = ["${var.upstream_dns_server}:53"]
@@ -387,10 +387,10 @@ resource "acme_certificate" "base_certificate" {
     provider = "route53"
 
     config = {
-      AWS_ACCESS_KEY_ID = "${var.aws_access_key_id}"
-      AWS_SECRET_ACCESS_KEY = "${var.aws_secret_access_key}"
-      AWS_DEFAULT_REGION = "${var.aws_default_region}"
-      AWS_HOSTED_ZONE_ID = "${data.aws_route53_zone.main.zone_id}"
+      AWS_ACCESS_KEY_ID       = "${var.aws_access_key_id}"
+      AWS_SECRET_ACCESS_KEY   = "${var.aws_secret_access_key}"
+      AWS_DEFAULT_REGION      = "${var.aws_default_region}"
+      AWS_HOSTED_ZONE_ID      = "${data.aws_route53_zone.main.zone_id}"
       AWS_PROPAGATION_TIMEOUT = 300
 
     }
@@ -402,9 +402,9 @@ resource "tls_private_key" "dashboard_cert_private_key" {
 }
 
 resource "tls_cert_request" "dashboard_req" {
-  key_algorithm = "RSA"
+  key_algorithm   = "RSA"
   private_key_pem = "${tls_private_key.dashboard_cert_private_key.private_key_pem}"
-  dns_names = ["${var.dns_dashboard_sub}.${var.dns_root}"]
+  dns_names       = ["${var.dns_dashboard_sub}.${var.dns_root}"]
 
   subject {
     common_name = "${var.dns_dashboard_sub}.${var.dns_root}"
@@ -413,7 +413,7 @@ resource "tls_cert_request" "dashboard_req" {
 
 # used by nginx proxy (dashboard)
 resource "acme_certificate" "dashboard_certificate" {
-  account_key_pem = "${acme_registration.reg.account_key_pem}"
+  account_key_pem         = "${acme_registration.reg.account_key_pem}"
   certificate_request_pem = "${tls_cert_request.dashboard_req.cert_request_pem}"
 
   recursive_nameservers = ["${var.upstream_dns_server}:53"]
@@ -422,10 +422,10 @@ resource "acme_certificate" "dashboard_certificate" {
     provider = "route53"
 
     config = {
-      AWS_ACCESS_KEY_ID = "${var.aws_access_key_id}"
-      AWS_SECRET_ACCESS_KEY = "${var.aws_secret_access_key}"
-      AWS_DEFAULT_REGION = "${var.aws_default_region}"
-      AWS_HOSTED_ZONE_ID = "${data.aws_route53_zone.main.zone_id}"
+      AWS_ACCESS_KEY_ID       = "${var.aws_access_key_id}"
+      AWS_SECRET_ACCESS_KEY   = "${var.aws_secret_access_key}"
+      AWS_DEFAULT_REGION      = "${var.aws_default_region}"
+      AWS_HOSTED_ZONE_ID      = "${data.aws_route53_zone.main.zone_id}"
       AWS_PROPAGATION_TIMEOUT = 300
     }
   }
@@ -433,58 +433,58 @@ resource "acme_certificate" "dashboard_certificate" {
 
 # A root tls cert cannot be generated (base_certificate) while this exists
 resource "aws_route53_record" "bdns_ns" {
-  zone_id = "${data.aws_route53_zone.main.zone_id}"
-  name = "${var.dns_sub}.${var.dns_root}"
-  type = "NS"
-  ttl = "5"
-  records = ["${var.dns_sub}.${var.dns_root}."]
+  zone_id    = "${data.aws_route53_zone.main.zone_id}"
+  name       = "${var.dns_sub}.${var.dns_root}"
+  type       = "NS"
+  ttl        = "5"
+  records    = ["${var.dns_sub}.${var.dns_root}."]
   depends_on = ["acme_certificate.base_certificate", "acme_certificate.dashboard_certificate"]
 }
 
 
 resource "null_resource" "setup_tls" {
   triggers = {
-    server_id = "${aws_instance.main.id}"
+    server_id       = "${aws_instance.main.id}"
     private_key_pem = "${tls_private_key.dashboard_cert_private_key.private_key_pem}"
     certificate_pem = "${acme_certificate.dashboard_certificate.certificate_pem}"
   }
 
 
   connection {
-    host = "${aws_instance.main.public_ip}"
-    type = "ssh"
-    user = "ubuntu"
+    host        = "${aws_instance.main.public_ip}"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = "${file("${path.root}/data/key.pem")}"
-    agent = false # change to true if agent is required
+    agent       = false # change to true if agent is required
   }
 
   provisioner "remote-exec" {
     inline = [
       "sudo mkdir -p /etc/letsencrypt/live/bountydns.proxy.docker",
-      "echo '${replace(tls_private_key.dashboard_cert_private_key.private_key_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/bountydns.proxy.docker/privkey.pem",
-      "echo '${replace(acme_certificate.dashboard_certificate.certificate_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/bountydns.proxy.docker/fullchain.pem",
-      "echo '${replace(acme_certificate.dashboard_certificate.issuer_pem, "\n", "\\n")}' | sudo tee -a /etc/letsencrypt/live/bountydns.proxy.docker/fullchain.pem"
+      "echo '${replace(tls_private_key.dashboard_cert_private_key.private_key_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/bountydns.proxy.docker/privkey.pem > /dev/null",
+      "echo '${replace(acme_certificate.dashboard_certificate.certificate_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/bountydns.proxy.docker/fullchain.pem > /dev/null",
+      "echo '${replace(acme_certificate.dashboard_certificate.issuer_pem, "\n", "\\n")}' | sudo tee -a /etc/letsencrypt/live/bountydns.proxy.docker/fullchain.pem > /dev/null"
     ]
   }
 }
 
 resource "null_resource" "restart_service" {
   triggers = {
-    server_id = "${aws_instance.main.id}"
-    api_env = "${data.template_file.api_env.rendered}"
-    db_env = "${data.template_file.db_env.rendered}"
-    proxy_env = "${data.template_file.proxy_env.rendered}"
-    broadcast_env = "${data.template_file.broadcast_env.rendered}"
+    server_id       = "${aws_instance.main.id}"
+    api_env         = "${data.template_file.api_env.rendered}"
+    db_env          = "${data.template_file.db_env.rendered}"
+    proxy_env       = "${data.template_file.proxy_env.rendered}"
+    broadcast_env   = "${data.template_file.broadcast_env.rendered}"
     private_key_pem = "${tls_private_key.private_key.private_key_pem}"
     certificate_pem = "${acme_certificate.dashboard_certificate.certificate_pem}"
   }
 
   connection {
-    host = "${aws_instance.main.public_ip}"
-    type = "ssh"
-    user = "ubuntu"
+    host        = "${aws_instance.main.public_ip}"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = "${file("${path.root}/data/key.pem")}"
-    agent = false # change to true if agent is required
+    agent       = false # change to true if agent is required
   }
 
   provisioner "remote-exec" {
