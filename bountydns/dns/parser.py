@@ -21,12 +21,14 @@ class RecordParser:
     @classmethod
     def from_zone(cls, zone):
         records = []
-        logger.info(f"loading zone: {zone.domain}/{zone.ip} ({zone.id})")
+        logger.info(
+            f"from_zone@parser.py - Loading zone: {zone.domain}/{zone.ip} ({zone.id})"
+        )
         dns_records = zone.dns_records or []
         # if the zone has no records, create some default ones
         if not dns_records:
             logger.warning(
-                f"zone has no dns_records. loading defaults: {zone.domain}/{zone.ip} ({zone.id})"
+                f"from_zone@parser.py - Zone has no dns_records. loading defaults: {zone.domain}/{zone.ip} ({zone.id})"
             )
             rrs = RR.fromZone(
                 ZONE_TEMPLATE.format(domain_name=zone.domain, domain_ip=zone.ip)
@@ -35,9 +37,9 @@ class RecordParser:
             for zr in zone_records:
                 # TODO: make this clean on output
                 rrstr = str(dedent(str(zr.rr)))
-                logger.debug(f"loading record entry: {rrstr}")
+                logger.debug(f"from_zone@parser.py - Loading record entry: {rrstr}")
                 logger.debug(
-                    "loaded record details - name: {} | rtype: {} | rr: {}".format(
+                    "from_zone@parser.py - Loaded record details - name: {} | rtype: {} | rr: {}".format(
                         str(zr.rr.rname), str(QTYPE[zr.rr.rtype]), str(zr.rr)
                     )
                 )
@@ -51,17 +53,21 @@ class RecordParser:
                     _zone_records = [Record.make(zone, rr) for rr in rrs]
                     for zr in _zone_records:
                         rrstr = str(dedent(str(zr.rr)))
-                        logger.debug(f"loading record: {str(dns_record.record)}")
-                        logger.debug(f"loading record entry: {rrstr}")
                         logger.debug(
-                            "loaded record details - name: {} | rtype: {} | rr: {}".format(
+                            f"from_zone@parser.py - Loading record: {str(dns_record.record)}"
+                        )
+                        logger.debug(
+                            f"from_zone@parser.py - Loading record entry: {rrstr}"
+                        )
+                        logger.debug(
+                            "from_zone@parser.py - Loaded record details - name: {} | rtype: {} | rr: {}".format(
                                 str(zr.rr.rname), str(QTYPE[zr.rr.rtype]), str(zr.rr)
                             )
                         )
                     zone_records = zone_records + _zone_records
                 except Exception as e:
                     logger.critical(
-                        f'Error processing line ({e.__class__.__name__}: {e}) "{dns_record.id}:{dns_record.record}" '
+                        f'from_zone@parser.py - Error processing line ({e.__class__.__name__}: {e}) "{dns_record.id}:{dns_record.record}" '
                     )
                     raise e
 

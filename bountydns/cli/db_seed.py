@@ -28,20 +28,24 @@ class DbSeed(BaseCommand):
 
         if self.option("target") == "env":
             # self.load_env("seed")
-            logger.info(f"seeding {self.option('target')}")
+            logger.info(f"run@db_seed.py - Seeding {self.option('target')}")
             raise NotImplementedError()  # seed based on env vars
 
         elif self.option("target") == "dev":
-            logger.info(f"seeding {self.option('target')}")
-
-            logger.info("creating superuser")
+            logger.info(f"run@db_seed.py - Seeding {self.option('target')}")
+            logger.info("run@db_seed.py - reating superuser")
             super = factory("SuperUserFactory").create(email="jim@jim.com")
-            logger.info("creating normal user")
+
+            logger.info("run@db_seed.py - Creating normal user")
             norm = factory("UserFactory").create(email="norm@jim.com")
 
-            logger.info("creating zones")
-            zone = factory("ZoneFactory").create(domain="othersite.com", ip="127.0.1.1")
+            logger.info("run@db_seed.py - Creating dns_server")
+
             dns_server = factory("DnsServerFactory").create()
+
+            logger.info("run@db_seed.py - Creating zones")
+
+            zone = factory("ZoneFactory").create(domain="othersite.com", ip="127.0.1.1")
 
             zone2 = factory("ZoneFactory").create(
                 domain="friends4life.com", ip="127.0.1.1", dns_server=dns_server
@@ -51,12 +55,12 @@ class DbSeed(BaseCommand):
                 domain="differentzone.com", ip="127.0.1.1"
             )
 
-            logger.info("creating api_tokens")
+            logger.info("run@db_seed.py - Creating api_tokens")
 
             for i in range(65):
                 factory("ApiTokenFactory").create(dns_server=dns_server)
 
-            logger.info("creating dns_requests")
+            logger.info("run@db_seed.py - Creating dns_requests")
 
             for i in range(35):
                 factory("DnsRequestFactory").create(dns_server=dns_server, zone=zone2)
@@ -64,7 +68,7 @@ class DbSeed(BaseCommand):
             for i in range(35):
                 factory("DnsRequestFactory").create(dns_server=dns_server, zone=zone3)
 
-            logger.info("creating dns_records")
+            logger.info("run@db_seed.py - Creating dns_records")
 
             for i in range(3):
                 factory("DnsRecordFactory").create(zone=zone)
@@ -75,5 +79,5 @@ class DbSeed(BaseCommand):
             for i in range(3):
                 factory("DnsRecordFactory").create(zone=zone3)
         else:
-            print("invalid target set for seeder")
+            logger.critical("run@db_seed.py - invalid target set for seeder")
             self.exit(1)

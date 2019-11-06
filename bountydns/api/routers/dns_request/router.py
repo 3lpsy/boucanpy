@@ -69,6 +69,7 @@ async def store(
 
     data["dns_server_id"] = dns_server_id
     data["zone_id"] = zone_id
-
+    logger.info("store@router.py - Creating DNS Request")
     dns_request = dns_request_repo.create(data).data()
+
     return DnsRequestResponse(dns_request=dns_request)

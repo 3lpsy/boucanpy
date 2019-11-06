@@ -1,8 +1,7 @@
 import os
-from alembic import command
 from bountydns.db.migrate.config import get_config
 
-
+# late import of alembic because it destroys loggers
 def migrate(
     directory=None,
     message=None,
@@ -14,6 +13,8 @@ def migrate(
     rev_id=None,
     x_arg=None,
 ):
+    from alembic import command
+
     """Alias for 'revision --autogenerate'"""
 
     config = get_config(directory, opts=["autogenerate"], x_arg=x_arg)

@@ -10,6 +10,7 @@ from bountydns.core.utils import project_dir
 from bountydns.core.security import hash_password
 from bountydns.cli.base import BaseCommand
 from bountydns.cli.db_setup import DbSetup
+from bountydns.cli.db_wait import DbWait
 from bountydns.db.factories import factory
 
 
@@ -27,6 +28,11 @@ class ApiServer(BaseCommand):
         )
         parser.add_argument(
             "-l", "--listen", action="store", default="127.0.0.1", help="bind address"
+        )
+        parser.add_argument(
+            "--force-exit",
+            action="store_true",
+            help="force exit on reload, useful for restarting websockets in development",
         )
 
         parser.add_argument("-r", "--reload", action="store_true", help="reload")
@@ -68,30 +74,39 @@ class ApiServer(BaseCommand):
         self.load_env(f"api.{env}")
 
         if self.should_import_check():
-            logger.info("performing import check")
+            logger.info("run@api_server.py - Performing import check")
             from bountydns.api.main import api
 
-        logger.critical("starting api server with options: {}".format(str(kwargs)))
+        logger.critical(
+            "run@api_server.py - Starting api server with options: {}".format(
+                str(kwargs)
+            )
+        )
         from bountydns.db.checks import is_db_up, is_db_setup
 
+        # alembic just destroys the loggers, it's annoying
         if self.should_db_check():
-            self.db_register()
-            db_up = is_db_up()
-            if not db_up:
-                logger.critical("database not up error. please check logs")
-                return self.exit(1)
+            logger.info("run@api_server.py - Waiting for database service to be up")
+            db_wait_options = self._args_to_dict(self.options)
+            await DbWait(db_wait_options).run()
 
         if self.option("db_setup"):
-            logger.critical("running database migration")
+            logger.critical("run@api_server.py - Running database migration")
             db_setup_options = self._args_to_dict(self.options)
             if self.option("db_seed"):
                 db_setup_options["seed"] = True
             await DbSetup(db_setup_options).run()
 
         if self.should_db_check():
+            logger.info(
+                "run@api_server.py - Checking if application database is setup and configured"
+            )
+
             db_setup = is_db_setup()
             if not db_setup:
-                logger.critical("database not setup error. please check logs")
+                logger.critical(
+                    "run@api_server.py - Database not setup error. please check logs"
+                )
                 return self.exit(1)
 
         from bountydns.broadcast import is_broadcast_up
@@ -99,29 +114,39 @@ class ApiServer(BaseCommand):
         if self.should_bcast_check():
             bcast_up = await is_broadcast_up()
             if not bcast_up:
-                logger.critical("broadcast (queue) not up error. please check logs")
+                logger.critical(
+                    "run@api_server.py - Broadcast (queue) not up error. please check logs"
+                )
                 return self.exit(1)
 
         if self.option("db_seed_env", False):
             self.seed_from_env()
 
         # taken from uvicorn/main.py:run
-        config = UvicornConfig(app, **kwargs)
+
+        logger.debug("run@api_server.py - Building Uvicorn Config and Server")
+        config = UvicornConfig(app, log_config=self.get_uvicorn_logging(), **kwargs)
         server = UvicornServer(config=config)
+        if self.option("force_exit"):
+            server.force_exit = True
 
         if isinstance(app, str) and (config.debug or config.reload):
+            logger.warning(f"run@api_server.py - Running bountydns api in dev mode...")
             sock = config.bind_socket()
             supervisor = StatReload(config)
-            logger.warning(f"running bountydns api in dev mode...")
             return supervisor.run(server.run, sockets=[sock])
         elif config.workers > 1:
             sock = config.bind_socket()
             supervisor = Multiprocess(config)
-            logger.warning(f"running bountydns api in worker mode...")
+            logger.warning(
+                f"run@api_server.py - Running bountydns api in worker mode..."
+            )
             return supervisor.run(server.run, sockets=[sock])
         else:
             sockets = None
-            logger.warning(f"running bountydns api in standard mode...")
+            logger.warning(
+                f"run@api_server.py - Running bountydns api in standard mode..."
+            )
             return await server.serve(sockets=sockets)
 
     def get_kwargs(self):
@@ -148,7 +173,9 @@ class ApiServer(BaseCommand):
 
     def get_workers(self):
         if self.option("debug", None) or self.option("reload", None):
-            logger.critical("Canot use debug or reload with workers. Skipping.")
+            logger.critical(
+                "get_workers@api_server.py - Cannot use debug or reload with workers. Skipping."
+            )
             return None
         return self.option("workers", 5)
 
@@ -196,14 +223,16 @@ class ApiServer(BaseCommand):
                 hashed_password = hash_password(password)
                 repo = UserRepo(db=session)
                 if not repo.exists(email=email):
-                    logger.info(f"seeding user {email}")
+                    logger.info(f"seed_from_env@api_server.py - seeding user {email}")
                     user = factory("UserFactory", session=session).create(
                         email=email,
                         hashed_password=hashed_password,
                         is_superuser=is_superuser,
                     )
                 else:
-                    logger.info(f"seeded user {email} already exists")
+                    logger.info(
+                        f"seed_from_env@api_server.py - Seeded user {email} already exists"
+                    )
 
         for i in range(9):
             i = str(i)
@@ -212,7 +241,7 @@ class ApiServer(BaseCommand):
             if name:
                 repo = DnsServerRepo(db=session)
                 if not repo.exists(name=name):
-                    logger.info(f"seeding domain {name}")
+                    logger.info(f"seed_from_env@api_server.py - Seeding domain {name}")
                     domain = factory("DnsServerFactory", session=session).create(
                         name=name
                     )
@@ -233,7 +262,9 @@ class ApiServer(BaseCommand):
                     if dns_server_repo.exists(name=dns_server_name):
                         dns_server = dns_server_repo.results()
                     else:
-                        logger.info(f"seeding dns server as zone dependency: {name}")
+                        logger.info(
+                            f"seed_from_env@api_server.py - Seeding dns server as zone dependency: {name}"
+                        )
                         dns_server = factory(
                             "DnsServerFactory", session=session
                         ).create(name=dns_server_name)
@@ -243,7 +274,9 @@ class ApiServer(BaseCommand):
                 else:
                     repo = ZoneRepo(db=session)
                     if not repo.exists(ip=ip, domain=domain):
-                        logger.info(f"seeding zone without dns server: {ip}, {domain}")
+                        logger.info(
+                            f"seed_from_env@api_server.py - Seeding zone without dns server: {ip}, {domain}"
+                        )
                         factory("GlobalZoneFactory", session=session).create(
                             ip=ip, domain=domain
                         )

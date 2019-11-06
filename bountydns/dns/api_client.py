@@ -15,16 +15,16 @@ class ApiClient:
         self.zones = []
         payload = jwt.decode(api_token, verify=False)  # do not trust
         if not "dns_server_name" in payload.keys() or not payload["dns_server_name"]:
-            logger.critical("no dns_server_name on api token")
+            logger.critical("__init__@api_client.py - No dns_server_name on api token")
             raise Exception("no dns_server_name on api token")
         self.dns_server_name = payload["dns_server_name"]
 
     def sync(self):
-        logger.info("syncing api token")
+        logger.info("sync@api_client.py - Syncing api token")
         return self.post("/api-token/sync", fail=True)
 
     def get_zones(self):
-        logger.info("getting zones")
+        logger.info("get_zones@api_client.py - Getting zones")
         zone_data = self.get(
             f"/dns-server/{self.dns_server_name}/zone",
             params={"includes": ["dns_records"]},
@@ -37,14 +37,16 @@ class ApiClient:
         return True
 
     def refresh_zones_if_needed(self):
-        logger.info("Checking for New Zones and Records...")
+        logger.info(
+            "refresh_zones_if_needed@api_client.py - Checking for New Zones and Records..."
+        )
         old_zones = self.zones
         new_zones = self.get_zones()
         # TODO: fix this mess
 
         if len(old_zones) != len(new_zones):
             logger.warning(
-                f"Zone Length mistmatch. New or Changed Zone Found: {str(old_zones)} != {str(new_zones)}. Reloading zones."
+                f"refresh_zones_if_needed@api_client.py - Zone Length mistmatch. New or Changed Zone Found: {str(old_zones)} != {str(new_zones)}. Reloading zones."
             )
             self.load_zones()
             return True
@@ -60,7 +62,7 @@ class ApiClient:
                         oz_dns_records = oz.dns_records or []
                         if len(nz_dns_records) != len(oz_dns_records):
                             logger.warning(
-                                f"Zone Record Length mistmatch {str(len(nz_dns_records))} != {str(len(oz_dns_records))}. New or Changed Zone Record Found: {str(nz_dns_records)} != {str(oz_dns_records)}. Reloading zones."
+                                f"refresh_zones_if_needed@api_client.py - Zone Record Length mistmatch {str(len(nz_dns_records))} != {str(len(oz_dns_records))}. New or Changed Zone Record Found: {str(nz_dns_records)} != {str(oz_dns_records)}. Reloading zones."
                             )
                             self.load_zones()
                             return True
@@ -69,19 +71,21 @@ class ApiClient:
                                 is_rec_satisfied = True
                         if not is_rec_satisfied:
                             logger.warning(
-                                f"New or Changed Zone Record {str(nz)}: {str(nrec)} found for server. Reloading zones."
+                                f"refresh_zones_if_needed@api_client.py - New or Changed Zone Record {str(nz)}: {str(nrec)} found for server. Reloading zones."
                             )
                             self.load_zones()
                             return True
                     is_nz_exists = True
             if not is_nz_exists:
                 logger.warning(
-                    f"New or Changed Zone {str(nz)} found for server. Reloading zones."
+                    f"refresh_zones_if_needed@api_client.py - New or Changed Zone {str(nz)} found for server. Reloading zones."
                 )
                 self.load_zones()
                 return True
 
-        logger.info("No New Zones or Records Found. All is well")
+        logger.info(
+            "refresh_zones_if_needed@api_client.py - No New Zones or Records Found. All is well"
+        )
 
         return False
 
@@ -89,7 +93,7 @@ class ApiClient:
         return self.get("/status")
 
     def create_dns_request(self, handler, request, request_uuid):
-        logger.info("creating dns request")
+        logger.info("create_dns_request@api_client.py - Creating dns request")
 
         name = str(request.q.qname)
         name = name.rstrip(".")
@@ -111,12 +115,13 @@ class ApiClient:
         headers = self.get_default_headers()
         res = requests.get(self.url(url), headers=headers, params=params)
 
-        logger.info("Getting URL: " + str(self.url(url)))
+        logger.info("get@api_client.py - Getting URL: " + str(self.url(url)))
 
         if fail:
             if res.status_code != 200:
                 logger.critical(
-                    f"Error getting API {self.url(url)}: " + str(res.json())
+                    f"get@api_client.py - Error getting API {self.url(url)}: "
+                    + str(res.json())
                 )
             res.raise_for_status()
         return res.json()
@@ -125,7 +130,7 @@ class ApiClient:
         data = data or {}
         headers = self.get_default_headers()
         res = requests.post(self.url(url), json=data, headers=headers)
-        logger.info("Posting URL: " + str(self.url(url)))
+        logger.info("post@api_client.py - Posting URL: " + str(self.url(url)))
 
         if fail:
             if res.status_code != 200:
@@ -147,7 +152,7 @@ class ApiClient:
             if seconds > 60:
                 logger.warning("could not connect to api. api not up")
                 return False
-            logger.info("checking for api status")
+            logger.info("wait_for_up@api_client.py - checking for api status")
             try:
                 sleep(1)
                 self.get_status()
@@ -155,7 +160,7 @@ class ApiClient:
                 return True
             except Exception as e:
                 logger.info(
-                    "api check not ready after {} seconds: {}".format(
+                    "wait_for_up@api_client.py - api check not ready after {} seconds: {}".format(
                         str(seconds), str(e.__class__.__name__)
                     )
                 )

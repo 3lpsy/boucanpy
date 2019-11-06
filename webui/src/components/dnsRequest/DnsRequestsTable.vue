@@ -48,37 +48,41 @@ export default class DnsRequestsTable extends mixins(
 ) {
     sortBy = 'created_at';
     sortDesc = true;
-    fields = {
-        id: {
+    fields = [
+        {
+            key: 'id',
             label: 'ID',
             sortable: true,
         },
-        dns_server_name: {
+        {
+            key: 'dns_server_name',
             label: 'Server',
             sortable: true,
         },
-        zone_id: {
+        {
+            key: 'zone_id',
             label: 'Zone',
             sortable: true,
         },
-        name: {
-            label: 'Name',
-            sortable: true,
-        },
-        source_address: {
+        { key: 'name', label: 'Name', sortable: true },
+        {
+            key: 'source_address',
             label: 'Source',
             sortable: true,
         },
-        type: {
+        {
+            key: 'type',
+
             label: 'Type',
             sortable: true,
         },
-        created_at: {
+        {
+            key: 'created_at',
             label: 'Created',
             sortable: true,
             formatter: 'formatDate',
         },
-    };
+    ];
     loadData() {
         dnsRequest
             .getDnsRequests(

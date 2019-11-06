@@ -22,14 +22,14 @@ class DbSetup(BaseCommand):
 
     async def run(self):
         if not Path(AlembicInit.migration_dir).is_dir():
-            logger.info("[*] running alembic-init")
+            logger.info("run@db_setup.py - Running alembic-init")
             await AlembicInit.make(self.options).run()
-        logger.info("[*] running alembic upgrade")
+        logger.info("run@db_setup.py - Running alembic upgrade")
         await AlembicUpgrade.make(self.options).run()
-        logger.info("[*] running alembic migrate")
+        logger.info("run@db_setup.py - Running alembic migrate")
         await AlembicMigrate.make(self.options).run()
-        logger.info("[*] running alembic upgrade again")
+        logger.info("run@db_setup.py - Running alembic upgrade again")
         await AlembicUpgrade.make(self.options).run()
         if self.option("seed", None):
-            logger.info("[*] running db seed")
+            logger.info("run@db_setup.py - Running db seed")
             await DbSeed.make(self.options).run()

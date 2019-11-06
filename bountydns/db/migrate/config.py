@@ -1,16 +1,16 @@
 import os
 import argparse
-from alembic.config import Config as AlembicConfig
 
-
-class Config(AlembicConfig):
-    def get_template_directory(self):
-        package_dir = os.path.abspath(os.path.dirname(__file__))
-
-        return os.path.join(package_dir, "templates")
-
-
+# late import of alembic because it destroys loggers
 def get_config(directory, x_arg=None, opts=None):
+    from alembic.config import Config as AlembicConfig
+
+    class Config(AlembicConfig):
+        def get_template_directory(self):
+            package_dir = os.path.abspath(os.path.dirname(__file__))
+
+            return os.path.join(package_dir, "templates")
+
     config = Config(os.path.join(directory, "alembic.ini"))
     config.set_main_option("script_location", directory)
     if config.cmd_opts is None:

@@ -138,13 +138,15 @@ class BaseRepo:
 
     def to_dict(self, item):
         root_data = item.as_dict() if hasattr(item, "as_dict") else dict(item)
-        self.debug(
-            f"attaching includables {str(self._includes)} in {self.__class__.__name__}"
-        )
+        # self.debug(
+        #     f"to_dict@repos.py: attaching includables {str(self._includes)} in {self.__class__.__name__}"
+        # )
         for name in self._includes.keys():
             if name not in root_data:
                 if not hasattr(item, name):
-                    self.debug(f"cannot find attr {str(name)} on item {str(item)}")
+                    self.debug(
+                        f"to_dict@repos.py: cannot find attr {str(name)} on item {str(item)}"
+                    )
                     continue
                 # TODO: what if 0
                 elif not getattr(item, name):
@@ -152,7 +154,9 @@ class BaseRepo:
                     root_data[prop_key] = None
                 else:
                     prop = getattr(item, name)
-                    self.debug(f"getting attr {str(name)} on item {str(item)}")
+                    # self.debug(
+                    #     f"to_dict@repos.py: getting attr {str(name)} on item {str(item)}"
+                    # )
                     # prop can be list
                     if isinstance(prop, list):
                         prop_data = []
@@ -185,7 +189,7 @@ class BaseRepo:
         elif kwargs:
             self.filter_by(**kwargs)
         self.debug(
-            f"executing first (exists) query {self.compiled()} in {self.__class__.__name__}"
+            f"exists@repos.py: query {self.compiled()} in {self.__class__.__name__}"
         )
         results = self.final().first()
         if or_fail and not results:
@@ -200,7 +204,7 @@ class BaseRepo:
         if kwargs:
             self.filter_by(**kwargs)
         self.debug(
-            f"executing first query {self.compiled()} in {self.__class__.__name__}"
+            f"first@repos.py: executing first query {self.compiled()} in {self.__class__.__name__}"
         )
         results = self.final().first()
         if or_fail:
@@ -356,11 +360,15 @@ class BaseRepo:
         return self._query
 
     def compiled(self):
-        return str(
-            self.query().statement.compile(
-                dialect=postgresql.base.PGDialect(),
-                compile_kwargs={"literal_binds": True},
+        return (
+            str(
+                self.query().statement.compile(
+                    dialect=postgresql.base.PGDialect(),
+                    compile_kwargs={"literal_binds": True},
+                )
             )
+            .replace("\r", " ")
+            .replace("\n", " ")
         )
 
     def set_data_model(self, data_model):
@@ -375,7 +383,6 @@ class BaseRepo:
         final_index = len(parts) - 1
         for i, part in enumerate(parts):
             if i == final_index:
-                logger.critical("LABEL " + str(getattr(parent, part)))
                 return getattr(parent, part)
             parent = self._get_relationship_model(part, parent)
         raise Exception(f"Unable to decipher label for key: {key}")

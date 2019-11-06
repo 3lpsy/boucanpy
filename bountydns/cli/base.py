@@ -1,6 +1,12 @@
 from sys import exit
 from os import environ
-from bountydns.core import load_env, set_log_level, make_logger
+from bountydns.core import (
+    load_env,
+    set_log_level,
+    make_logger,
+    set_log_format,
+    get_uvicorn_logging,
+)
 from bountydns.core.security import create_bearer_token
 from bountydns.db.session import db_register, session
 from bountydns.db.utils import make_db_url
@@ -32,7 +38,7 @@ class BaseCommand:
 
     async def call(self):
         if self.add_log_level:
-            set_log_level(self.get_log_level(), self.get_second_log_level())
+            self.configure_logging()
         return await self.run()
 
     @classmethod
@@ -48,12 +54,19 @@ class BaseCommand:
                 "-L", "--log-level", action="store", default="info", help="log level"
             )
             parser.add_argument(
+                "-F",
+                "--log-format",
+                action="store",
+                default="full",
+                choices=["full", "short"],
+                help="log format",
+            )
+            parser.add_argument(
                 "--second-log-level",
                 action="store",
                 default="info",
                 help="secondary log level",
             )
-
             parser.add_argument(
                 "--no-envs", action="store_true", help="don't load env files"
             )
@@ -62,16 +75,31 @@ class BaseCommand:
 
         return cls.parser(parser)
 
+    def configure_logging(self):
+        set_log_level(self.get_log_level(), self.get_second_log_level())
+        set_log_format(self.get_log_format())
+
+    def get_uvicorn_logging(self):
+        return get_uvicorn_logging(
+            self.get_log_level(), self.get_second_log_level(), self.get_log_format()
+        )
+
     def get_log_level(self):
         level = "info"
         second_level = level
-        if self.option("debug", None):
-            level = "debug"
-        elif self.option("log_level", None):
+        if self.option("log_level", None):
             level = self.option("log_level")
+        elif self.option("debug", None):
+            level = "debug"
         elif self.env("LOG_LEVEL", "info"):
             level = "info"
         return level
+
+    def get_log_format(self):
+        format_ = "FULL"
+        if self.option("log_format", None):
+            format_ = self.option("log_format").upper()
+        return format_
 
     def get_second_log_level(self):
         if self.option("second_log_level", None):

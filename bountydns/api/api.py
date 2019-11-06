@@ -15,11 +15,12 @@ from starlette.exceptions import HTTPException
 from bountydns.core.utils import webui_dir, landing_dir
 from bountydns.core import logger
 from bountydns.api.routers import routers
-from bountydns.api.websocket import broadcast_index, broadcast_authed_index
+from bountydns.api.websocket import broadcast_index, broadcast_auth
 from bountydns.db.session import session, db_register
 from bountydns.db.utils import make_db_url
 
 db_register(make_db_url())
+
 from bountydns.api import (
     config,
 )  # environment must be loaded, dabatabse must be registerd
@@ -32,10 +33,13 @@ origins = []
 # Set all CORS enabled origins
 if config.API_CORS_ORIGINS:
     origins_raw = config.API_CORS_ORIGINS.split(",")
+
     for origin in origins_raw:
         use_origin = origin.strip()
         origins.append(use_origin)
-    logger.debug(f"registering cors origins {origins}")
+
+    logger.info(f"global@api.py - Registering cors origins {origins}")
+
     api.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -47,8 +51,10 @@ if config.API_CORS_ORIGINS:
 main_router = APIRouter()
 
 for r, ropts in routers:
-    logger.debug(f"registering router {str(r)} {str(ropts)}")
+    logger.debug(f"global@api.py - Registering router {str(r)} {str(ropts)}")
     main_router.include_router(r, **ropts)
+
+logger.debug(f"global@api.py - Registering main router {str(r)} {str(ropts)}")
 
 api.include_router(main_router, prefix=config.API_V1_STR)
 
@@ -57,9 +63,10 @@ from starlette.websockets import WebSocket
 # public broadcast
 
 if int(environ.get("BROADCAST_ENABLED", 0)) == 1:
+    logger.info("global@api.py - Registering broadcast routers")
     api.add_websocket_route("/broadcast", broadcast_index, name="broadcast.index")
     api.add_websocket_route(
-        "/broadcast/auth", broadcast_authed_index, name="broadcast.authed.index"
+        "/broadcast/auth", broadcast_auth, name="broadcast.auth.index"
     )
 
 
@@ -70,6 +77,7 @@ async def webui_redir():
 
 # served by nginx
 if Path(landing_dir("index.html")).is_file():
+    logger.info("global@api.py - Registering landing routers")
 
     @api.get("/landing/")
     async def web_index():
@@ -79,6 +87,7 @@ if Path(landing_dir("index.html")).is_file():
 
 # served by nginx
 if Path(webui_dir("dist")).is_dir():
+    logger.info("global@api.py - Registering webui routers")
 
     # served by nginx
     @api.get("/webui")
@@ -91,6 +100,9 @@ if Path(webui_dir("dist")).is_dir():
         return FileResponse(webui_dir(join("dist", "index.html")))
 
     api.mount("/webui/assets", StaticFiles(directory=webui_dir("dist")))
+
+
+logger.debug("global@api.py - Registering 404 handler")
 
 # TODO: make core handler
 @api.exception_handler(404)
@@ -105,9 +117,15 @@ async def http_exception(request, exc):
     return JSONResponse({"detail": "Not Found"}, status_code=404)
 
 
+logger.debug("global@api.py - Registering 500 handler")
+
+
 @api.exception_handler(500)
 async def http_exception(request, exc):
     return JSONResponse({"detail": "Server Error"}, status_code=500)
+
+
+logger.debug("global@api.py - Api import complete")
 
 
 # async def db_session_middleware(request: Request, call_next):
@@ -115,4 +133,3 @@ async def http_exception(request, exc):
 #     response = await call_next(request)
 #     request.state.db.close()
 #     return response
-

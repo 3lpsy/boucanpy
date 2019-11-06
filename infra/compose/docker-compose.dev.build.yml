@@ -7,7 +7,7 @@ services:
     image: 3lpsy/bountydns:latest
     networks:
       bountydnspub:
-    command: api-server --debug --reload --no-envs --db-setup --db-seed -l 0.0.0.0 --db-seed-env
+    command: api-server --debug --reload --no-envs -l 0.0.0.0 --db-seed --db-setup --db-seed-env --log-level debug --log-format short --second-log-level warning --force-exit
     env_file:
       - ${COMPOSE_ENV_DIR}/api.dev.env
     depends_on:
@@ -17,7 +17,7 @@ services:
     image: 3lpsy/bountydns:latest
     networks:
       bountydnspub:
-    command: dns-server -l 0.0.0.0 -p 53
+    command: dns-server -l 0.0.0.0 -p 53 --log-level info --log-format short
     env_file:
       - ${COMPOSE_ENV_DIR}/dns.dev.env
     restart: on-failure:2

@@ -38,7 +38,7 @@ async def sync(
         api_token = None
         if not dns_server_repo.exists(name=token.payload.dns_server_name.lower()):
             dns_server_repo.clear()
-            logger.info("saving dns server from api token")
+            logger.info("sync@router.py - Saving dns server from api token")
             dns_server = dns_server_repo.create(
                 dict(name=token.payload.dns_server_name.lower())
             ).results()
@@ -47,7 +47,7 @@ async def sync(
 
         if not api_token_repo.loads("dns_server").exists(token=token.token):
             api_token_repo.clear()
-            logger.info("saving api token from auth token")
+            logger.info("sync@router.py - Saving api token from auth token")
             item = api_token_repo.create(
                 dict(
                     token=token.token,
@@ -65,7 +65,7 @@ async def sync(
                 .data()
             )
         else:
-            logger.info("token already exists in database")
+            logger.info("sync@router.py - token already exists in database")
             item = api_token_repo.loads("dns_server").includes("dns_server").data()
         return ApiTokenResponse(api_token=item)
 
@@ -81,8 +81,6 @@ async def index(
     token: TokenPayload = Depends(ScopedTo("api-token:list")),
     includes: List[str] = Query(None),
 ):
-    logger.critical("LOOK AT MEEEEE")
-    print("HELLOOOOOOOOOOO")
     includes = only(includes, ["dns_server"], values=True)
 
     pg, items = (
@@ -115,7 +113,9 @@ async def store(
             if user_token in requested_scope:
                 request_scope_satisfied = True
         if not request_scope_satisfied:
-            logger.warning(f"Attempt to create unauthorized scope {requested_scope}")
+            logger.warning(
+                f"store@router.py: Attempt to create unauthorized scope {requested_scope}"
+            )
             raise HTTPException(403, detail="unauthorized")
         else:
             scopes.append(requested_scope)

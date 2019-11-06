@@ -8,10 +8,10 @@ class DNSLogger(BaseDNSLogger):
         super().__init__(log, prefix)
 
     def log_pass(self, *args):
-        print("log_pass")
+        pass
 
     def log_request(self, handler, request, request_uuid):
-        logger.critical(f"log_request: {handler}, {request}, {request_uuid}")
+        logger.debug(f"log_request: {handler}, {request}, {request_uuid}")
         self.api.create_dns_request(handler, request, request_uuid)
         super().log_request(handler, request)
 
