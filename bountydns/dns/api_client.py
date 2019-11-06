@@ -115,9 +115,9 @@ class ApiClient:
     def get(self, url: str, params=None, fail=True):
         params = params or {}
         headers = self.get_default_headers()
-        res = requests.get(self.url(url), headers=headers, params=params)
-
         logger.info("get@api_client.py - Getting URL: " + str(self.url(url)))
+
+        res = requests.get(self.url(url), headers=headers, params=params)
 
         if fail:
             if res.status_code != 200:
