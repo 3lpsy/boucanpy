@@ -65,7 +65,7 @@ class DnsServer(BaseCommand):
 
         # TODO: thread issues?
         verify_ssl = True
-        if bool(self.option("no_verify_ssl")):
+        if bool(self.option("no_ssl_verify")):
             verify_ssl = False
 
         self.api_client = ApiClient(
