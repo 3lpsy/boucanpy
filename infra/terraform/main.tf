@@ -198,9 +198,10 @@ resource "aws_instance" "main" {
 ### Environment + Secrets 
 
 # jwt secret is generated on the server via API_SECRET
+# ssl can be disabled (and probably is) in order to use the docker-compose hostname "proxy"
 data "template_file" "dns_env" {
   template = <<-EOT
-API_URL=https://${var.dns_dashboard_sub}.${var.dns_root}:8443
+API_URL=https://proxy:8443
 API_TOKEN=
 EOT
 }
