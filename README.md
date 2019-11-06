@@ -66,6 +66,24 @@ Run the following to run the containers.
 $ ./compose.sh dev up
 ```
 
+## What does it do?
+
+It doesn't do much really. The project will set up an API, a web interface, and a DNS server. When the DNS server receives a DNS request, it will tell the API. The API will then tell the web interface.
+
+![Screenshot](screenshots/screenshot-dns-requests.png)
+
+You can also see the raw request:
+
+![Screenshot](screenshots/screenshot-dns-request.png)
+
+This information is useful for testing the injection of domains into payloads in attacks such as Blind Cross Site scripting, Remote File Inclusion, Blind SQL Injection, Blind XML External Entity Injection, and Server Side Request Forgery.
+
+And that's basically it. A Burp Extension is in the works in the spirit of Collaborator Everywhere which will (hopefully) be used to inject targeted zones into web requests and poll the API for updates (like Collaborator). You can currently manage these "zones" within the web interface.
+
+![Screenshot](screenshots/screenshot-zones.png)
+
+In addition, there's an Packer build and Terraform deployment in the "infra" folder for easy deploying.
+
 ## Developing and Hacking
 
 The development Docker Compose project uses mounts to mount the correct folders and files onto the "bountydns" and "dns" containers. In addition, the command uses "--reload" so you can edit the python project on your host and automatically refresh the servers inside the containers.
