@@ -1,8 +1,8 @@
 # Bounty DNS: A DNS Catcher
 
-![Screenshot](screenshots/screenshot-dns-requests.png)
+![Screenshot](screenshots/diagram.png)
 
-This project is an attempt to implement a lightweight burp collaborator-esc application and consists of two main components: a DNS Server (Custom Python Implemention with dnslib) and an API. It is still very much in the early days of development
+This project is an attempt to implement a lightweight burp collaborator-esc application and consists of two main components: a DNS Server (Custom Python Implemention with dnslib) and an API. It is still very much in the early days of development. You can think of BountyDNS as sort of a Canary that will notify you when an external asset (DNS Record, HTTP Server, SMTP Server) has been interacted with. This is useful for blind payload injection.
 
 For more information on Burp Collaborator, checkout [burp's documentation](https://portswigger.net/burp/documentation/collaborator)
 
@@ -140,72 +140,18 @@ Once the core DNS use case is satisfied, the API will be extended to support the
 
 TODO:
 
-- [x] Build DNS Implementation
-- [x] Build CLI Foundation
-- [x] Build Alembic Commands
-- [x] Build API Auth Routes
-- [x] Build API Authentication Controls
-- [x] Build API Token Capabilities (Generate Extended Auth Tokens)
-- [x] Build API Zone / DNS Routes
-- [x] Integrate API Callbacks into DNS Server
-- [x] Build Web GUI Foundation
-- [x] Incorporate ApiClient and ApiTokens into DNS Server
-- [x] Get Websockets Working
-- [x] Handle Pagination on the Front End
-- [x] Create docker compose files
-- [x] Create Server Page
-- [x] Create DNS Server Create Form
-- [x] Create DNS Server Edit Form
-- [x] Fix API Tokens Page (validation, etc)
-- [x] Create DNS Record Repo, Factory, Seed Data, etc
-- [x] Create DNS Server View Page
-- [x] Create DNS Zone page with Record Table
-- [x] Create DNS Create Record Form
-- [x] Create DNS Edit Record Form
-- [x] Validate DNS Records in create and edit forms
-- [x] Fix WebSockets
-
-- [x] Change DNS Server to Pull Records from API
-- [x] Move Create Zone from modal to Page
-
-- [x] Restrict length of inputs
-- [x] Apply stricter validation to server name
-- [x] Apply server name validation during sync process
-- [x] Check for refreshable WebSocket token on page load
-- [x] Updatable Dns Records while running
-- [x] User management API & Frontend
-- [x] Deletable items (Zones / Users / Dns Records etc)
-- [x] Treat all emails as lowercase
-
-- [x] Handle General Network Errors on the Front End
-- [x] Add basic tests to API
-- [x] Initialize repos with .new()
-- [x] Create Packer build
-- [x] Create Terraform build
-
+- [ ] Build HTTP Server
+- [ ] Build SMTP Server
+- [ ] Build ability for webhook's / events
 - [ ] Fix logging / better logging
-- [ ] Get websockets working in production
-- [ ] setup ssl via terraform
-- [ ] setup default zone via terraform
-- [ ] figure out how to grab public IPs (source ips) inside docker network
-
-- [ ] Allow user to seed from yaml
-- [ ] Create DNS Payloads Page
-- [ ] Create DNS Payloads Form
+- [ ] Better config setup
 - [ ] Gracefully allow actions when super is in token via ScopedTo
 - [ ] Users can manage their own profile / user info
-
-### Icebox
-
-- [ ] Write more tests and enabling logging in tests
-- [ ] Perform Better Validation on the Backend
-- [ ] Perform Better Validation on the Frontend
+- [ ] Perform Better Validation
 - [ ] Refactor code to handle General network errors via toast
 - [ ] Add MFA
-- [ ] Use vuex store for datatable data
+- [ ] Moar Vuex
 - [ ] Make relationsips sortable in repo
-- [ ] Confirm DNS Server is as Compliant as possible
-- [ ] Build ability for webhook's / events
 
 ### Contributing
 
