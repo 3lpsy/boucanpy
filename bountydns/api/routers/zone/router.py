@@ -5,6 +5,8 @@ from bountydns.core import logger, only, abort, abort_for_input
 
 from bountydns.core import SortQS, PaginationQS, BaseResponse
 from bountydns.core.dns_server import DnsServerRepo
+from bountydns.core.http_server import HttpServerRepo
+
 from bountydns.core.zone import (
     ZoneRepo,
     ZonesResponse,
@@ -25,7 +27,8 @@ async def index(
     token: TokenPayload = Depends(ScopedTo("zone:list")),
     includes: List[str] = Query(None),
 ):
-    includes = only(includes, ["dns_server", "dns_records"], values=True)
+    # TODO: bypasses a bunch of scopes, find a way to restrict access via scopes
+    includes = only(includes, ["dns_server", "dns_records", "http_server"], values=True)
 
     pg, items = (
         zone_repo.loads(includes)
@@ -43,6 +46,7 @@ async def store(
     form: ZoneCreateForm,
     zone_repo: ZoneRepo = Depends(ZoneRepo()),
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
+    http_server_repo: HttpServerRepo = Depends(HttpServerRepo()),
     token: TokenPayload = Depends(ScopedTo("zone:create")),
 ):
 
@@ -61,6 +65,10 @@ async def store(
         if dns_server_repo.exists(id=form.dns_server_id):
             data["dns_server_id"] = dns_server_repo.results().id
 
+    if form.http_server_id:
+        if http_server_repo.exists(id=form.http_server_id):
+            data["http_server_id"] = http_server_repo.results().id
+
     zone = zone_repo.create(data).data()
     return ZoneResponse(zone=zone)
 
@@ -72,7 +80,7 @@ async def show(
     token: TokenPayload = Depends(ScopedTo("zone:show")),
     includes: List[str] = Query(None),
 ):
-    includes = only(includes, ["dns_server", "dns_records"], values=True)
+    includes = only(includes, ["dns_server", "dns_records", "http_server"], values=True)
 
     zone = zone_repo.loads(includes).get_or_fail(zone_id).includes(includes).data()
     return ZoneResponse(zone=zone)
@@ -85,6 +93,7 @@ async def update(
     form: ZoneCreateForm,
     zone_repo: ZoneRepo = Depends(ZoneRepo()),
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
+    http_server_repo: DnsServerRepo = Depends(HttpServerRepo()),
     token: TokenPayload = Depends(ScopedTo("zone:update")),
     includes: List[str] = Query(None),
 ):
@@ -103,6 +112,13 @@ async def update(
         elif dns_server_repo.exists(id=form.dns_server_id):
             dns_server = dns_server_repo.results()
             data["dns_server"] = dns_server
+
+    if form.http_server_id is not None:
+        if form.http_server_id is 0:
+            data["http_server_id"] = None
+        elif http_server_repo.exists(id=form.http_server_id):
+            http_server = http_server_repo.results()
+            data["http_server"] = http_server
 
     zone = (
         zone_repo.loads(includes)

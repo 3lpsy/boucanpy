@@ -66,6 +66,13 @@ class DnsServerData(BaseModel):
     created_at: datetime
 
 
+class HttpServerData(BaseModel):
+    id: int
+    name: str
+    zones: Optional[List[ForwardRef("ZoneData")]]
+    created_at: datetime
+
+
 class DnsRecordData(BaseModel):
     id: int
     record: str
@@ -82,6 +89,8 @@ class ZoneData(BaseModel):
     dns_server_id: Optional[int]
     dns_server: Optional[DnsServerData]
     dns_records: Optional[List[DnsRecordData]]
+    http_server_id: Optional[int]
+    http_server: Optional[HttpServerData]
     created_at: datetime
 
 
@@ -99,6 +108,21 @@ class DnsRequestData(BaseModel):
     dns_server: Optional[DnsServerData]
 
 
+class HttpRequestData(BaseModel):
+    id: int
+    name: str
+    path: str
+    zone_id: int = None
+    source_address: str
+    source_port: int
+    type: str
+    protocol: str
+    raw_request: str
+    http_server_id: int
+    http_server: Optional[HttpServerData]
+    created_at: datetime
+
+
 class ApiTokenData(BaseModel):
     id: int
     scopes: str
@@ -114,3 +138,4 @@ class SensitiveApiTokenData(ApiTokenData):
 
 
 DnsServerData.update_forward_refs()
+HttpServerData.update_forward_refs()

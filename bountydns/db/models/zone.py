@@ -34,6 +34,18 @@ class Zone(Base):
         back_populates="zone",
     )
 
+    http_server_id = Column(ForeignKey("http_servers.id"), nullable=True)
+    http_server = relationship(
+        "bountydns.db.models.http_server.HttpServer",
+        foreign_keys="bountydns.db.models.zone.Zone.http_server_id",
+        back_populates="zones",
+    )
+
+    http_requests = relationship(
+        "bountydns.db.models.http_request.HttpRequest",
+        foreign_keys="bountydns.db.models.http_request.HttpRequest.zone_id",
+    )
+
     @staticmethod
     async def on_after_insert(mapper, connection, target):
         try:

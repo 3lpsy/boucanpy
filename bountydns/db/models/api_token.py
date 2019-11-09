@@ -12,9 +12,16 @@ class ApiToken(Base):
     is_active = Column(Boolean(), default=True)
     expires_at = Column(DateTime, default=True)
 
-    dns_server_id = Column(ForeignKey("dns_servers.id"), nullable=False)
+    dns_server_id = Column(ForeignKey("dns_servers.id"), nullable=True)
     dns_server = relationship(
         "bountydns.db.models.dns_server.DnsServer",
         foreign_keys="bountydns.db.models.api_token.ApiToken.dns_server_id",
+        back_populates="api_tokens",
+    )
+
+    http_server_id = Column(ForeignKey("http_servers.id"), nullable=True)
+    http_server = relationship(
+        "bountydns.db.models.http_server.HttpServer",
+        foreign_keys="bountydns.db.models.api_token.ApiToken.http_server_id",
         back_populates="api_tokens",
     )

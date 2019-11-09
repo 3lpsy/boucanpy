@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from bountydns.core import logger, only
+from bountydns.core import logger, only, abort
 from bountydns.core.security import (
     ScopedTo,
     TokenPayload,
@@ -19,6 +19,7 @@ from bountydns.core.api_token import (
     SensitiveApiTokenData,
 )
 from bountydns.core.dns_server import DnsServerRepo
+from bountydns.core.http_server import HttpServerRepo
 
 from bountydns.core import SortQS, PaginationQS, BaseResponse
 
@@ -27,46 +28,85 @@ router = APIRouter()
 options = {"prefix": ""}
 
 
+# TODO: fix this
 @router.post("/api-token/sync", name="api_token.sync", response_model=ApiTokenResponse)
 async def sync(
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo()),
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
+    http_server_repo: HttpServerRepo = Depends(HttpServerRepo()),
     token: TokenPayload = Depends(ScopedTo("api-token:syncable")),
 ):
     scopes = token.scopes
     if "api-token" in scopes or "api-token:syncable" in scopes:
         api_token = None
-        if not dns_server_repo.exists(name=token.payload.dns_server_name.lower()):
-            dns_server_repo.clear()
-            logger.info("sync@router.py - Saving dns server from api token")
-            dns_server = dns_server_repo.create(
-                dict(name=token.payload.dns_server_name.lower())
-            ).results()
-        else:
-            dns_server = dns_server_repo.results()
+        if not len(token.payload.dns_server_name) > 0 or not len(token.payload.http_server_name):
+            abort(code=422, msg="No DNS Server Name or HTTP Server Name on payload", debug=""):
 
-        if not api_token_repo.loads("dns_server").exists(token=token.token):
-            api_token_repo.clear()
-            logger.info("sync@router.py - Saving api token from auth token")
-            item = api_token_repo.create(
-                dict(
-                    token=token.token,
-                    scopes=" ".join(scopes),
-                    dns_server=dns_server,
-                    expires_at=datetime.utcfromtimestamp(float(token.exp)),
-                )
-            ).data()
-            api_token_id = item.id
-            item = (
+        if len(token.payload.dns_server_name) > 0:
+            if not dns_server_repo.exists(name=token.payload.dns_server_name.lower()):
+                dns_server_repo.clear()
+                logger.info("sync@router.py - Saving dns server from api token")
+                dns_server = dns_server_repo.create(
+                    dict(name=token.payload.dns_server_name.lower())
+                ).results()
+            else:
+                dns_server = dns_server_repo.results()
+
+            if not api_token_repo.loads("dns_server").exists(token=token.token):
                 api_token_repo.clear()
-                .loads("dns_server")
-                .get(api_token_id)
-                .includes("dns_server")
-                .data()
-            )
-        else:
-            logger.info("sync@router.py - token already exists in database")
-            item = api_token_repo.loads("dns_server").includes("dns_server").data()
+                logger.info("sync@router.py - Saving api token from auth token")
+                item = api_token_repo.create(
+                    dict(
+                        token=token.token,
+                        scopes=" ".join(scopes),
+                        dns_server=dns_server,
+                        expires_at=datetime.utcfromtimestamp(float(token.exp)),
+                    )
+                ).data()
+                api_token_id = item.id
+                item = (
+                    api_token_repo.clear()
+                    .loads("dns_server")
+                    .get(api_token_id)
+                    .includes("dns_server")
+                    .data()
+                )
+            else:
+                logger.info("sync@router.py - token already exists in database")
+                item = api_token_repo.loads("dns_server").includes("dns_server").data()
+
+        if len(token.payload.http_server) > 0:
+            if not http_server_repo.exists(name=token.payload.http_server_name.lower()):
+                http_server_repo.clear()
+                logger.info("sync@router.py - Saving http server from api token")
+                http_server = http_server_repo.create(
+                    dict(name=token.payload.http_server_name.lower())
+                ).results()
+            else:
+                http_server = http_server_repo.results()
+
+            if not api_token_repo.loads("http_server").exists(token=token.token):
+                api_token_repo.clear()
+                logger.info("sync@router.py - Saving api token from auth token")
+                item = api_token_repo.create(
+                    dict(
+                        token=token.token,
+                        scopes=" ".join(scopes),
+                        http_server=http_server,
+                        expires_at=datetime.utcfromtimestamp(float(token.exp)),
+                    )
+                ).data()
+                api_token_id = item.id
+                item = (
+                    api_token_repo.clear()
+                    .loads("http_server")
+                    .get(api_token_id)
+                    .includes("http_server")
+                    .data()
+                )
+            else:
+                logger.info("sync@router.py - token already exists in database")
+                item = api_token_repo.loads("http_server").includes("http_server").data()
         return ApiTokenResponse(api_token=item)
 
     else:
@@ -81,10 +121,10 @@ async def index(
     token: TokenPayload = Depends(ScopedTo("api-token:list")),
     includes: List[str] = Query(None),
 ):
-    includes = only(includes, ["dns_server"], values=True)
+    includes = only(includes, ["dns_server", "http_server"], values=True)
 
     pg, items = (
-        api_token_repo.loads("dns_server")
+        api_token_repo.loads(includes)
         .strict()
         .sort(sort_qs)
         .paginate(pagination)

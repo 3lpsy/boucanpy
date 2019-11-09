@@ -13,6 +13,7 @@ export interface ApiToken {
     scopes: string;
     is_active: boolean;
     dns_server_id: number;
+    http_server_id: number;
     created_at: number;
 }
 
@@ -31,7 +32,9 @@ export interface ApiTokensResponse {
 export interface ApiTokenCreateForm {
     scopes: string;
     expires_at: number;
-    dns_server_id: number;
+    dns_server_id?: number;
+    http_server_id?: number;
+
 }
 
 export interface SensitiveApiToken {
@@ -39,7 +42,8 @@ export interface SensitiveApiToken {
     token?: string | null;
     scopes: string;
     is_active: boolean;
-    dns_server_id: number;
+    dns_server_id?: number;
+    http_server_id?: number;
     created_at: number;
 }
 
@@ -53,6 +57,7 @@ export interface ZoneFormData {
     ip: string;
     domain: string;
     dns_server_id?: string;
+    http_server_id?: string;
 }
 
 export interface Zone {
@@ -61,6 +66,7 @@ export interface Zone {
     ip: string;
     is_active: boolean;
     dns_server_id?: string;
+    http_server_id?: string;
     created_at: number;
 }
 
@@ -80,6 +86,8 @@ export interface ZoneCreateForm {
     domain: string;
     ip: string;
     dns_server_name?: string;
+    http_server_name?: string;
+
 }
 
 export interface DnsRequest {
@@ -105,6 +113,34 @@ export interface DnsRequestResponse {
 
 export interface DnsRequestsResponse {
     dns_requests: DnsRequest[];
+    messages?: Message[];
+    pagination?: object;
+}
+
+export interface HttpRequest {
+    id: number;
+    name: string;
+    path: string;
+    zone_id: number | null;
+    zone?: Zone;
+    source_address: string;
+    source_port: number;
+    type: string;
+    protocol: string;
+    http_server_id: number;
+    http_server?: DnsServer;
+    created_at: number;
+    raw_request: string;
+}
+
+export interface HttpRequestResponse {
+    http_request: HttpRequest;
+    messages?: Message[];
+    pagination?: object;
+}
+
+export interface HttpRequestsResponse {
+    http_requests: HttpRequest[];
     messages?: Message[];
     pagination?: object;
 }
@@ -162,6 +198,28 @@ export interface DnsServerResponse {
 
 export interface DnsServersResponse {
     dns_servers: DnsServer[];
+    messages?: Message[];
+    pagination?: object;
+}
+
+export interface HttpServer {
+    id: number;
+    name: string;
+    zones: Zone[];
+    created_at: number;
+}
+
+export interface HttpServerCreateForm {
+    name: string;
+}
+
+export interface HttpServerResponse {
+    http_server: HttpServer;
+    messages?: Message[];
+}
+
+export interface HttpServersResponse {
+    http_servers: HttpServer[];
     messages?: Message[];
     pagination?: object;
 }

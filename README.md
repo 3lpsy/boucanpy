@@ -140,7 +140,10 @@ Once the core DNS use case is satisfied, the API will be extended to support the
 
 TODO:
 
-- [ ] Build HTTP Server
+- [x] Build HTTP Server
+- [ ] Handle callbacks to api for http server
+- [ ] Fix api token creation due to http server introduction
+- [ ] Add front end for http server
 - [ ] Build SMTP Server
 - [ ] Build ability for webhook's / events
 - [ ] Fix logging / better logging
