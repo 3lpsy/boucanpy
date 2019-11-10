@@ -139,6 +139,8 @@ Once the core DNS use case is satisfied, the API will be extended to support the
 TODO:
 
 - [ ] Add SSL capabilities to http node
+- [ ] Fix packer/terraform to incorporate http/s node
+- [ ] Reorg project into multiple projects (api, dns, http, common, webui, deploy, compose, burp)
 
 ### Contributing
 
