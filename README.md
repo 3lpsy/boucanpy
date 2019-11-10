@@ -140,6 +140,7 @@ TODO:
 
 - [ ] Add SSL capabilities to http node
 - [ ] Fix packer/terraform to incorporate http/s node
+- [ ] Fix scope requirement bypass via includes
 - [ ] Reorg project into multiple projects (api, dns, http, common, webui, deploy, compose, burp)
 
 ### Contributing
