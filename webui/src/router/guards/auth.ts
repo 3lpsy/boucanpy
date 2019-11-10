@@ -37,6 +37,7 @@ export class IsAuthenticated extends Guard {
                                     console.log(
                                         'Error during middleware authentication for setUpWsAccessToken',
                                     );
+                                    console.log(err);
                                     next({ name: 'login' });
                                     throw err;
                                 });
@@ -52,6 +53,7 @@ export class IsAuthenticated extends Guard {
                     console.log(
                         'Error during middleware authentication for setUpAccessToken',
                     );
+                    console.log(err);
                     next({ name: 'login' });
                     throw err;
                 });

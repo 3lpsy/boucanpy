@@ -30,11 +30,17 @@ export default class App extends Vue {
                 type: 'info',
             });
         });
+        bus.$on('HTTP_REQUEST_CREATED', (event: any) => {
+            bus.$emit('APP_ALERT', {
+                text: 'New HTTP Request Added!',
+                type: 'info',
+            });
+        });
         bus.$on('ZONE_CREATED', (event: any) => {
             bus.$emit('APP_ALERT', { text: 'New Zone Added!', type: 'info' });
         });
         bus.$on('API_TOKEN_CREATED', (event: any) => {
-            bus.$emit('API_TOKEN_CREATED', {
+            bus.$emit('APP_ALERT', {
                 text: 'New Api Token Created!',
                 type: 'info',
             });

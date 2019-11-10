@@ -7,6 +7,7 @@ class ZoneCreateForm(BaseModel):
     domain: constr(min_length=4, max_length=64)
     ip: constr(min_length=7, max_length=15)
     dns_server_id: Optional[int]
+    http_server_id: Optional[int]
 
     @validator("ip")
     def check_is_valid_ipv4address(cls, v):

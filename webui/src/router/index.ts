@@ -26,6 +26,12 @@ import ApiTokenCreate from '@/views/ApiTokenCreate.vue';
 import ApiTokenEdit from '@/views/ApiTokenEdit.vue';
 
 import DnsRequestShow from '@/views/DnsRequestShow.vue';
+
+import HttpServerCreate from '@/views/HttpServerCreate.vue';
+import HttpServerEdit from '@/views/HttpServerEdit.vue';
+import HttpServerShow from '@/views/HttpServerShow.vue';
+import HttpRequestShow from '@/views/HttpRequestShow.vue';
+
 import Login from '@/views/Login.vue';
 
 import NotFound from '@/views/errors/NotFound.vue';
@@ -108,7 +114,12 @@ export default new Router({
             component: DnsServerEdit,
             beforeEnter: AUTHED_GUARDS,
         },
-
+        {
+            path: '/webui/dns-request/:dnsRequestId',
+            name: 'dns-request.show',
+            component: DnsRequestShow,
+            beforeEnter: AUTHED_GUARDS,
+        },
         {
             path: '/webui/zone/:zoneId/dns-record/create',
             name: 'zone.dns-record.create',
@@ -165,9 +176,27 @@ export default new Router({
             beforeEnter: AUTHED_GUARDS,
         },
         {
-            path: '/webui/dns-request/:dnsRequestId',
-            name: 'dns-request.show',
-            component: DnsRequestShow,
+            path: '/webui/http-server/create',
+            name: 'http-server.create',
+            component: HttpServerCreate,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/http-server/:httpServerId',
+            name: 'http-server.show',
+            component: HttpServerShow,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/http-server/:httpServerId/edit',
+            name: 'http-server.edit',
+            component: HttpServerEdit,
+            beforeEnter: AUTHED_GUARDS,
+        },
+        {
+            path: '/webui/http-request/:httpRequestId',
+            name: 'http-request.show',
+            component: HttpRequestShow,
             beforeEnter: AUTHED_GUARDS,
         },
         {

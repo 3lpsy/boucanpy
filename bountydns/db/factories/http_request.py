@@ -24,7 +24,7 @@ class HttpRequestFactory(BaseFactory):
     path = "/some/fake/path"
     source_address = LazyFunction(fake.ipv4_private)
     source_port = LazyFunction(random_port)
-    type = "A"
+    type = "GET"
     protocol = "http"
     http_server = SubFactory(HttpServerFactory)
     zone = SubFactory(ZoneFactory)

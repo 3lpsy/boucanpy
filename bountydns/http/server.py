@@ -2,6 +2,8 @@ from http.server import HTTPServer
 
 
 class HttpServer(HTTPServer):
+    is_ssl = False
+
     def __init__(self, server_address, handler_class, api_client, logger):
         self.api_client = api_client
         self.logger = logger
@@ -9,4 +11,5 @@ class HttpServer(HTTPServer):
 
 
 class HttpsServer(HttpServer):
-    pass
+    is_ssl = True
+

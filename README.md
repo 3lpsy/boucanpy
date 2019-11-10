@@ -113,9 +113,7 @@ Features:
 
 ## Phase 2: Polish The Code
 
-After demonstrating that the project is worth dedicating time to, Phase 2 will involve making the project feature complete with all clients (WebUI / CLI) and features (webhooks / email / queue) completed. At this point, the project should not be considered stable nor secure.
-
-Features:
+After demonstrating that the project is worth dedicating time to, Phase 2 will involve making the project feature complete with all clients (WebUI / CLI) and features (webhooks / email / queue) com name, path, source_address, source_port, type, protocol, raw_request,
 
 - Manage DNS Records through WebUI / API
 - Ability to update the DNS server's records for running DNS Server (Polling)
@@ -140,21 +138,7 @@ Once the core DNS use case is satisfied, the API will be extended to support the
 
 TODO:
 
-- [x] Build HTTP Server
-- [ ] Handle callbacks to api for http server
-- [ ] Fix api token creation due to http server introduction
-- [ ] Add front end for http server
-- [ ] Build SMTP Server
-- [ ] Build ability for webhook's / events
-- [ ] Fix logging / better logging
-- [ ] Better config setup
-- [ ] Gracefully allow actions when super is in token via ScopedTo
-- [ ] Users can manage their own profile / user info
-- [ ] Perform Better Validation
-- [ ] Refactor code to handle General network errors via toast
-- [ ] Add MFA
-- [ ] Moar Vuex
-- [ ] Make relationsips sortable in repo
+- [ ] Add SSL capabilities to http node
 
 ### Contributing
 

@@ -34,7 +34,6 @@ export interface ApiTokenCreateForm {
     expires_at: number;
     dns_server_id?: number;
     http_server_id?: number;
-
 }
 
 export interface SensitiveApiToken {
@@ -87,7 +86,6 @@ export interface ZoneCreateForm {
     ip: string;
     dns_server_name?: string;
     http_server_name?: string;
-
 }
 
 export interface DnsRequest {

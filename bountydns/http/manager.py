@@ -45,8 +45,10 @@ class HttpServerManager:
         self.server.shutdown()
 
     def is_alive(self):
-        logger.info("is_alive@server.py - Checking if Http server is alive")
         if not self.thread:
+            logger.info(
+                "is_alive@server.py -  HttpServer is not alive because there is not thread"
+            )
             return False
         return self.thread.isAlive()
 

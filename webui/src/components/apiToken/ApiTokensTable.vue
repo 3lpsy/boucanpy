@@ -11,6 +11,16 @@
             v-on:sort-changed="changeSort"
             :busy="isLoading || !isLoaded"
         >
+            <template v-slot:cell(dns_server_name)="row">
+                <span
+                    v-if="row.item.dns_server"
+                >{{ truncateWithTrail(row.item.dns_server.name, 10, '...') }}</span>
+            </template>
+            <template v-slot:cell(http_server_name)="row">
+                <span
+                    v-if="row.item.http_server"
+                >{{ truncateWithTrail(row.item.http_server.name, 10, '...') }}</span>
+            </template>
             <!-- TODO: don't use expires_at, use expires delta -->
             <template v-slot:cell(actions)="row">
                 <b-button
@@ -32,13 +42,15 @@
 
                 <span v-else>Dead</span>
             </template>
-            <template v-slot:cell(edit)="row">
+            <!-- <template v-slot:cell(edit)="row">
                 <router-link
                     :to="{ name: 'api-token.edit', params: { apiTokenId: row.item.id } }"
                     tag="button"
                     class="btn btn-warning btn-sm"
+                    v-if="row.item.is_active"
                 >Edit</router-link>
-            </template>
+                <span v-else>Dead</span>
+            </template>-->
         </b-table>
         <div class="col-xs-12 text-center" v-if="items.length < 1 && isLoaded">
             <span class="text-center">No Data Found :(</span>
@@ -68,9 +80,15 @@
             <div class="container">
                 <p class="text-left" style="word-wrap: break-word">
                     <span>
-                        <strong>Server Name (ID):</strong>
+                        <strong>DNS Server Name:</strong>
                         <br>
-                        {{ revealed.dns_server_name }}
+                        {{ revealed.dns_server_name || "None"}}
+                    </span>
+                    <br>
+                    <span>
+                        <strong>HTTP Server Name:</strong>
+                        <br>
+                        {{ revealed.http_server_name || "None"}}
                     </span>
                     <br>
                     <br>
@@ -97,10 +115,7 @@ import { GeneralQS } from '@/queries';
 
 // TODO: move to vuex / persistent data
 @Component({ name: 'ApiTokensTable' })
-export default class ApiTokensTable extends mixins(
-    CommonMixin,
-    DataTableMixin,
-) {
+export default class ApiTokensTable extends mixins(CommonMixin, DataTableMixin) {
     query = new GeneralQS();
     isLoading = false;
     revealed = {
@@ -120,8 +135,13 @@ export default class ApiTokensTable extends mixins(
             sortable: true,
         },
         {
-            key: 'dns_server.name',
-            label: 'Server',
+            key: 'dns_server_name',
+            label: 'DNS',
+            sortable: true,
+        },
+        {
+            key: 'http_server_name',
+            label: 'HTTP',
             sortable: true,
         },
         {
@@ -134,10 +154,10 @@ export default class ApiTokensTable extends mixins(
             key: 'actions',
             label: 'Status',
         },
-        {
-            key: 'edit',
-            label: 'Edit',
-        },
+        // {
+        //     key: 'edit',
+        //     label: 'Edit',
+        // },
         {
             key: 'reveal',
             label: 'Reveal',
@@ -151,13 +171,13 @@ export default class ApiTokensTable extends mixins(
     }
 
     revealAction(token, index, target) {
-        apiToken.getSensitiveApiToken(token.id, ['dns_server']).then((res) => {
+        apiToken.getSensitiveApiToken(token.id, ['dns_server', 'http_server']).then((res) => {
             let token = res.api_token;
             this.revealed.id = token.id;
             this.revealed.token = token.token;
-            this.revealed.dns_server_name = token.dns_server
-                ? token.dns_server.name
-                : '';
+            this.revealed.dns_server_name = token.dns_server ? token.dns_server.name : '';
+            this.revealed.http_server_name = token.http_server ? token.http_server.name : '';
+
             this.openRevealedModal();
         });
     }
@@ -183,7 +203,7 @@ export default class ApiTokensTable extends mixins(
 
     loadData() {
         this.isLoading = true;
-        this.query.includes = ['dns_server'];
+        this.query.includes = ['dns_server', 'http_server'];
         return apiToken
             .getApiTokens(this.query)
             .then((res) => {

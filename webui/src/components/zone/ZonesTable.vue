@@ -15,6 +15,16 @@
                 <b-spinner class="align-middle"></b-spinner>
                 <strong>Loading...</strong>
             </template>
+            <template v-slot:cell(dns_server_name)="row">
+                <span
+                    v-if="row.item.dns_server"
+                >{{ truncateWithTrail(row.item.dns_server.name, 10, '...') }}</span>
+            </template>
+            <template v-slot:cell(http_server_name)="row">
+                <span
+                    v-if="row.item.http_server"
+                >{{ truncateWithTrail(row.item.http_server.name, 10, '...') }}</span>
+            </template>
             <!-- TODO: don't use expires_at, use expires delta -->
             <template v-slot:cell(actions)="row">
                 <div>
@@ -102,8 +112,12 @@ export default class ZonesTable extends mixins(
             sortable: true,
         },
         {
-            key: 'dns_server.name',
-            label: 'Server',
+            key: 'dns_server_name',
+            label: 'DNS Server',
+        },
+        {
+            key: 'http_server_name',
+            label: 'HTTP Server',
         },
         {
             key: 'actions',
@@ -140,7 +154,7 @@ export default class ZonesTable extends mixins(
 
     loadData() {
         this.isLoading = true;
-        this.query.includes = 'dns_server';
+        this.query.includes = ['dns_server', 'http_server'];
         return zone
             .getZones(this.query)
             .then((res) => {

@@ -10,6 +10,11 @@ services:
       - ./../../bountydns:/bountydns/bountydns
       - ./../../bdnsctl.py:/bountydns/bdnsctl.py
       - ./../../requirements.txt:/bountydns/requirements.tx
+  http:
+    volumes:
+      - ./../../bountydns:/bountydns/bountydns
+      - ./../../bdnsctl.py:/bountydns/bdnsctl.py
+      - ./../../requirements.txt:/bountydns/requirements.tx
   proxy:
     volumes:
       - ./../../webui/dist:/var/www/app/webui

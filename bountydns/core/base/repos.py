@@ -1,3 +1,4 @@
+from os import environ
 from typing import Optional, List
 from fastapi import Depends
 
@@ -400,7 +401,8 @@ class BaseRepo:
 
     def debug(self, msg):
         # pass
-        logger.debug(msg)
+        if int(environ.get("API_REPO_DEBUG", 0)) == 1:
+            logger.debug(msg)
 
     def clear(self):
         self._query = None

@@ -27,8 +27,13 @@ class ApiClient:
             logger.critical(
                 f"__init__@api_client.py - No dns_server_name on api token payload: {str(payload)}"
             )
-            raise Exception("no dns_server_name on api token")
-        self.dns_server_name = payload["dns_server_name"]
+        self.dns_server_name = payload.get("dns_server_name", "")
+
+        if not "http_server_name" in payload.keys() or not payload["http_server_name"]:
+            logger.critical(
+                f"__init__@api_client.py - No http_server_name on api token payload: {str(payload)}"
+            )
+        self.http_server_name = payload.get("http_server_name", "")
 
     def sync(self):
         logger.info("sync@api_client.py - Syncing api token")
@@ -118,6 +123,23 @@ class ApiClient:
             "raw_request": str(request),
         }
         self.post("/dns-request", data=data)
+
+    def create_http_request(
+        self, name, path, source_address, source_port, type, protocol, raw_request,
+    ):
+        logger.info("create_http_request@api_client.py - Creating http request")
+
+        data = {
+            "name": name,
+            "path": path,
+            "source_address": str(source_address),
+            "source_port": int(source_port),
+            "type": str(type),
+            "protocol": str(protocol),
+            "http_server_name": str(self.http_server_name),
+            "raw_request": str(raw_request),
+        }
+        self.post("/http-request", data=data)
 
     def url(self, url):
         return self.api_url + "/api/v1" + url

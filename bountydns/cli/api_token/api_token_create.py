@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime
 
 import uuid
+from bountydns.core.enums import NODE_SCOPES
 from bountydns.core.utils import load_env
 from bountydns.core.security import create_bearer_token
 from bountydns.core.api_token import ApiTokenRepo
@@ -10,7 +11,7 @@ from bountydns.db.models.api_token import ApiToken
 
 class ApiTokenCreate(BaseCommand):
     name = "api-token-create"
-    aliases = ["api-token"]
+    aliases = ["token"]
     description = "create api-tokens directly"
 
     @classmethod
@@ -24,11 +25,12 @@ class ApiTokenCreate(BaseCommand):
         )
         parser.add_argument(
             "-n",
-            "--dns-server-name",
+            "--server-name",
             action="store",
             type=str,
-            help="dns server name (aaa-bbb-ccc)",
+            help="dns/http server name (aaa-bbb-ccc)",
         )
+
         return parser
 
     async def run(self):
@@ -36,7 +38,8 @@ class ApiTokenCreate(BaseCommand):
         self.load_env(f"api.{env}")
         self.db_register()
 
-        dns_server_name = self.option("dns_server_name", None) or uuid.uuid4().hex
+        server_name = self.option("server_name", None) or uuid.uuid4().hex
+
         scopes = self.get_scopes()
         expires_delta = timedelta(days=int(self.option("days")))
         expires_at = datetime.utcnow() + expires_delta
@@ -45,7 +48,8 @@ class ApiTokenCreate(BaseCommand):
             data={
                 "sub": self.option("user_id"),
                 "scopes": scopes,
-                "dns_server_name": dns_server_name,
+                "dns_server_name": server_name,
+                "http_server_name": server_name,
             },
             expire=expires_at,
         )
@@ -56,4 +60,4 @@ class ApiTokenCreate(BaseCommand):
         if self.option("scope"):
             return " ".join(self.option("scope"))
         else:
-            return "profile dns-request:create dns-request:list zone:list zone:read refresh api-token:syncable"
+            return NODE_SCOPES

@@ -5,10 +5,10 @@ import moment from 'moment';
 
 // You can declare a mixin as the same style as components.
 @Component
-export default class ApiTokenMixin extends Vue {
+export default class DataTableMixin extends Vue {
     isLoaded = false;
     currentPage = 0;
-    perPage = 40;
+    perPage = 20;
     total = 0;
     sortBy = 'id';
     sortDesc = false;

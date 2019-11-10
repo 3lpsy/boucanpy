@@ -10,11 +10,15 @@ from bountydns.core.security import (
     current_user,
 )
 from bountydns.db.models.user import User
+from bountydns.db.models.dns_server import DnsServer
+from bountydns.db.models.http_server import HttpServer
+
 from bountydns.core.api_token import (
     ApiTokensResponse,
     ApiTokenResponse,
     ApiTokenRepo,
     ApiTokenCreateForm,
+    ApiTokenData,
     SensitiveApiTokenResponse,
     SensitiveApiTokenData,
 )
@@ -36,78 +40,33 @@ async def sync(
     http_server_repo: HttpServerRepo = Depends(HttpServerRepo()),
     token: TokenPayload = Depends(ScopedTo("api-token:syncable")),
 ):
-    scopes = token.scopes
-    if "api-token" in scopes or "api-token:syncable" in scopes:
-        api_token = None
-        if not len(token.payload.dns_server_name) > 0 or not len(token.payload.http_server_name):
-            abort(code=422, msg="No DNS Server Name or HTTP Server Name on payload", debug=""):
+    if "api-token" in token.scopes or "api-token:syncable" in token.scopes:
+        abort_for_no_server_names(token)
+        if (
+            len(token.payload.dns_server_name) > 0
+            and len(token.payload.http_server_name) > 0
+        ):
+            dns_server = create_or_get_dns_server(token, dns_server_repo)
+            http_server = create_or_get_http_server(token, http_server_repo)
+            api_token_data = create_or_get_api_token_for_all_nodes(
+                token, api_token_repo, dns_server, http_server
+            )
+        elif len(token.payload.dns_server_name) > 0:
+            dns_server = create_or_get_dns_server(token, dns_server_repo)
+            api_token_data = create_or_get_api_token_for_dns_server(
+                token, api_token_repo, dns_server
+            )
 
-        if len(token.payload.dns_server_name) > 0:
-            if not dns_server_repo.exists(name=token.payload.dns_server_name.lower()):
-                dns_server_repo.clear()
-                logger.info("sync@router.py - Saving dns server from api token")
-                dns_server = dns_server_repo.create(
-                    dict(name=token.payload.dns_server_name.lower())
-                ).results()
-            else:
-                dns_server = dns_server_repo.results()
+        elif len(token.payload.http_server_name) > 0:
+            http_server = create_or_get_http_server(token, http_server_repo)
+            api_token_data = create_or_get_api_token_for_http_server(
+                token, api_token_repo, http_server
+            )
+        else:
+            # something went wrong, should not hit
+            raise HTTPException(403, detail="Not found")
 
-            if not api_token_repo.loads("dns_server").exists(token=token.token):
-                api_token_repo.clear()
-                logger.info("sync@router.py - Saving api token from auth token")
-                item = api_token_repo.create(
-                    dict(
-                        token=token.token,
-                        scopes=" ".join(scopes),
-                        dns_server=dns_server,
-                        expires_at=datetime.utcfromtimestamp(float(token.exp)),
-                    )
-                ).data()
-                api_token_id = item.id
-                item = (
-                    api_token_repo.clear()
-                    .loads("dns_server")
-                    .get(api_token_id)
-                    .includes("dns_server")
-                    .data()
-                )
-            else:
-                logger.info("sync@router.py - token already exists in database")
-                item = api_token_repo.loads("dns_server").includes("dns_server").data()
-
-        if len(token.payload.http_server) > 0:
-            if not http_server_repo.exists(name=token.payload.http_server_name.lower()):
-                http_server_repo.clear()
-                logger.info("sync@router.py - Saving http server from api token")
-                http_server = http_server_repo.create(
-                    dict(name=token.payload.http_server_name.lower())
-                ).results()
-            else:
-                http_server = http_server_repo.results()
-
-            if not api_token_repo.loads("http_server").exists(token=token.token):
-                api_token_repo.clear()
-                logger.info("sync@router.py - Saving api token from auth token")
-                item = api_token_repo.create(
-                    dict(
-                        token=token.token,
-                        scopes=" ".join(scopes),
-                        http_server=http_server,
-                        expires_at=datetime.utcfromtimestamp(float(token.exp)),
-                    )
-                ).data()
-                api_token_id = item.id
-                item = (
-                    api_token_repo.clear()
-                    .loads("http_server")
-                    .get(api_token_id)
-                    .includes("http_server")
-                    .data()
-                )
-            else:
-                logger.info("sync@router.py - token already exists in database")
-                item = api_token_repo.loads("http_server").includes("http_server").data()
-        return ApiTokenResponse(api_token=item)
+        return ApiTokenResponse(api_token=api_token_data)
 
     else:
         raise HTTPException(403, detail="Not found")
@@ -139,11 +98,18 @@ async def store(
     form: ApiTokenCreateForm,
     api_token_repo: ApiTokenRepo = Depends(ApiTokenRepo()),
     dns_server_repo: DnsServerRepo = Depends(DnsServerRepo()),
+    http_server_repo: HttpServerRepo = Depends(HttpServerRepo()),
     token: TokenPayload = Depends(ScopedTo("api-token:create")),
     user: User = Depends(current_user),
 ):
-    dns_server = dns_server_repo.first_or_fail(id=form.dns_server_id).results()
-
+    if form.dns_server_id and form.dns_server_id > 0:
+        dns_server_name = (
+            dns_server_repo.first_or_fail(id=form.dns_server_id).results().name
+        )
+    if form.http_server_id and form.http_server_id > 0:
+        http_server_name = (
+            http_server_repo.first_or_fail(id=form.http_server_id).results().name
+        )
     scopes = []
     for requested_scope in form.scopes.split(" "):
         request_scope_satisfied = False
@@ -166,7 +132,8 @@ async def store(
         data={
             "sub": user.id,
             "scopes": " ".join(scopes),
-            "dns_server_name": dns_server.name,
+            "dns_server_name": dns_server_name,
+            "http_server_name": http_server_name,
         }
     )
 
@@ -175,6 +142,7 @@ async def store(
         "token": str(token),
         "expires_at": form.expires_at,
         "dns_server_id": form.dns_server_id,
+        "http_server_id": form.http_server_id,
     }
 
     api_token = api_token_repo.create(data).data()
@@ -190,8 +158,11 @@ async def show(
     token: TokenPayload = Depends(ScopedTo("api-token:read")),
     includes: List[str] = Query(None),
 ):
+
+    includes = only(includes, ["dns_server", "http_server"], values=True)
+
     if (
-        not api_token_repo.loads("dns_server")
+        not api_token_repo.loads(includes)
         .strict()
         .includes(includes)
         .exists(api_token_id)
@@ -212,11 +183,14 @@ async def sensitive(
     token: TokenPayload = Depends(ScopedTo("api-token:read")),
     includes: List[str] = Query(None),
 ):
+
+    includes = only(includes, ["dns_server", "http_server"], values=True)
+
     # TODO: require stronger scope
     if not api_token_repo.exists(api_token_id):
         raise HTTPException(404, detail="Not found")
     api_token = (
-        api_token_repo.loads("dns_server")
+        api_token_repo.loads(includes)
         .set_data_model(SensitiveApiTokenData)
         .includes(includes)
         .data()
@@ -235,3 +209,106 @@ async def destroy(
         return BaseResponse(messages=messages)
     api_token_repo.deactivate(api_token_id)
     return BaseResponse(messages=messages)
+
+
+def abort_for_no_server_names(token: TokenPayload):
+    if not len(token.payload.dns_server_name) or not len(
+        token.payload.http_server_name
+    ):
+        abort(
+            code=422, msg="No DNS Server Name or HTTP Server Name on payload", debug="",
+        )
+
+
+def create_or_get_api_token_for_all_nodes(
+    token: TokenPayload,
+    api_token_repo: ApiTokenRepo,
+    dns_server: DnsServer,
+    http_server: HttpServer,
+) -> ApiTokenData:
+    scopes = token.scopes
+
+    if not api_token_repo.exists(token=token.token):
+        api_token_repo.clear()
+        logger.info("sync@router.py - Saving api token from auth token for all nodes")
+        return api_token_repo.create(
+            dict(
+                token=token.token,
+                scopes=" ".join(scopes),
+                dns_server_id=dns_server.id,
+                http_server_id=http_server.id,
+                expires_at=datetime.utcfromtimestamp(float(token.exp)),
+            )
+        ).data()
+    else:
+        logger.info("sync@router.py - token already exists in database")
+        return api_token_repo.data()
+
+
+def create_or_get_dns_server(
+    token: TokenPayload, dns_server_repo: DnsServerRepo
+) -> DnsServer:
+    if not dns_server_repo.exists(name=token.payload.dns_server_name.lower()):
+        dns_server_repo.clear()
+        logger.info("sync@router.py - Saving dns server from api token")
+        return dns_server_repo.create(
+            dict(name=token.payload.dns_server_name.lower())
+        ).results()
+    else:
+        return dns_server_repo.results()
+
+
+def create_or_get_api_token_for_dns_server(
+    token: TokenPayload, api_token_repo: ApiTokenRepo, dns_server: DnsServer
+) -> ApiTokenData:
+    scopes = token.scopes
+
+    if not api_token_repo.exists(token=token.token):
+        api_token_repo.clear()
+        logger.info("sync@router.py - Saving api token from auth token for dns node")
+        return api_token_repo.create(
+            dict(
+                token=token.token,
+                scopes=" ".join(scopes),
+                dns_server=dns_server,
+                expires_at=datetime.utcfromtimestamp(float(token.exp)),
+            )
+        ).data()
+    else:
+        logger.info("sync@router.py - token already exists in database")
+        return api_token_repo.loads("dns_server").includes("dns_server").data()
+
+
+def create_or_get_http_server(
+    token: TokenPayload, http_server_repo: HttpServerRepo
+) -> HttpServer:
+    if not http_server_repo.exists(name=token.payload.http_server_name.lower()):
+        http_server_repo.clear()
+        logger.info("sync@router.py - Saving http server from api token")
+        return http_server_repo.create(
+            dict(name=token.payload.http_server_name.lower())
+        ).results()
+    else:
+        return http_server_repo.results()
+
+
+def create_or_get_api_token_for_http_server(
+    token: TokenPayload, api_token_repo: ApiTokenRepo, http_server: HttpServer
+) -> ApiTokenData:
+    scopes = token.scopes
+
+    if not api_token_repo.exists(token=token.token):
+        api_token_repo.clear()
+        logger.info("sync@router.py - Saving api token from auth token for http node")
+        return api_token_repo.create(
+            dict(
+                token=token.token,
+                scopes=" ".join(scopes),
+                http_server=http_server,
+                expires_at=datetime.utcfromtimestamp(float(token.exp)),
+            )
+        ).data()
+    else:
+        logger.info("sync@router.py - token already exists in database")
+        return api_token_repo.loads("http_server").includes("http_server").data()
+

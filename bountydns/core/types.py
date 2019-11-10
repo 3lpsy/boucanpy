@@ -128,8 +128,10 @@ class ApiTokenData(BaseModel):
     scopes: str
     is_active: bool
     expires_at: datetime
-    dns_server_id: int
+    dns_server_id: Optional[int] = None
     dns_server: Optional[DnsServerData]
+    http_server_id: Optional[int] = None
+    http_server: Optional[HttpServerData]
     created_at: datetime
 
 

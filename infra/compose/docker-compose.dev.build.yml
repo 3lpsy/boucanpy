@@ -25,6 +25,18 @@ services:
       - bountydns
       - broadcast
       - proxy
+  http:
+    image: 3lpsy/bountydns:latest
+    networks:
+      bountydnspub:
+    command: http-server -l 0.0.0.0 -p 80 --log-level info --log-format short --no-ssl-verify
+    env_file:
+      - ${COMPOSE_ENV_DIR}/http.dev.env
+    restart: on-failure:2
+    depends_on:
+      - bountydns
+      - broadcast
+      - proxy
   webui:
     build:
       context: ./../../

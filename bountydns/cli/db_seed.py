@@ -41,14 +41,25 @@ class DbSeed(BaseCommand):
 
             logger.info("run@db_seed.py - Creating dns_server")
 
+            _dns_server = factory("DnsServerFactory").create(name="mydnsserver")
+
             dns_server = factory("DnsServerFactory").create()
+
+            logger.info("run@db_seed.py - Creating http_server")
+
+            _http_server = factory("HttpServerFactory").create(name="myhttpserver")
+
+            http_server = factory("HttpServerFactory").create()
 
             logger.info("run@db_seed.py - Creating zones")
 
             zone = factory("ZoneFactory").create(domain="othersite.com", ip="127.0.1.1")
 
             zone2 = factory("ZoneFactory").create(
-                domain="friends4life.com", ip="127.0.1.1", dns_server=dns_server
+                domain="friends4life.com",
+                ip="127.0.1.1",
+                dns_server=dns_server,
+                http_server=http_server,
             )
 
             zone3 = factory("ZoneFactory").create(
@@ -57,8 +68,11 @@ class DbSeed(BaseCommand):
 
             logger.info("run@db_seed.py - Creating api_tokens")
 
-            for i in range(65):
-                factory("ApiTokenFactory").create(dns_server=dns_server)
+            factory("ApiTokenFactory").create(dns_server=dns_server)
+            factory("ApiTokenFactory").create(http_server=http_server)
+            factory("ApiTokenFactory").create(
+                dns_server=dns_server, http_server=http_server
+            )
 
             logger.info("run@db_seed.py - Creating dns_requests")
 
@@ -78,6 +92,18 @@ class DbSeed(BaseCommand):
 
             for i in range(3):
                 factory("DnsRecordFactory").create(zone=zone3)
+
+            logger.info("run@db_seed.py - Creating http_requests")
+
+            for i in range(35):
+                factory("HttpRequestFactory").create(
+                    http_server=http_server, zone=zone2
+                )
+
+            for i in range(35):
+                factory("HttpRequestFactory").create(
+                    http_server=http_server, zone=zone3
+                )
         else:
             logger.critical("run@db_seed.py - invalid target set for seeder")
             self.exit(1)

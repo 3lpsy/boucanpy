@@ -12,6 +12,7 @@ class TokenPayloadDict(BaseModel):
     exp: int = None
     scopes: str
     dns_server_name: str = ""
+    http_server_name: str = ""
 
 
 class TokenPayload(BaseModel):

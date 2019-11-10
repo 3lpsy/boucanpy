@@ -3,7 +3,7 @@
         <b-form-group
             label="Name"
             label-for="input-name"
-            description="The DNS Server name"
+            description="The HTTP Server name"
             :disabled="disabled"
         >
             <b-form-input
@@ -22,7 +22,7 @@
             <li>{{ formError }}</li>
         </ul>
         <p v-if="mode=='edit'">
-            <em>*Note: Changing the name for a server after a token has been generated may deauth the server or prevent it from pulling the correct zones.</em>
+            <em>*Note: Changing the name for a server after a token has been generated may deauth the server.</em>
         </p>
         <button class="btn btn-lg btn-primary pull-right">Submit</button>
     </b-form>
@@ -35,7 +35,7 @@ import uuid4 from 'uuid4';
 
 import CommonMixin from '@/mixins/common';
 
-import dnsServer from '@/services/dnsServer';
+import httpServer from '@/services/httpServer';
 import moment from 'moment';
 import bus from '@/bus';
 
@@ -45,13 +45,13 @@ import bus from '@/bus';
             type: String,
             default: 'create',
         },
-        dnsServerId: {
+        httpServerId: {
             type: Number,
             default: 0,
         },
     },
 })
-export default class DnsServerCreateForm extends mixins(CommonMixin) {
+export default class HttpServerCreateForm extends mixins(CommonMixin) {
     formError = '';
     form = {
         name: '',
@@ -76,15 +76,15 @@ export default class DnsServerCreateForm extends mixins(CommonMixin) {
                     .then((data) => {
                         console.log('SUbmitting data');
                         if (this.mode === 'edit') {
-                            dnsServer
-                                .updateDnsServer(this.dnsServerId, data)
+                            httpServer
+                                .updateHttpServer(this.httpServerId, data)
                                 .then(() => {
                                     console.log('emiting app event');
                                     bus.$emit('APP_ALERT', {
-                                        text: 'Dns Server Created',
+                                        text: 'Http Server Created',
                                         type: 'success',
                                     });
-                                    bus.$emit('DNS_SERVER_UPDATED');
+                                    bus.$emit('HTTP_SERVER_UPDATED');
                                     this.disabled = false;
                                     this.$router.push({ name: 'server' });
                                 })
@@ -93,15 +93,15 @@ export default class DnsServerCreateForm extends mixins(CommonMixin) {
                                     throw e;
                                 });
                         } else {
-                            dnsServer
-                                .createDnsServer(data)
+                            httpServer
+                                .createHttpServer(data)
                                 .then(() => {
                                     console.log('emiting app event');
                                     bus.$emit('APP_ALERT', {
-                                        text: 'Dns Server Created',
+                                        text: 'Http Server Created',
                                         type: 'success',
                                     });
-                                    bus.$emit('DNS_SERVER_CREATED');
+                                    bus.$emit('HTTP_SERVER_CREATED');
                                     this.disabled = false;
                                     this.$router.push({ name: 'server' });
                                 })
@@ -126,12 +126,12 @@ export default class DnsServerCreateForm extends mixins(CommonMixin) {
         };
 
         if (this.mode === 'edit') {
-            // check to make sure dnsServer exists for edit form and load data
-            dnsServer
-                .getDnsServer(this.dnsServerId)
+            // check to make sure httpServer exists for edit form and load data
+            httpServer
+                .getHttpServer(this.httpServerId)
                 .then((res) => {
                     this.isLoaded = true;
-                    this.form.name = res.dns_server.name;
+                    this.form.name = res.http_server.name;
                 })
                 .catch((e) => {
                     console.log(e);

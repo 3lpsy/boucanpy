@@ -59,10 +59,10 @@ LIB_LOGGERS = [
     # "uvicorn.error",
     # "uvicorn.access",
     # "uvicorn.asgi",
-    # "websockets",
-    # "websockets.client",
-    # "websockets.server",
-    # "websockets.protocol"
+    "websockets",
+    "websockets.client",
+    "websockets.server",
+    "websockets.protocol",
 ]
 
 ## place in api.py to see loggerts to uvicorn runtime

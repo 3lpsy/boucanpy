@@ -3,7 +3,7 @@ from pathlib import Path
 from time import sleep
 from bountydns.core import logger
 from bountydns.cli.base import BaseCommand
-from bountydns.dns.api_client import ApiClient
+from bountydns.api_client import ApiClient
 from bountydns.http.manager import HttpServerManager
 
 
@@ -124,57 +124,8 @@ class HttpServer(BaseCommand):
         try:
             count = 0
             while self.is_alive():
-                # logger.info("run@http_server.py - Polling")
-                #  if count > 0 and count % self.option("refresh_ttl") == 0:
-                # if self.api_client.refresh_zones_if_needed():
-                #     logger.critical(
-                #         "run@dns_server.py - API Client found new or changed zones. Stopping servers..."
-                #     )
-                #     # TODO: figure out why "stop" does not release the address
-                #     self.stop_servers()
-
-                #     sleep(1)
-
-                #     stop_count = 0
-                #     logger.critical(
-                #         "run@dns_server.py - Waiting for UDP Server to stop..."
-                #     )
-                #     while self.udp_server.thread and self.udp_server.isAlive():
-                #         if stop_count > 30:
-                #             logger.critical(
-                #                 "run@dns_server.py - UDP Server did not stop while reloading zones"
-                #             )
-                #             raise Exception(
-                #                 "run@dns_server.py - UDP Server threads went rogue during zone reload"
-                #             )
-                #         logger.info(
-                #             "run@dns_server.py - Waiting for DNS Server to stop before reloading zones"
-                #         )
-                #         stop_count = stop_count + 1
-                #         sleep(1)
-                #     stop_count = 0
-                #     logger.critical(
-                #         "run@dns_server.py - Waiting for TCP Server to stop..."
-                #     )
-                #     while self.tcp_server.thread and self.tcp_server.isAlive():
-                #         if stop_count > 30:
-                #             logger.critical(
-                #                 "run@dns_server.py - TCP Server did not stop while reloading zones"
-                #             )
-                #             raise Exception(
-                #                 "run@dns_server.py - TCP Server threads went rogue during zone reload"
-                #             )
-                #         logger.info(
-                #             "run@dns_server.py - Waiting for DNS Server to stop before reloading zones"
-                #         )
-                #         stop_count = stop_count + 1
-                #         sleep(1)
-                #     logger.critical(
-                #         "run@dns_server.py - Rebooting server with fresh zones..."
-                #     )
-                #     self.boot()
-                #     self.start_servers()
-
+                # zones don't need to be refreshed for http server
+                # may want to do something in the future thought
                 count = count + 1
                 sleep(1)
 

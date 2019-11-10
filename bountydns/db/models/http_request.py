@@ -9,7 +9,7 @@ class HttpRequest(Base):
     __tablename__ = "http_requests"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)  # domain
-    path = Column(String, index=True)  # path
+    path = Column(String)  # path
 
     # TODO: add foreign key and relationship and handl cascades, etc
     zone_id = Column(
@@ -18,7 +18,7 @@ class HttpRequest(Base):
     zone = relationship(
         "bountydns.db.models.zone.Zone",
         foreign_keys="bountydns.db.models.http_request.HttpRequest.zone_id",
-        back_populates="dns_requests",
+        back_populates="http_requests",
     )
 
     source_address = Column(String, index=True)

@@ -28,6 +28,20 @@ services:
     ports:
       - "0.0.0.0:53:53/udp"
       - "0.0.0.0:53:53/tcp"
+  http:
+    image: 3lpsy/bountydns:latest
+    networks:
+      bountydnspub:
+    command: dns-server -l 0.0.0.0 -p 80 --no-ssl-verify
+    env_file:
+      - ${COMPOSE_ENV_DIR}/dns.prod.env
+    restart: on-failure:2
+    depends_on:
+      - bountydns
+      - broadcast
+      - proxy
+    ports:
+      - "0.0.0.0:80:80/tcp"
   webui:
     build:
       context: ./../../

@@ -66,6 +66,27 @@
                 :disabled="disabled"
             ></vue-bootstrap-typeahead>
         </b-form-group>
+        <b-form-group
+            label="HTTP Server Name"
+            label-for="input-http-server-id"
+            description="The HTTP Server which will use the zone. If left blank, all HTTP
+            Servers will use the zone."
+            :disabled="disabled"
+        >
+            <vue-bootstrap-typeahead
+                ref="inputHttpServer"
+                id="input-http-server-id"
+                name="http_server_id"
+                :data="httpServers"
+                v-model="httpServersSearch"
+                size="lg"
+                placeholder="Type a HTTP Server Name or ID"
+                @hit="form.http_server_id = $event.id"
+                :min-matching-chars="0"
+                :serializer="(item) => item.id.toString() + ': ' + item.name"
+                :disabled="disabled"
+            ></vue-bootstrap-typeahead>
+        </b-form-group>
         <ul class="error-messages" v-if="formError">
             <li>{{ formError }}</li>
         </ul>
@@ -81,6 +102,8 @@ import ZoneMixin from '@/mixins/zone';
 import DataTableMixin from '@/mixins/dataTable';
 import zone from '@/services/zone';
 import dnsServer from '@/services/dnsServer';
+import httpServer from '@/services/httpServer';
+
 import { GeneralQS } from '@/queries';
 
 import bus from '@/bus';
@@ -99,6 +122,15 @@ import _ from 'underscore';
                 this.dnsServers = res.dns_servers;
             });
         },
+        httpServersSearch(value) {
+            if (value.length < 1) {
+                this.form.http_server_id = 0;
+            }
+            this.httpSearchQuery.search = value;
+            httpServer.getHttpServers(this.httpSearchQuery).then((res) => {
+                this.httpServers = res.http_servers;
+            });
+        },
     },
     props: {
         mode: {
@@ -111,20 +143,22 @@ import _ from 'underscore';
         },
     },
 })
-export default class ZoneForm extends mixins(
-    CommonMixin,
-    ZoneMixin,
-    DataTableMixin,
-) {
+export default class ZoneForm extends mixins(CommonMixin, ZoneMixin, DataTableMixin) {
     formError = '';
     dnsServers = [];
     dnsServersSearch = '';
-    disabled = false;
     dnsSearchQuery = new GeneralQS();
+
+    httpServers = [];
+    httpServersSearch = '';
+    httpSearchQuery = new GeneralQS();
+
+    disabled = false;
     form = {
         domain: '',
         ip: '',
         dns_server_id: '',
+        http_server_id: '',
     };
 
     collectForm() {
@@ -182,6 +216,7 @@ export default class ZoneForm extends mixins(
                                                     domain: '',
                                                     ip: '',
                                                     dns_server_id: '',
+                                                    http_server_id: '',
                                                 };
                                                 this.disabled = false;
                                                 this.$router.push({
@@ -206,6 +241,7 @@ export default class ZoneForm extends mixins(
                                                     domain: '',
                                                     ip: '',
                                                     dns_server_id: '',
+                                                    http_server_id: '',
                                                 };
                                                 this.disabled = false;
                                                 this.$router.push({
@@ -235,26 +271,33 @@ export default class ZoneForm extends mixins(
 
     boot() {
         this.dnsSearchQuery = new GeneralQS();
+        this.httpSearchQuery = new GeneralQS();
+
         this.disabled = false;
         this.form = {
             domain: '',
             ip: '',
             dns_server_id: 0,
+            http_server_id: 0,
         };
 
         if (this.mode === 'edit') {
-            zone.getZone(this.zoneId, ['dns_server'])
+            zone.getZone(this.zoneId, ['dns_server', 'http_server'])
                 .then((res) => {
                     this.form.ip = res.zone.ip;
                     this.form.domain = res.zone.domain;
                     this.form.dns_server_id = res.zone.dns_server_id || 0;
+                    this.form.http_server_id = res.zone.http_server_id || 0;
+
                     if (res.zone.dns_server) {
-                        let dnsStr =
-                            res.zone.dns_server.id.toString() +
-                            ': ' +
-                            res.zone.dns_server.name;
+                        let dnsStr = res.zone.dns_server.id.toString() + ': ' + res.zone.dns_server.name;
                         this.dnsServersSearch = dnsStr;
                         this.$refs.inputDnsServer.inputValue = dnsStr;
+                    }
+                    if (res.zone.http_server) {
+                        let httpStr = res.zone.http_server.id.toString() + ': ' + res.zone.http_server.name;
+                        this.httpServersSearch = httpStr;
+                        this.$refs.inputHttpServer.inputValue = httpStr;
                     }
                 })
                 .catch((e) => {
