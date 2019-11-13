@@ -1,8 +1,8 @@
-from bountydns.db.factories import factory
-from bountydns.db.models import model
+from boucanpy.db.factories import factory
+from boucanpy.db.models import model
 
-from bountydns.core.security import create_bearer_token
-from bountydns.core import SUPER_SCOPES, NORMAL_SCOPES
+from boucanpy.core.security import create_bearer_token
+from boucanpy.core import SUPER_SCOPES, NORMAL_SCOPES
 import sys
 
 

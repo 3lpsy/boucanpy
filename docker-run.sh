@@ -2,6 +2,6 @@
 
 set -e
 
-BDBSCTL="/bountydns/bdnsctl.py"
+BDBSCTL="/boucanpy/bdnsctl.py"
 echo "[+] running: python3 $BDBSCTL $@"
 exec python3 $BDBSCTL $@

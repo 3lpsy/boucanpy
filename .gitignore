@@ -1,10 +1,10 @@
 .vscode
 .tls
-bountydns/storage/logs/*.log
-bountydns/storage/logs/*.log*
-bountydns/storage/database/*.db
-bountydns/storage/database/*.sqlite
-bountydns/storage/database/*.sqlite*
+boucanpy/storage/logs/*.log
+boucanpy/storage/logs/*.log*
+boucanpy/storage/database/*.db
+boucanpy/storage/database/*.sqlite
+boucanpy/storage/database/*.sqlite*
 
 .env/*.env
 !.env/.gitkeep
@@ -13,8 +13,8 @@ bountydns/storage/database/*.sqlite*
 !.env/*.test.env
 
 *.pem
-!bountydns/storage/ssl/devkey.pem
-!bountydns/storage/ssl/devcert.pem
+!boucanpy/storage/ssl/devkey.pem
+!boucanpy/storage/ssl/devcert.pem
 
 .venv
 

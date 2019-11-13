@@ -5,7 +5,7 @@ import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 from sys import exit
-from bountydns.core.utils import load_env
+from boucanpy.core.utils import load_env
 
 
 async def call_command(command, args):
@@ -14,8 +14,8 @@ async def call_command(command, args):
 
 
 if __name__ == "__main__":
-    from bountydns.cli import commands
-    from bountydns.cli.parser import make_parser
+    from boucanpy.cli import commands
+    from boucanpy.cli.parser import make_parser
 
     loop = asyncio.get_event_loop()
     # asyncio.set_event_loop(loop)

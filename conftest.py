@@ -5,21 +5,21 @@ from os.path import join, exists
 
 from sqlalchemy.orm import scoped_session
 
-from bountydns.core import load_env
-from bountydns.core.utils import db_dir, project_dir, storage_dir
+from boucanpy.core import load_env
+from boucanpy.core.utils import db_dir, project_dir, storage_dir
 
 load_env("api.test")
 
-from bountydns.api.api import api
-from bountydns.db.session import session as _api_session
-from bountydns.db.session import _session  # sessionmaker
-from bountydns.db import metadata as _metadata
-from bountydns.db import engine as _engine
+from boucanpy.api.api import api
+from boucanpy.db.session import session as _api_session
+from boucanpy.db.session import _session  # sessionmaker
+from boucanpy.db import metadata as _metadata
+from boucanpy.db import engine as _engine
 
-from bountydns.db.utils import get_resolved_db_path
+from boucanpy.db.utils import get_resolved_db_path
 from starlette.testclient import TestClient
 
-from bountydns.db.migrate.upgrade import upgrade
+from boucanpy.db.migrate.upgrade import upgrade
 import logging
 
 

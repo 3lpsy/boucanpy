@@ -49,7 +49,7 @@ Copy the relevant output to dns.env to set the API_TOKEN variable.
 This is only required for development containers where the front end code is mounted.
 
 ```
-$ cd bountydns/webui
+$ cd boucanpy/webui
 $ npm install
 $ npm run build
 
@@ -86,12 +86,12 @@ In addition, there's an Packer build and Terraform deployment in the "infra" fol
 
 ## Developing and Hacking
 
-The development Docker Compose project uses mounts to mount the correct folders and files onto the "bountydns" and "dns" containers. In addition, the command uses "--reload" so you can edit the python project on your host and automatically refresh the servers inside the containers.
+The development Docker Compose project uses mounts to mount the correct folders and files onto the "boucanpy" and "dns" containers. In addition, the command uses "--reload" so you can edit the python project on your host and automatically refresh the servers inside the containers.
 
 The frontend WebUI application is also mounted. To setup automatic rebuilding, run the following:
 
 ```
-$ cd bountydns/webui
+$ cd boucanpy/webui
 $ npm run watch
 ```
 
