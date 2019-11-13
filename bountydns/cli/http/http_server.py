@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from time import sleep
 from bountydns.core import logger
+from bountydns.core.utils import storage_dir
 from bountydns.cli.base import BaseCommand
 from bountydns.api_client import ApiClient
 from bountydns.http.manager import HttpServerManager
@@ -66,6 +67,20 @@ class HttpServer(BaseCommand):
             help="bind address of the https server",
         )
 
+        parser.add_argument(
+            "--ssl-key-path",
+            action="store",
+            default=storage_dir("ssl/devkey.pem"),
+            help="path to ssl key",
+        )
+
+        parser.add_argument(
+            "--ssl-cert-path",
+            action="store",
+            default=storage_dir("ssl/devcert.pem"),
+            help="path to ssl cert",
+        )
+
         # also need cert/pem paths
 
         parser.add_argument(
@@ -95,7 +110,6 @@ class HttpServer(BaseCommand):
         return parser
 
     async def run(self):
-
         # TODO: thread issues?
         verify_ssl = True
         if bool(self.option("no_ssl_verify")):
@@ -136,17 +150,29 @@ class HttpServer(BaseCommand):
         port = self.option("port")
         listen = self.option("listen")
 
+        logger.info("boot@http_server.py - Building http server on port %d", port)
+
         self.http_server = HttpServerManager(
             port=port, listen=listen, ssl=False, api_client=self.api_client
         )
 
-        logger.info("boot@http_server.py - Building http server on port %d", port)
-
         if bool(self.option("enable_ssl")):
-            ssl_port = self.option("port")
-            ssl_listen = self.option("listen")
+
+            ssl_port = self.option("ssl_port")
+            ssl_listen = self.option("ssl_listen")
+            ssl_key_path = self.option("ssl_key_path")
+            ssl_cert_path = self.option("ssl_cert_path")
+            logger.info(
+                f"boot@http_server.py - Building https server manager on port {str(ssl_port)} with {ssl_cert_path} and {ssl_key_path}",
+            )
+
             self.https_server = HttpServerManager(
-                port=ssl_port, listen=ssl_listen, ssl=True, api_client=self.api_client
+                port=ssl_port,
+                listen=ssl_listen,
+                api_client=self.api_client,
+                ssl=True,
+                ssl_cert_path=ssl_cert_path,
+                ssl_key_path=ssl_key_path,
             )
             logger.info(
                 "boot@http_server.py - Building https server on port %d", ssl_port
@@ -165,7 +191,7 @@ class HttpServer(BaseCommand):
     def is_alive(self):
         _is_alive = self.http_server.is_alive()
         if bool(self.option("enable_ssl")):
-            _is_alive = _is_alive and self.https_server.stop()
+            _is_alive = _is_alive and self.https_server.is_alive()
 
         return _is_alive
 

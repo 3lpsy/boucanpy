@@ -12,6 +12,10 @@ bountydns/storage/database/*.sqlite*
 !.env/*.dev.env
 !.env/*.test.env
 
+*.pem
+!bountydns/storage/ssl/devkey.pem
+!bountydns/storage/ssl/devcert.pem
+
 .venv
 
 # Byte-compiled / optimized / DLL files

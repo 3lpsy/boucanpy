@@ -3,7 +3,9 @@
         <b-container style="padding-top: 10px" class="page" v-if="isLoaded">
             <div class="row" style="margin-bottom: 10px;">
                 <div class="col-md-12 col-xs-12">
-                    <h3 v-if="httpRequestId">HTTP Request: {{ httpRequestId }}</h3>
+                    <h3
+                        v-if="httpRequestId"
+                    >{{httpRequest.protocol.toUpperCase()}} Request: {{ httpRequestId }}</h3>
                 </div>
             </div>
             <div class="row" v-if="httpRequest && httpRequest.id"></div>
@@ -13,6 +15,10 @@
                         <strong>Received:</strong>
                         {{ moment(httpRequest.created_at).format("YYYY-MM-DD HH:mm:ss") }}
                         <em>({{ diffForHumans(moment(httpRequest.created_at))}})</em>
+                    </b-card-text>
+                    <b-card-text>
+                        <strong>Protocol:</strong>
+                        {{ httpRequest.protocol}}
                     </b-card-text>
                     <b-card-text>
                         <strong>Type:</strong>

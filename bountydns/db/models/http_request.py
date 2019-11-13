@@ -39,7 +39,7 @@ class HttpRequest(Base):
 
     @staticmethod
     async def on_after_insert(mapper, connection, target):
-        logger.info("on_after_insert@http_request.py: Publishing message")
+        logger.debug("on_after_insert@http_request.py: Publishing message")
         try:
             publisher = await make_redis()
             res = await publisher.publish_json(

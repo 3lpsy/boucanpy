@@ -7,7 +7,7 @@ services:
     image: 3lpsy/bountydns:latest
     networks:
       bountydnspub:
-    command: api-server --debug --reload --no-envs -l 0.0.0.0 --db-seed --db-setup --db-seed-env --log-level debug --log-format short --second-log-level warning --force-exit
+    command: api-server --debug --reload --no-envs -l 0.0.0.0 --db-seed --db-setup --db-seed-env --log-level info --log-format short --second-log-level warning --force-exit
     env_file:
       - ${COMPOSE_ENV_DIR}/api.dev.env
     depends_on:
@@ -29,7 +29,7 @@ services:
     image: 3lpsy/bountydns:latest
     networks:
       bountydnspub:
-    command: http-server -l 0.0.0.0 -p 80 --log-level info --log-format short --no-ssl-verify
+    command: http-server -l 0.0.0.0 -p 80 --log-level info --log-format short --no-ssl-verify --enable-ssl --ssl-port 443 --ssl-listen 0.0.0.0
     env_file:
       - ${COMPOSE_ENV_DIR}/http.dev.env
     restart: on-failure:2
