@@ -1,4 +1,3 @@
-from boucanpy.core.utils import load_env
 from boucanpy.cli.base import BaseCommand
 
 
@@ -12,8 +11,6 @@ class ApiUrls(BaseCommand):
         return parser
 
     async def run(self):
-        env = self.option("env")
-        self.load_env(f"api.{env}")
         from boucanpy.api.main import api
 
         for route in api.routes:

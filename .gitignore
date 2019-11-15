@@ -6,11 +6,7 @@ boucanpy/storage/database/*.db
 boucanpy/storage/database/*.sqlite
 boucanpy/storage/database/*.sqlite*
 
-.env/*.env
-!.env/.gitkeep
-!.env/*.example
-!.env/*.dev.env
-!.env/*.test.env
+api.env
 
 *.pem
 !boucanpy/storage/ssl/devkey.pem

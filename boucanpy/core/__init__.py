@@ -10,7 +10,6 @@ from .logger import (
 from .utils import (
     only,
     only_values,
-    load_env,
     abort,
     abort_for_input,
     is_valid_domain,

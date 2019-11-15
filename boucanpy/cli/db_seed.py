@@ -19,15 +19,12 @@ class DbSeed(BaseCommand):
         return parser
 
     async def run(self):
-        env = self.option("env")
-        self.load_env(f"api.{env}")
         self.db_register()
 
         if self.option("target", False) == False:
             self.set_option("target", "dev")
 
         if self.option("target") == "env":
-            # self.load_env("seed")
             logger.info(f"run@db_seed.py - Seeding {self.option('target')}")
             raise NotImplementedError()  # seed based on env vars
 

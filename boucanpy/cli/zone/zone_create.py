@@ -1,5 +1,4 @@
 from ipaddress import ip_address
-from boucanpy.core.utils import load_env
 from boucanpy.cli.base import BaseCommand
 from boucanpy.db.models.zone import Zone
 
@@ -20,8 +19,6 @@ class ZoneCreate(BaseCommand):
         return parser
 
     async def run(self):
-        env = self.option("env")
-        self.load_env(f"api.{env}")
         self.db_register()
         ip = self.get_ip()
         domain = self.get_domain()

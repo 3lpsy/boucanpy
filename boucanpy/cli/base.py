@@ -3,7 +3,6 @@ from os import environ
 from typing import List
 
 from boucanpy.core import (
-    load_env,
     set_log_level,
     make_logger,
     set_log_format,
@@ -125,13 +124,6 @@ class BaseCommand:
     def set_option(self, key, val):
         self.options[key] = val
         return self
-
-    def load_env(self, *args):
-        if not self.option("no_envs", False):
-            for key in args:
-                load_env(key)
-            return True
-        return False
 
     def env(self, key, default=None, int_=False):
         val = environ.get(key, default)

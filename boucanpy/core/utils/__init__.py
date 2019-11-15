@@ -13,6 +13,6 @@ from .paths import (
     project_dir,
     core_dir,
 )
-from .env import load_env, setenv, getenv, getenv_bool
+from .env import setenv, getenv, getenv_bool
 from .helpers import only, only_values, abort, abort_for_input
 from .validating import is_valid_domain, is_valid_ipv4address

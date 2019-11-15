@@ -5,10 +5,10 @@ from os.path import join, exists
 
 from sqlalchemy.orm import scoped_session
 
-from boucanpy.core import load_env
+# from boucanpy.core import load_env
 from boucanpy.core.utils import db_dir, project_dir, storage_dir
 
-load_env("api.test")
+# load_env("api.test")
 
 from boucanpy.api.api import api
 from boucanpy.db.session import session as _api_session

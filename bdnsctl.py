@@ -5,7 +5,6 @@ import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 from sys import exit
-from boucanpy.core.utils import load_env
 
 
 async def call_command(command, args):

@@ -70,8 +70,6 @@ class ApiServer(BaseCommand):
     async def run(self):
         app = "boucanpy.api.main:api"
         kwargs = self.get_kwargs()
-        env = self.option("env")
-        self.load_env(f"api.{env}")
 
         if self.should_import_check():
             logger.info("run@api_server.py - Performing import check")

@@ -1,5 +1,4 @@
 import requests
-from boucanpy.core.utils import load_env
 from boucanpy.cli.base import BaseCommand
 from boucanpy.db.models.zone import Zone
 

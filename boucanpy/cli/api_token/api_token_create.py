@@ -2,7 +2,6 @@ from datetime import timedelta, datetime
 
 import uuid
 from boucanpy.core.enums import NODE_SCOPES
-from boucanpy.core.utils import load_env
 from boucanpy.core.security import create_bearer_token
 from boucanpy.core.api_token import ApiTokenRepo
 from boucanpy.cli.base import BaseCommand
@@ -34,8 +33,6 @@ class ApiTokenCreate(BaseCommand):
         return parser
 
     async def run(self):
-        env = self.option("env")
-        self.load_env(f"api.{env}")
         self.db_register()
 
         server_name = self.option("server_name", None) or uuid.uuid4().hex

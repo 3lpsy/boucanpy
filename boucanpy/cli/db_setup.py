@@ -1,5 +1,5 @@
 from pathlib import Path
-from boucanpy.core import logger, load_env
+from boucanpy.core import logger
 from boucanpy.cli.base import BaseCommand
 
 from boucanpy.cli.alembic import AlembicInit

@@ -15,8 +15,6 @@ class DbWait(BaseCommand):
         return parser
 
     async def run(self):
-        env = self.option("env")
-        self.load_env(f"api.{env}")
         from boucanpy.db.checks import is_db_up, is_db_setup
 
         self.db_register()

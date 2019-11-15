@@ -1,5 +1,4 @@
 from ipaddress import ip_address
-from boucanpy.core.utils import load_env
 from boucanpy.core.security import hash_password
 from boucanpy.cli.base import BaseCommand
 from boucanpy.db.models.user import User
@@ -33,8 +32,6 @@ class UserCreate(BaseCommand):
         return parser
 
     async def run(self):
-        env = self.option("env")
-        self.load_env(f"api.{env}")
         self.db_register()
         email = self.option("email").lower()
         password = self.get_password()

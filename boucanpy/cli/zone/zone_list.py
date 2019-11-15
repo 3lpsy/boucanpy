@@ -1,4 +1,3 @@
-from boucanpy.core.utils import load_env
 from boucanpy.cli.base import BaseCommand
 from boucanpy.db.models.zone import Zone
 
@@ -13,8 +12,6 @@ class ZoneList(BaseCommand):
         return parser
 
     async def run(self):
-        env = self.option("env")
-        self.load_env(f"api.{env}")
         self.db_register()
         for zone in self.session().query(Zone).all():
             print(zone.id, zone.domain, zone.ip, zone.dns_server.name)

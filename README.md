@@ -1,8 +1,8 @@
-# Bounty DNS: A DNS Catcher
+# Boucan: A Bug Bounty Canary Platform
 
 ![Screenshot](screenshots/diagram.png)
 
-This project is an attempt to implement a lightweight burp collaborator-esc application and consists of two main components: a DNS Server (Custom Python Implemention with dnslib) and an API. It is still very much in the early days of development. You can think of BountyDNS as sort of a Canary that will notify you when an external asset (DNS Record, HTTP Server, SMTP Server) has been interacted with. This is useful for blind payload injection.
+This project is an attempt to implement a lightweight burp collaborator-esc application and consists of two main components: a DNS Server (Custom Python Implemention with dnslib) and an API. It is still very much in the early days of development. You can think of Boucan as sort of a Canary that will notify you when an external asset (DNS Record, HTTP Server, SMTP Server) has been interacted with. This is useful for blind payload injection.
 
 For more information on Burp Collaborator, checkout [burp's documentation](https://portswigger.net/burp/documentation/collaborator)
 
@@ -10,46 +10,60 @@ When answering queries, the DNS server hits the API with information regarding t
 
 ### Getting Started Quickly
 
-Set the Environment variables
+The docker-compose project exists here: [Boucan Compose](https://github.com/3lpsy/boucan-compose)
 
 ```
-$ cd .env
-$ cp x.env.example x.dev.env # alternatively x.prod.env
-$ vim x.env #
+## make a directory to hold all projects
+$ mkdir boucan;
+## move to that directory
+$ cd boucan;
+## clone the compose project
+$ git clone git@github.com:3lpsy/boucan-compose.git
+## cd into the compose directory
+$ cd boucan-compose;
+## run the setup script from inside the compose directory
+$ ./setup.sh
 ```
 
-## Building and Running
+Below are the steps for getting the developer server up and running. You'll obviously want to not do this for prod.
 
-Make sure the environment is set appropriate for building. As of now the project can only automatically build for development. The build system uses docker and docker-compose to raise multiple services which the application requires.
-
-### Building the Containers
-
-Run the following to build and pull the containers.
+Next, you'll need to set two envrionment variables using the same secret as the API server. For the dev server, the secret is "helloworld". You can use the super tiny jwt.py script to generate these secrets assuming you have python-jwt installed.
 
 ```
+## inside the compose directory
+$ ./makejwt.py -S helloworld -n mynode
+## afterwards, set HTTP_API_TOKEN and DNS_API_TOKEN to the value of the output (excluding "TOKEN:" prefix)
+
+## alternatively, you can do this fun stuff and it'll automatically update the environment
+$ source <(./makejwt.py -S helloworld -n mynode --exportformat)
+
+## finally, you can also just place the the export commands in compose.env if want so they always import. it's up to you
+$ ./makejwt.py -S helloworld -n mynode --exportformat >> compose.env
+```
+
+Once all the projects have been cloned and the HTTP_API_TOKEN and DNS_API_TOKEN are set, you can start the server by using the compose.sh script. Below is how to start the dev server:
+
+```
+## inside the compose directory
 $ ./compose.sh dev build
+$ ./compose.sh dev up
 ```
 
-### Before Running any Commands
+## Deploying
 
-Go into the .env folder and copy all the examples to files with the ".example" extension removed. You will need to reference the next section to create a DNS API Token for the "dns.env" folder.
+A terraform + packer project exists here: [Boucan Deploy](https://github.com/3lpsy/boucan-deploy)
 
-### Creating a DNS Token
+## Developing
 
-Run the following to generate the API_TOKEN.
-
-```
-$ ./api-token.sh
-```
-
-Copy the relevant output to dns.env to set the API_TOKEN variable.
+The "dev" version of the docker-compose project syncs volumes to the container and so the api will automatically reload. It also syncs the "dist" folder (for the boucan-web project). However, to have the changes reflected in the container without restarting it, you can follow the following steps
 
 ### Build the Frontend application
 
 This is only required for development containers where the front end code is mounted.
 
 ```
-$ cd boucanpy/webui
+## from the root boucan directory
+$ cd boucan-web
 $ npm install
 $ npm run build
 
@@ -64,6 +78,12 @@ Run the following to run the containers.
 
 ```
 $ ./compose.sh dev up
+```
+
+### Restarting the Services
+
+```
+$ ./compose.sh dev fresh
 ```
 
 ## What does it do?
@@ -83,19 +103,6 @@ And that's basically it. A Burp Extension is in the works in the spirit of Colla
 ![Screenshot](screenshots/screenshot-zones.png)
 
 In addition, there's an Packer build and Terraform deployment in the "infra" folder for easy deploying.
-
-## Developing and Hacking
-
-The development Docker Compose project uses mounts to mount the correct folders and files onto the "boucanpy" and "dns" containers. In addition, the command uses "--reload" so you can edit the python project on your host and automatically refresh the servers inside the containers.
-
-The frontend WebUI application is also mounted. To setup automatic rebuilding, run the following:
-
-```
-$ cd boucanpy/webui
-$ npm run watch
-```
-
-You will still need to refresh the browser to view changes.
 
 ## About the Project
 
