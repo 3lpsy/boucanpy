@@ -32,6 +32,7 @@ router = APIRouter()
 options = {"prefix": ""}
 
 
+# race condition between nodes
 # TODO: fix this
 @router.post("/api-token/sync", name="api_token.sync", response_model=ApiTokenResponse)
 async def sync(
