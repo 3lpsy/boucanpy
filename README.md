@@ -8,7 +8,7 @@ For more information on Burp Collaborator, checkout [burp's documentation](https
 
 When answering queries, the DNS server hits the API with information regarding the DNS query. The API will then serve the log of the DNS queries via a RESTful HTTP API as well as front-end (HTML/JS) web GUI.
 
-I frequently stream development of Boucan on my twitch so come join me over there if you want to get started contributing [Shameless Twitch Link](https://www.twitch.tv/3lpsy)
+I frequently stream development of Boucan on my twitch so come join me over there if you want to get started contributing: [Shameless Twitch Link](https://www.twitch.tv/3lpsy)
 
 ### Getting Started Quickly
 
