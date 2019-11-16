@@ -53,6 +53,10 @@ $ ./compose.sh dev up
 
 A terraform + packer project exists here: [Boucan Deploy](https://github.com/3lpsy/boucan-deploy)
 
+## Automating
+
+A Burp Extension which automates some injection can be found here: [Boucan Burp Extension](https://github.com/3lpsy/boucan-burpex)
+
 ## Developing
 
 The "dev" version of the docker-compose project syncs volumes to the container and so the api will automatically reload. It also syncs the "dist" folder (for the boucan-web project). However, to have the changes reflected in the container without restarting it, you can follow the following steps
