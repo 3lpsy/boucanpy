@@ -12,7 +12,7 @@ fastapi==0.42.0
 passlib==1.7.1
 psycopg2>=2.7.7
 psycopg2-binary>=2.7.7
-pydantic==0.32.2
+pydantic==1.6.2
 PyJWT>=1.7.1
 pytest>=4.6.3
 pytest-cov>=2.7.1
