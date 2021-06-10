@@ -8,7 +8,7 @@ elasticsearch>=6.3.1
 email-validator>=1.0.3
 factory-boy>=2.11.1
 Faker>=1.0.4
-fastapi==0.42.0
+fastapi==0.65.2
 passlib==1.7.1
 psycopg2>=2.7.7
 psycopg2-binary>=2.7.7
